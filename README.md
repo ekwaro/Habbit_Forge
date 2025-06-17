@@ -1,12 +1,29 @@
-# React + Vite
+# Habbit Forge Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## App Architecture
+Below is the compete break down of the tools anf platforms that have been used to comeup with this important social impact project
+### - Code Editor   
+Vs Code
 
-Currently, two official plugins are available:
+### -Source code repoitory:
+Github
+### Version Control tool:
+Git
+### FrontEnd
+- React + Mantine UI Library
+ - Statemanagement . We used React hooks(useState and useEffect hooks)
+ - Client side routing: 
+   React router dom
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ ### Authentication
+ - Auth0
+ ### Backend
+ - Strapi for rapidly building APIs . perform crud operations(Create , Delete, update and Read)
+ ### Database
+ - Postgre database hosted on NEON (The free tier) . We will perform data migrations when there is need
+### Hosting/ deployment platforms
 
-## Expanding the ESLint configuration
+ - Netlify for the front end
+ - Render.com for the backend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
