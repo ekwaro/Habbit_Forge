@@ -2,13 +2,13 @@
 
 ## App Architecture
 Below is the compete break down of the tools anf platforms that have been used to comeup with this important social impact project
-### - Code Editor   
+###  Code Editor   
 Vs Code
 
-### -Source code repoitory:
-Github
+### Source code repoitory:
+ - Github
 ### Version Control tool:
-Git
+ - Git
 ### FrontEnd
 - React + Mantine UI Library
  - Statemanagement . We used React hooks(useState and useEffect hooks)
