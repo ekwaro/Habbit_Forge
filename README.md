@@ -1,7 +1,7 @@
 # Habbit Forge Application
 
 ## App Architecture
-Below is the compete break down of the tools anf platforms that have been used to comeup with this important social impact project
+Below is the compete break down of the tools and platforms that have been used to comeup with this important social impact project
 ###  Code Editor   
 Vs Code
 
