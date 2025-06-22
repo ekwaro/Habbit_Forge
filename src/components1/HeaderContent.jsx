@@ -7,7 +7,7 @@ function HeaderContent() {
   const adminInfo = getAdminInfo(); // Get admin info
    console.log('Admin Info:', adminInfo); 
   console.log('Profile Picture URL:', adminInfo.profilePicture); 
- t
+ 
 
   const handleLogout = () => {
     //logout logic
@@ -16,8 +16,8 @@ function HeaderContent() {
   };
 
   return (
-    // The key is this outer Group with justify="space-between"
-    <Group h="100%" px="md" justify="space-between" style={{ flexGrow: 1 }}> {/* Added flexGrow: 1 */}
+    
+    <Group h="100%" px="md" justify="space-between" style={{ flexGrow: 1 }}>
       {/* Left side: Dashboard Title */}
       <Text fw={700} size="xl">Admin Dashboard</Text>
 
