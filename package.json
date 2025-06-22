@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@auth0/auth0-react": "^2.3.0",
     "@mantine/carousel": "^8.1.1",
     "@mantine/charts": "^8.1.1",
     "@mantine/code-highlight": "^8.1.1",
+=======
+    "@mantine/charts": "^8.1.1",
+>>>>>>> 81bf4a2 (add user dashboard)
     "@mantine/core": "^8.1.1",
     "@mantine/dates": "^8.1.1",
     "@mantine/dropzone": "^8.1.1",
@@ -29,8 +33,12 @@
     "@tiptap/react": "^2.22.0",
     "@tiptap/starter-kit": "^2.22.0",
     "dayjs": "^1.11.13",
+<<<<<<< HEAD
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+=======
+    "pg": "^8.16.0",
+>>>>>>> 81bf4a2 (add user dashboard)
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",

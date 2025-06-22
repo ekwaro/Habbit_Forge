@@ -19,22 +19,16 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 
 function App() {
-  const { user, isAuthenticated } = useAuth0();
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      saveUserToStorage(user);
-    } else if (!isAuthenticated) {
-      removeUserFromStorage();
-    }
-  }, [isAuthenticated, user]);
-
-  return (
-    <main>
-      <Outlet />
-      
-    </main>
-  );
+  return(
+    <>
+    <Center>
+      <div>
+        <Text size="xl" weight={700} mb="md">Welcome to HabbitForge!</Text>
+        <Text size="md" c="dimmed">Your journey to better habits starts here.</Text>
+      </div>
+    </Center>
+    </>
+  )
 }
 
 export default App;
