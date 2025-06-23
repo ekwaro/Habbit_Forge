@@ -11,39 +11,71 @@ import {
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 function LoginForm() {
-  const { loginWithRedirect, isAuthenticated, isLoading, user } = useAuth0();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  // Initialize Google Sign-In
   useEffect(() => {
-    if (isLoading) return;
+    // Load Google Identity Services script
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
 
-    if (isAuthenticated && user) {
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+          callback: handleGoogleCallback,
+        });
+      }
+    };
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  // Handle Google Sign-In callback
+  const handleGoogleCallback = (response) => {
+    try {
+      // Decode the JWT token to get user info
+      const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
+      
       setIsRedirecting(true);
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem(
         "currentUser",
         JSON.stringify({
-          name: user.name,
-          email: user.email,
+          name: userInfo.name,
+          email: userInfo.email,
+          picture: userInfo.picture,
+          authMethod: "google",
         })
       );
 
       notifications.show({
         title: "Success",
-        message: "Welcome back!",
+        message: `Welcome ${userInfo.name}!`,
         color: "green",
       });
 
       setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+        navigate("/user-dashboard", { replace: true });
+      }, 1000);
+    } catch (error) {
+      console.error("Google login error:", error);
+      notifications.show({
+        title: "Error",
+        message: "Google sign-in failed. Please try again.",
+        color: "red",
+      });
     }
-  }, [isAuthenticated, isLoading, user, navigate]);
+  };
 
   const form = useForm({
     initialValues: {
@@ -57,6 +89,7 @@ function LoginForm() {
     },
   });
 
+  // Keep your existing local login logic
   const handleSubmit = (values) => {
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
@@ -76,7 +109,7 @@ function LoginForm() {
         });
 
         setTimeout(() => {
-          navigate("/dashboard", { replace: true });
+          navigate("/user-dashboard", { replace: true });
         }, 100);
       } else {
         notifications.show({
@@ -95,20 +128,16 @@ function LoginForm() {
     }
   };
 
+  // Simple Google sign-in trigger
   const handleGoogleLogin = () => {
-    try {
-      loginWithRedirect({
-        authorizationParams: {
-          prompt: "login",
-        },
-      });
-    } catch (error) {
+    if (window.google) {
+      window.google.accounts.id.prompt();
+    } else {
       notifications.show({
         title: "Error",
-        message: "Google sign-in failed. Please try again.",
+        message: "Google Sign-In not loaded. Please refresh and try again.",
         color: "red",
       });
-      console.error("Google login error:", error);
     }
   };
 
@@ -117,7 +146,7 @@ function LoginForm() {
       size="lg"
       style={{
         minHeight: "100vh",
-        backgroundColor: "#e6f4ea", 
+        backgroundColor: "#e6f4ea",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -129,7 +158,7 @@ function LoginForm() {
         p="xl"
         withBorder
         style={{
-          backgroundColor: "#c7eed8", 
+          backgroundColor: "#c7eed8",
           width: "100%",
           maxWidth: 450,
         }}
@@ -155,7 +184,14 @@ function LoginForm() {
             mb="xl"
           />
 
-          <Button type="submit" fullWidth size="md" color="blue" mb="md">
+          <Button
+            type="submit"
+            fullWidth
+            size="md"
+            color="blue"
+            mb="md"
+            loading={isRedirecting}
+          >
             Log In
           </Button>
 
