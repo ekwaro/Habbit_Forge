@@ -29,7 +29,7 @@ const GoalsManagement = () => {
               key={goal.id}
               goal={goal}
          
-              onComplete={() => markGoalAsComplete(goal.id)}
+              onMarkGoalAsCompleted={(checked) => markGoalAsComplete(goal.id, checked)}
               onToggleSubgoal={(subgoalId) => toggleSubgoalCompletion(goal.id, subgoalId)}
               onAddSubgoal={(subgoalTitle) =>
                 addSubgoal(goal.id, subgoalTitle)

@@ -20,7 +20,8 @@ const useLocalStorageGoals = () => {
     }, [goals]);
 
     const removeGoals=()=>{
-        setGoals(localStorage.removeItem('goals'))
+        localStorage.removeItem('goals');
+  setGoals([]);
     }
 
     const addGoals = (goals) => {
@@ -43,7 +44,7 @@ const useLocalStorageGoals = () => {
         if (goal.id === goalId) {
           return {
             ...goal,
-            subgoals: [...goal.subgoal, {id: Date.now(), title: subgoalTitle, completed: false }],
+            subgoals: [...goal.subgoals, {id: Date.now(), title: subgoalTitle, completed: false }],
           };
         }
         return goal;
@@ -68,11 +69,14 @@ const useLocalStorageGoals = () => {
       return updatedGoals;
     });
   }
-  const markGoalAsComplete = (goalId) => {
+  const markGoalAsComplete = (goalId, checked) => {
     setGoals((prevGoals) => {
       const updatedGoals = prevGoals.map((goal) => {
         if (goal.id === goalId) {
-          return { ...goal, completed: !goal.completed };
+          return { ...goal, completed: checked, subgoals: goal.subgoals.map((sub)=>({
+            ...sub,
+            completed: checked,
+          })) };
         }
         return goal;
       });
@@ -84,12 +88,10 @@ const useLocalStorageGoals = () => {
     setGoals((prevGoals) => {
       const updatedGoals = prevGoals.map((goal) => {
         if (goal.id === goalId) {
-          return {
-            ...goal,
-            subgoals: goal.subgoals.map((subgoal) =>
-              subgoal.id === subgoalId ? { ...subgoal, completed: !subgoal.completed } : subgoal
-            ),
-          };
+          
+            const updatedSubgoals = goal.subgoals.map((sub) => sub.id === subgoalId ? { ...sub, completed: !sub.completed } : sub);
+          const allSubgoalCompleted = updatedSubgoals.every((sub)=>sub.completed)
+          return{ ...goal, subgoals:updatedSubgoals, completed:allSubgoalCompleted}
         }
         return goal;
       });

@@ -1,7 +1,7 @@
 import { TextInput } from "@mantine/core";
 import React, { useEffect } from "react";
 import { useForm } from "@mantine/form";
-import { Modal, Textarea, Button, Select } from "@mantine/core";
+import { Modal,Pagination, Textarea, Button, Select } from "@mantine/core";
 
 const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
   const form = useForm({
@@ -25,6 +25,8 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
       startdate: (value) => {
         const date = new Date(value);
         const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        console.log(date, today)
         return date < today ? "Start date must be in the future" : null;
       },
       endDate: (value) => {

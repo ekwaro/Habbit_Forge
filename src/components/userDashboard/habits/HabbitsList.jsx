@@ -8,13 +8,15 @@ import {
   ScrollArea,
   Stack,
   Checkbox,
+  Pagination,
   Progress,
+  Divider,
   Container,
 } from "@mantine/core";
 import "@mantine/dates/styles.css";
 import { DatePicker } from "@mantine/dates";
 import { LineChart } from "@mantine/charts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorage from "../useLocalStorage";
 import { useNavigate, Outlet, useParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -24,11 +26,20 @@ import {
 } from "./utils/TodaysHabit";
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
-const HabbitsList = ({ list, removeItem, updateItem , setEditingQuote, open}) => {
+const HabbitsList = ({
+  list,
+  removeItem,
+  updateItem,
+  setEditingQuote,
+  open,
+}) => {
+  const [activePage, setPage] = useState(1)
+  const pageSize = 5
+  const paginatedList = list.slice((activePage - 1) * pageSize, activePage*pageSize)
   const navigate = useNavigate();
   console.log("HabbitsList Rendered", list);
-  const rows = list.map((habit) => (
-    <Table.Tr key={habit.id }>
+  const rows = paginatedList.map((habit) => (
+    <Table.Tr key={habit.id}>
       <Table.Td>{habit.title}</Table.Td>
       <Table.Td>{habit.frequency}</Table.Td>
       <Table.Td>{new Date(habit.startdate).toLocaleDateString()}</Table.Td>
@@ -59,7 +70,7 @@ const HabbitsList = ({ list, removeItem, updateItem , setEditingQuote, open}) =>
           onClick={() => {
             setEditingQuote(habit);
             open();
-            }}
+          }}
         >
           Update
         </Button>
@@ -86,7 +97,15 @@ const HabbitsList = ({ list, removeItem, updateItem , setEditingQuote, open}) =>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
-      
+      {list.length > pageSize && (
+  <Pagination
+    value={activePage}
+    onChange={setPage}
+    total={Math.ceil(list.length / pageSize)}
+    mt="md"
+    position="center"
+  />
+)}
     </>
   );
 };
@@ -100,25 +119,46 @@ const HabbitsItem = () => {
   return (
     <>
       <Card withBorder shadow="sm" p="lg" my="md">
-        <Group position="apart" mb="xs">
-          <Text weight={500}>Habit Details</Text>
-        </Group>
-        {!habit ? (
-          <Text color="dimmed">Habit not found.</Text>
-        ) : (
-          <Stack>
-            <Text size="lg" fw={500}>
-              {habit.title}
-            </Text>
-            <Text>Frequency: {habit.frequency}</Text>
-            <Text>
-              Start Date: {dayjs(habit.startdate).format("MMM D, YYYY")}
-            </Text>
-            <Text>End Date: {dayjs(habit.endDate).format("MMM D, YYYY")}</Text>
-          </Stack>
-        )}
+        <Group position="apart" mb="md">
+    <Text fw={600} size="xl">
+      Habit Details
+    </Text>
+    {habit && (
+      <Badge color="teal" variant="light" size="lg">
+        {habit.frequency}
+      </Badge>
+    )}
+  </Group>
+
+  {!habit ? (
+    <Text c="dimmed" align="center">
+      Habit not found.
+    </Text>
+  ) : (
+    <Stack spacing="xs">
+      <Text fw={700} size="lg" c="blue">
+        {habit.title}
+      </Text>
+
+      <Divider my="xs" />
+
+      <Text size="sm" c="gray">
+        <strong>Start Date:</strong> {dayjs(habit.startDate).format("MMM D, YYYY")}
+      </Text>
+      <Text size="sm" c="gray">
+        <strong>End Date:</strong> {dayjs(habit.endDate).format("MMM D, YYYY")}
+      </Text>
+    </Stack>
+  )}
+        
         <Group justify="space-between" mt="md">
-          <Card mt={20} withBorder shadow="sm" p="lg" style={{ flex: 1, minWidth: 300, maxWidth: 600 }}>
+          <Card
+            mt={20}
+            withBorder
+            shadow="sm"
+            p="lg"
+            style={{ flex: 1, minWidth: 300, maxWidth: 600 }}
+          >
             <LineChart
               mt={20}
               h={300}
@@ -128,13 +168,18 @@ const HabbitsItem = () => {
               curveType="monotone"
               yAxisLabel="Completed"
               margin={{ top: 20, right: 20, bottom: 20, left: 50 }}
-              xAxisFormatter={(value) => dayjs(value).format("MMM D")}
-              yAxisFormatter={(value) => (value ? "Yes" : "No")}
+          
               dataKey="date"
               series={[{ name: "Completed", color: "teal" }]}
             />
           </Card>
-          <Card mt={20} withBorder shadow="sm" p="lg" style={{ flex: 1, minWidth: 200, maxWidth: 300 }}>
+          <Card
+            mt={20}
+            withBorder
+            shadow="sm"
+            p="lg"
+            style={{ flex: 1, minWidth: 200, maxWidth: 300 }}
+          >
             <HabitCalenderView habit={habit} />
           </Card>
         </Group>
@@ -157,7 +202,7 @@ const HabitCalenderView = ({ habit }) => {
               backgroundColor: isCompleted ? "teal" : undefined,
               borderRadius: "50%",
               width: 24,
-              
+
               height: 24,
               color: isCompleted ? "white" : undefined,
               textAlign: "center",
@@ -170,7 +215,7 @@ const HabitCalenderView = ({ habit }) => {
             {isCompleted && (
               <Badge
                 color="green"
-                variant='transparent'
+                variant="transparent"
                 size="xs"
                 style={{ position: "absolute", top: 0, right: 0 }}
               >
@@ -186,8 +231,6 @@ const HabitCalenderView = ({ habit }) => {
 };
 
 const DailyHabitView = ({ list, removeItem, updateItem }) => {
- 
-
   const todayStr = dayjs().format("YYYY-MM-DD");
   // This component can be used to display a detailed view of a daily habit
   // It can include progress indicators, notes, and other relevant information
@@ -200,22 +243,28 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
     habits
       .filter((habit) => isTodayMatchingFrequency(habit))
       .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
+
   const todaysHabbit = useMemo(() => getTodaysHabit(list), [list]);
   console.log("Today's Habits:", todaysHabbit);
   console.log(list);
 
-  const markHabbitComplete = (index) => {
+  const markHabbitComplete = (myhabit) => {
     const today = dayjs().format("YYYY-MM-DD");
-    const habit = list[index];
+     const habit = list.find((h) => h.id === myhabit.id);
+  if (!habit) {
+    console.warn("Habit not found for id:", myhabit.id);
+    return;
+  }
+
     const alreadyCompleted = habit.completedDates?.includes(today);
 
     const updatedHabit = {
       ...habit,
       completedDates: alreadyCompleted
-        ? habit.completedDates.filter((date) => date !== todayStr)
+        ? habit.completedDates.filter((date) => date !== today)
         : [...(habit.completedDates || []), today],
     };
-    updateItem(index, updatedHabit);
+    updateItem(myhabit.id, updatedHabit);
   };
   return (
     <Card withBorder shadow="sm" p="lg" my="md">
@@ -228,7 +277,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
           {todaysHabbit.length === 0 ? (
             <Text>("No daily habits for today.")</Text>
           ) : (
-            todaysHabbit.map((habit, index) => {
+              todaysHabbit.map((habit) => {             
               const progress = getHabitProgress(habit);
               const isCompleted = habit.completedDates?.includes(todayStr);
               return (
@@ -236,7 +285,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                   withBorder
                   shadow="sm"
                   p="lg"
-                  key={index}
+                  key={habit.id}
                   style={{
                     backgroundColor: isCompleted ? "#d4edda" : "#f8d7da",
                   }}
@@ -245,7 +294,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                     <Checkbox
                       label={habit.habitName}
                       checked={habit.completedDates?.includes(todayStr)}
-                      onChange={() => markHabbitComplete(index)}
+                      onChange={() => markHabbitComplete(habit)}
                     />
                     <Badge color="teal" variant="light">
                       {habit.frequency}
@@ -265,14 +314,14 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                       size="xs"
                       variant="light"
                       color="red"
-                      onClick={() => removeItem(index)}
+                      onClick={() => removeItem(habit.id)}
                     >
                       Delete
                     </Button>
                     <Button
                       size="xs"
                       variant="light"
-                      onClick={() => updateItem(index, habit)}
+                      onClick={() => updateItem(habit.id, habit)}
                     >
                       Update
                     </Button>

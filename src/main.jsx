@@ -11,7 +11,7 @@ import UserDashBoard from "./pages/userDahboard/UserDashBoad.jsx";
 import HabbitsManagement from "./components/userDashboard/habits/HabbitsManagement.jsx";
 import GoalsManagement from "./components/userDashboard/goals/GoalsManagement.jsx";
 import MotivationalQuotes from "./components/userDashboard/quotes/MotivationalQuotes.jsx";
-import Tips from "./components/userDashboard/Tips.jsx";
+import Tips from "./components/userDashboard/tips/Tips.jsx";
 import Overview from "./components/userDashboard/Overview.jsx";
 import Profile from "./components/userDashboard/Profile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
