@@ -1,13 +1,9 @@
-import { useState } from 'react'
-
+import { useState, useEffect } from 'react'
+import './App.css'
 import { Center, Text } from '@mantine/core'
 
 function App() {
-  useEffect(() => {
-  if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission();
-  }
-}, []);
+ 
 
   return(
     <>

@@ -1,5 +1,6 @@
-import { Modal, Card, Text, Button, Group, Progress, TextInput, Textarea } from '@mantine/core';
+import { Modal, Card, Text, Button, Group, Progress, TextInput, Textarea, Stack, Checkbox, Divider } from '@mantine/core';
 import { useForm } from '@mantine/form'
+import { useState } from 'react';
 
 
 const GoalForm = ({opened, onClose, onSubmit}) => {
@@ -33,35 +34,62 @@ const GoalForm = ({opened, onClose, onSubmit}) => {
 
 
 
-const GoalCard = ({goal, onView, onComplete}) => {
+const GoalCard = ({goal,onAddSubgoal,onAddNote, onToggleSubgoal, onComplete}) => {
+const subgoals = goal.subgoals || [];
+const notes = goal.notes || [];
+
   const total = goal.subgoals?.length || 1
   const done = goal.subgoals?.filter((s)=> s.completed).length;
   const percent = Math.round((done/total)* 100)
+  const [newSubgoal, setNewSubgoal] = useState(''); 
+  const [newNote, setNewNote] = useState('');
   return (
-    <Card withBorder p='md' shadow='sm'>
-      <Group position='apart'>
-        <Text fw={500}>{goal.title}</Text>
-        <Text size='sm'>{goal.targetDate}</Text>
-       </Group>
-       <Text size='sm' c='dimmed'>{goal.description}</Text>
-       <Progress value={percent} mt='md'/>
-       <Group >
-        <Button size='xs' onClick={onView}>Details</Button>
-        <Button size='xs' disabled={goal.completed} color={goal.completed? 'gray':'green'} onClick={onComplete}>
-          {goal.completed ? 'Completed' : 'Mark as Completed'}
-        </Button>
-       </Group>
+    <Card withBorder p='md' shadow='sm' radius='md' my='md'>
+      <Stack spacing='xs'>
+        <Checkbox checked={goal.completed} onChange={onComplete} label={<Text>{goal.title}</Text>} />
+        <Text size='sm' c='dimmed'>{goal.description}</Text>
+        <Divider label="Subgoals" labelPosition="center" />
+        </Stack>
+      <Stack spacing='xs'>
+          {subgoals?.length === 0 ? (
+            <Text size='sm' c='dimmed'>No subgoals added yet.</Text>
+          ) : (
+            subgoals.map((subgoal) => (
+              <Group key={subgoal.id} position="apart">
+                <Text size='sm'>{subgoal.title}</Text>
+                <Checkbox checked={subgoal.completed} onChange={() => onToggleSubgoal(subgoal.id)} />
+              </Group>
+            ))
+          )}
+          <TextInput
+          placeholder='Add a subgoal'
+          value={newSubgoal}
+          onChange={(e)=>setNewSubgoal(e.target.value)}/>
+          <Button onClick={() => { onAddSubgoal(newSubgoal); setNewSubgoal(''); }}>Add Subgoal</Button>
+          <Divider label="Notes" labelPosition="center" />
+          {goal.notes?.length === 0 ? (
+            <Text size='sm' c='dimmed'>No notes added yet.</Text>
+          ) : (
+            goal.notes.map((note) => (
+              <Text key={note.id} size='sm'>{note.content} <br />
+              <i>{new Date(note.createdAt).toLocaleString()}</i>
+              </Text>
+              
+            ))
+          )}
+          <TextInput placeholder='Add a Note ...' 
+          value={newNote} onChange={(e)=>setNewNote(e.target.value)}/>
+
+          <Button size='xs' color='gray' onClick={() => { onAddNote(newNote); setNewNote(''); }}>Add Note</Button>
+        <Progress value={percent} size='sm' radius='xl' mt='md' />
+      </Stack>
+      
+     
 
     </Card>
   )
 }
 
 
-const GoalsFilter = () => {
-  return (
-    <div>GoalsFilter</div>
 
-  )
-
-}
-export { GoalForm,GoalsFilter,  GoalCard }
+export { GoalForm,  GoalCard }

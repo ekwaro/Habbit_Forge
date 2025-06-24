@@ -24,13 +24,14 @@ import {
 } from "./utils/TodaysHabit";
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
-const HabbitsList = ({ list, removeItem, updateItem }) => {
+const HabbitsList = ({ list, removeItem, updateItem , setEditingQuote, open}) => {
   const navigate = useNavigate();
+  console.log("HabbitsList Rendered", list);
   const rows = list.map((habit) => (
     <Table.Tr key={habit.id }>
-      <Table.Td>{habit.habitName}</Table.Td>
+      <Table.Td>{habit.title}</Table.Td>
       <Table.Td>{habit.frequency}</Table.Td>
-      <Table.Td>{new Date(habit.startDate).toLocaleDateString()}</Table.Td>
+      <Table.Td>{new Date(habit.startdate).toLocaleDateString()}</Table.Td>
       <Table.Td>{new Date(habit.endDate).toLocaleDateString()}</Table.Td>
       <Table.Td>
         <Button
@@ -55,7 +56,10 @@ const HabbitsList = ({ list, removeItem, updateItem }) => {
         <Button
           size="xs"
           variant="light"
-          onClick={() => updateItem(habit.id, habit)}
+          onClick={() => {
+            setEditingQuote(habit);
+            open();
+            }}
         >
           Update
         </Button>
@@ -90,6 +94,7 @@ const HabbitsList = ({ list, removeItem, updateItem }) => {
 const HabbitsItem = () => {
   const { list } = useLocalStorage("habitData", []);
   const params = useParams();
+  console.log("HabbitsItem Rendered", params, list);
   const habit = list.find((habit) => habit.id.toString() === params.id);
   console.log(params, habit);
   return (
@@ -103,11 +108,11 @@ const HabbitsItem = () => {
         ) : (
           <Stack>
             <Text size="lg" fw={500}>
-              {habit.habitName}
+              {habit.title}
             </Text>
             <Text>Frequency: {habit.frequency}</Text>
             <Text>
-              Start Date: {dayjs(habit.startDate).format("MMM D, YYYY")}
+              Start Date: {dayjs(habit.startdate).format("MMM D, YYYY")}
             </Text>
             <Text>End Date: {dayjs(habit.endDate).format("MMM D, YYYY")}</Text>
           </Stack>
@@ -181,41 +186,20 @@ const HabitCalenderView = ({ habit }) => {
 };
 
 const DailyHabitView = ({ list, removeItem, updateItem }) => {
-  useEffect(() => {
-  const now = dayjs();
-
-  list.forEach((habit) => {
-    if (!habit.reminderTime || !isTodayMatchingFrequency(habit)) return;
-
-    const [hour, minute] = habit.reminderTime.split(":").map(Number);
-    const reminderTime = dayjs().hour(hour).minute(minute).second(0);
-
-    const delay = reminderTime.diff(now);
-
-    if (delay > 0) {
-      setTimeout(() => {
-        if (Notification.permission === "granted") {
-          new Notification(`⏰ Habit Reminder`, {
-            body: `Don't forget to do "${habit.habitName}" today!`,
-          });
-        }
-      }, delay);
-    }
-  });
-}, [list]);
+ 
 
   const todayStr = dayjs().format("YYYY-MM-DD");
   // This component can be used to display a detailed view of a daily habit
   // It can include progress indicators, notes, and other relevant information
-  const isTodayInRange = (startDate, endDate) => {
+  const isTodayInRange = (startdate, endDate) => {
     const today = dayjs(new Date()).startOf("day");
-    console.log(today, dayjs(startDate), endDate);
-    return dayjs(startDate) <= today && today <= dayjs(endDate);
+    console.log(today, dayjs(startdate), endDate);
+    return dayjs(startdate) <= today && today <= dayjs(endDate);
   };
   const getTodaysHabit = (habits) =>
     habits
       .filter((habit) => isTodayMatchingFrequency(habit))
-      .filter((habit) => isTodayInRange(habit.startDate, habit.endDate));
+      .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
   const todaysHabbit = useMemo(() => getTodaysHabit(list), [list]);
   console.log("Today's Habits:", todaysHabbit);
   console.log(list);

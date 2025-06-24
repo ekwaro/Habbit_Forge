@@ -33,13 +33,11 @@ const useLocalStorage = (key, initialValue = []) => {
     setList([]);
   };
 
-  const updateItem = (index, updatedItem) => {
-    setList((prevList) => {
-      if (!Array.isArray(prevList)) return [];
-      const newList = [...prevList];
-      newList[index] = updatedItem;
-      return newList;
-    });
+  const updateItem = (index, updatedHabit) => {
+    const updatedList = list.map((habit) =>
+    habit.id === index ? { ...habit, ...updatedHabit } : habit
+  );
+  setList(updatedList);
   };
 
   return { list, addItem, removeItem, clearList, updateItem };
