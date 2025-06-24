@@ -19,6 +19,14 @@ import Overview from "./components/userDashboard/Overview.jsx";
 import Profile from "./components/userDashboard/Profile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
 
+import AdminLayout from './components1/AdminLayout';
+import AdminProfilePage from './pages1/AdminProfilePage';
+import HabitCategoriesPage from './pages1/HabitCategoriesPage';
+import MotivationalQuotesPage from './pages1/MotivationalQuotesPage';
+import HabitTipsPage from './pages1/HabitTipsPage';
+import AnalyticsSectionPage from './pages1/AnalyticsSectionPage';
+import DashboardPage from './pages1/DashboardPage';
+
 const theme = {
   colorScheme: "light",
   primaryColor: "blue",
@@ -65,7 +73,22 @@ createRoot(document.getElementById("root")).render(
               />
               <Route path="tips" element={<Tips />} />
             </Route>
-            {/* Add more routes as needed */}
+
+            
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            {/* Nested Routes for Sidebar items */}
+            <Route index element={<DashboardPage />} /> {/* Default content for /admin */}
+            <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="categories" element={<HabitCategoriesPage />} />
+            <Route path="quotes" element={<MotivationalQuotesPage />} />
+            <Route path="tips" element={<HabitTipsPage />} />
+            <Route path="analytics" element={<AnalyticsSectionPage />} />
+
+            {/* Handle 404 for admin routes (optional) */}
+            <Route path="*" element={<div>404 Admin Page Not Found</div>} />
+          </Route>
+            
             {/* Catch-all route for 404 Not Found */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
