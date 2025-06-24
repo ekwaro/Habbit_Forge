@@ -6,12 +6,22 @@ import {
   Title,
   Text,
   Paper,
-  Container,
+  Overlay,
+  Divider,
   Group,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
 import { useState, useEffect } from "react";
+import { IconBrandGoogle, IconLogin } from "@tabler/icons-react";
+import { motion } from "framer-motion";
+import { keyframes } from "@emotion/react";
+
+// Define keyframes for animated background
+const animatedBackground = keyframes`
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+`;
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -19,7 +29,6 @@ function LoginForm() {
 
   // Initialize Google Sign-In
   useEffect(() => {
-    // Load Google Identity Services script
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -29,7 +38,7 @@ function LoginForm() {
     script.onload = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+          client_id: 'YOUR_GOOGLE_CLIENT_ID',
           callback: handleGoogleCallback,
         });
       }
@@ -40,10 +49,8 @@ function LoginForm() {
     };
   }, []);
 
-  // Handle Google Sign-In callback
   const handleGoogleCallback = (response) => {
     try {
-      // Decode the JWT token to get user info
       const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
       
       setIsRedirecting(true);
@@ -82,14 +89,12 @@ function LoginForm() {
       email: "",
       password: "",
     },
-
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       password: (value) => (value.length > 0 ? null : "Password is required"),
     },
   });
 
-  // Keep your existing local login logic
   const handleSubmit = (values) => {
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
@@ -105,7 +110,7 @@ function LoginForm() {
         notifications.show({
           title: "Success",
           message: "Welcome back!",
-          color: "green",
+          color: "black",
         });
 
         setTimeout(() => {
@@ -128,7 +133,6 @@ function LoginForm() {
     }
   };
 
-  // Simple Google sign-in trigger
   const handleGoogleLogin = () => {
     if (window.google) {
       window.google.accounts.id.prompt();
@@ -142,92 +146,167 @@ function LoginForm() {
   };
 
   return (
-    <Container
-      size="lg"
+    <div
       style={{
-        minHeight: "100vh",
-        backgroundColor: "#e6f4ea",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          linear-gradient(135deg, #b2f2bb80 0%, #96f2d780 100%),
+          url('https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg')
+        `,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundBlendMode: "overlay",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        animation: `${animatedBackground} 20s linear infinite`,
+        overflow: "auto",
+        padding: 20,
       }}
     >
-      <Paper
-        shadow="md"
-        radius="md"
-        p="xl"
-        withBorder
+      <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
         style={{
-          backgroundColor: "#c7eed8",
+          position: "relative",
+          zIndex: 2,
           width: "100%",
           maxWidth: 450,
         }}
       >
-        <Title order={2} align="center" mb="md" color="blue">
-          Log In
-        </Title>
-
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-          <TextInput
-            label="Email"
-            placeholder="your@email.com"
-            withAsterisk
-            {...form.getInputProps("email")}
-            mb="sm"
-          />
-
-          <PasswordInput
-            label="Password"
-            placeholder="Your password"
-            withAsterisk
-            {...form.getInputProps("password")}
-            mb="xl"
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            size="md"
-            color="blue"
+        <Paper
+          shadow="lg"
+          radius="lg"
+          p="xl"
+          style={{
+            backgroundColor: "rgba(230, 240, 230, 0.15)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            border: "none",
+          }}
+        >
+          <Title
+            order={2}
+            align="center"
             mb="md"
-            loading={isRedirecting}
+            style={{ color: "black", fontWeight: 700 }}
           >
-            Log In
-          </Button>
+            WELCOME BACK
+          </Title>
 
-          <Group position="center" mb="md">
-            <Button
-              variant="outline"
-              onClick={handleGoogleLogin}
-              fullWidth
-              size="md"
-              color="blue"
-            >
-              Sign in with Google
-            </Button>
-          </Group>
-
-          <Text align="center" mt="sm">
-            Don't have an account?{" "}
-            <Text
-              component={Link}
-              to="/signup"
-              color="blue"
-              td="underline"
-              fw={500}
-              inherit
-            >
-              Sign up
-            </Text>
+          <Text align="center" mb="xl" style={{ color: "black" }}>
+            <strong>Master your habits. Master your life</strong>
           </Text>
-        </form>
-      </Paper>
-    </Container>
+
+          <Divider mb="xl" style={{ borderTopColor: "rgba(255,255,255,0.3)" }} />
+
+          <form onSubmit={form.onSubmit(handleSubmit)}>
+            <TextInput
+              label="Email"
+              placeholder="your@email.com"
+              withAsterisk
+              {...form.getInputProps("email")}
+              mb="md"
+              styles={{
+                input: {
+                  backgroundColor: "rgba(255,255,255,0.9)",
+                },
+                label: {
+                  color: "black",
+                },
+              }}
+            />
+
+            <PasswordInput
+              label="Password"
+              placeholder="Your password"
+              withAsterisk
+              {...form.getInputProps("password")}
+              mb="xl"
+              styles={{
+                input: {
+                  backgroundColor: "rgba(255,255,255,0.9)",
+                },
+                innerInput: {
+                  backgroundColor: "transparent",
+                },
+                label: {
+                  color: "black",
+                },
+              }}
+            />
+
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                fullWidth
+                size="md"
+                color="teal"
+                leftIcon={<IconLogin size={18} />}
+                loading={isRedirecting}
+                style={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  marginBottom: "1rem",
+                }}
+              >
+                CONTINUE JOURNEY
+              </Button>
+            </motion.div>
+
+            <Divider
+              label="OR"
+              labelPosition="center"
+              my="lg"
+              style={{ borderTopColor: "rgba(255,255,255,0.3)" }}
+            />
+
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={handleGoogleLogin}
+                fullWidth
+                size="md"
+                variant="outline"
+                color="black"
+                leftIcon={<IconBrandGoogle size={18} />}
+                style={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  borderColor: "rgba(20, 19, 19, 0.5)",
+                }}
+              >
+                CONTINUE WITH GOOGLE
+              </Button>
+            </motion.div>
+
+            <Text align="center" mt="xl" style={{ color: "black" }}>
+              New to HabitTracker?{" "}
+              <Text
+                component={Link}
+                to="/signup"
+                color="white"
+                td="underline"
+                fw={600}
+                style={{ display: "inline" }}
+              >
+                Sign in to Start your journey
+              </Text>
+            </Text>
+          </form>
+        </Paper>
+      </motion.div>
+    </div>
   );
 }
 
-function LoginPage() {
+export default function LoginPage() {
   return <LoginForm />;
 }
-
-export default LoginPage;
