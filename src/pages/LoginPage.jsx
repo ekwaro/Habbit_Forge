@@ -22,7 +22,11 @@ const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
-
+const ADMIN_CONFIG = {
+  email: "admin@gmail.com",
+  password: "admin123",
+  name: "System Admin"
+};
 function LoginForm() {
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -111,22 +115,56 @@ function LoginForm() {
     console.log("Login form values:", values);
     
     try {
+          // Check if this is admin login first
+      const isAdminLogin = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
+      
+      if (isAdminLogin) {
+        console.log("Admin login detected");
+        setIsRedirecting(true);
+        
+        const adminUser = {
+          name: ADMIN_CONFIG.name,
+          email: ADMIN_CONFIG.email,
+          admin: true
+        };
+        
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("currentUser", JSON.stringify(adminUser));
+        console.log("Saved admin user to localStorage:", adminUser);
+
+        notifications.show({
+          title: "Success",
+          message: `Welcome back ${adminUser.name}!`,
+          color: "green",
+        });
+
+        setTimeout(() => {
+          console.log("Executing navigation to: /admin");
+          navigate("/admin", { replace: true });
+        }, 1000);
+        return;
+      }
+
+
+
+
+       // For regular users, check localStorage
       const users = JSON.parse(localStorage.getItem("users") || "[]");
       console.log("All users in localStorage:", users);
       
       const user = users.find(
-        (u) => u.email === values.email && u.password === values.password
+        (u) => u.email === values.email && u.password === values.password && !u.admin
       );
-      console.log("Found user:", user);
+      console.log("Found regular user:", user);
 
       if (user) {
-        console.log("User authentication successful");
-        console.log("User admin status:", user.admin);
+        console.log("Regular user authentication successful");
         
         setIsRedirecting(true);
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
         console.log("Saved current user to localStorage:", user);
+
 
         notifications.show({
           title: "Success",
@@ -134,15 +172,12 @@ function LoginForm() {
           color: "green",
         });
 
-        // Determine redirect path based on admin status
-        const redirectPath = user.admin ? "/admin" : "/user-dashboard";
-        console.log("Determined redirect path:", redirectPath);
-        console.log("User is admin:", user.admin);
+
 
         // Redirect based on admin status
         setTimeout(() => {
-          console.log("Executing navigation to:", redirectPath);
-          navigate(redirectPath, { replace: true });
+          console.log("Executing navigation to: /user-dashboard");
+          navigate("/user-dashboard", { replace: true });
         }, 1000);
       } else {
         console.log("User authentication failed - no matching user found");
