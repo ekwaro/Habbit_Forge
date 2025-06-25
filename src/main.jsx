@@ -16,6 +16,24 @@ import Overview from "./components/userDashboard/Overview.jsx";
 import Profile from "./components/userDashboard/Profile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
 
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import DashboardPage from "./pages/DashboardPage";
+
+
+import AboutUsPage from "./pages1/AboutUsPage";
+import ContactUsPage from "./pages1/ContactUsPage";
+
+import AdminLayout from './components1/AdminLayout';
+import AdminProfilePage from './pages1/AdminProfilePage';
+import HabitCategoriesPage from './pages1/HabitCategoriesPage';
+import MotivationalQuotesPage from './pages1/MotivationalQuotesPage';
+import HabitTipsPage from './pages1/HabitTipsPage';
+import AnalyticsSectionPage from './pages1/AnalyticsSectionPage';
+import DashboardPage1 from './pages1/DashboardPage';
+import TermsOfService from "./pages1/TermsOfService"; 
+
 const theme = {
   colorScheme: "light",
   primaryColor: "blue",
@@ -54,9 +72,9 @@ createRoot(document.getElementById("root")).render(
             </Route>   
 
             {/* <Route path="/" element={<App />} /> */}
-            <Route path="/" element={<HomePage />} />
+            {/* <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/signup" element={<SignupPage />} /> */}
             {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
 
             <Route path="/user-dashboard" element={<UserDashBoard />}>
