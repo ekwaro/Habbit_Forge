@@ -7,13 +7,13 @@ import {
   Title,
   Text,
   Paper,
-  Container,
+  Container, // Not used, can be removed
   Overlay,
   Divider,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { IconFlame, IconUserPlus } from "@tabler/icons-react";
+import { IconFlame, IconUserPlus } from "@tabler/icons-react"; // IconUserPlus not used, can be removed
 import { motion } from "framer-motion";
 import { keyframes } from "@emotion/react";
 
@@ -31,10 +31,10 @@ function SignupPage() {
     // Check if admin user exists, if not create one
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     console.log("Existing users:", users);
-    
+
     const adminExists = users.some(user => user.admin);
     console.log("Admin exists:", adminExists);
-    
+
     if (!adminExists) {
       const adminUser = {
         name: "Admin",
@@ -78,7 +78,7 @@ function SignupPage() {
   const handleSubmit = (values) => {
     console.log("=== SIGNUP FORM SUBMITTED ===");
     console.log("Form values:", values);
-    
+
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
       console.log("Current users before signup:", users);
@@ -94,14 +94,14 @@ function SignupPage() {
           message: "User with this email already exists",
           color: "red",
         });
-        return;
+        return; // Stop execution if user exists
       }
 
       // Create new user object
       const newUser = {
         name: values.name,
         email: values.email,
-        password: values.password,
+        password: values.password, // In a real app, hash this password!
         admin: false
       };
       console.log("Creating new user:", newUser);
@@ -126,9 +126,7 @@ function SignupPage() {
 
     } catch (error) {
       console.error("Signup error:", error);
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    if (users.some((user) => user.email === values.email)) {
-
+      // Generic error message for unexpected issues
       notifications.show({
         title: "Error",
         message: "Failed to create account. Please try again.",
@@ -137,7 +135,7 @@ function SignupPage() {
     }
   };
 
-  // Debug button click
+  // Debug button click - useful for testing form validation without full submission
   const handleButtonClick = (e) => {
     console.log("Button clicked!");
     console.log("Form errors:", form.errors);
@@ -148,7 +146,6 @@ function SignupPage() {
   return (
     <div
       style={{
-        position: "fixed",
         top: 0,
         left: 0,
         right: 0,

@@ -14,6 +14,25 @@ const PublicFooter = () => {
         borderTop: '1px solid var(--mantine-color-gray-2)', // A subtle top border
         backgroundColor: 'var(--mantine-color-gray-0)', // Light background for the footer
         paddingBlock: '1rem', // Vertical padding
+
+        // --- START OF ADJUSTED STYLES ---
+
+        // 1. Darker Background Color
+        backgroundColor: '#222', // Dark grey/near black
+
+        // 2. Lighter Text Color (applies to children unless overridden)
+        color: '#f0f0f0', // Light grey for general text
+
+        // 3. Adjusted Padding (more vertical space)
+        paddingBlock: '1.25rem', // Increased from 1rem
+
+        // 4. Subtle Top Border (lighter color for contrast)
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)', // Very subtle light grey border
+
+        // 5. Add a subtle shadow to give it some depth
+        boxShadow: '0 -2px 5px rgba(0, 0, 0, 0.1)', // Shadow above the footer
+
+        // --- END OF ADJUSTED STYLES ---
       }}
     >
       {/* Right side: Site Logo and Name */}
