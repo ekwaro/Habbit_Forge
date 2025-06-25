@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Title, Text, Avatar, Button, Group, TextInput, Stack, Paper, Box } from '@mantine/core';
 import { IconEdit, IconCheck, IconX } from '@tabler/icons-react';
-import { getAdminInfo } from '../data/adminData';
+import { notifications } from '@mantine/notifications';
 
 function AdminProfilePage() {
-  const initialAdminInfo = getAdminInfo();
+  const navigate = useNavigate();
+  const initialAdminInfo = JSON.parse(localStorage.getItem('currentUser')) || {
+    name: 'Admin',
+    email: 'admin@gmail.com',
+    profilePicture: '',
+    admin: true
+  };
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: initialAdminInfo.name,
-    email: initialAdminInfo.email || 'admin@example.com',
-    profilePicture: initialAdminInfo.profilePicture,
+    email: initialAdminInfo.email,
+    profilePicture: initialAdminInfo.profilePicture || '',
   });
+
+  useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser?.admin) {
+      navigate('/user-dashboard');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,28 +36,51 @@ function AdminProfilePage() {
   };
 
   const handleUpdate = () => {
-    console.log("Updating profile with:", formData);
+    const updatedUser = {
+      ...JSON.parse(localStorage.getItem('currentUser')),
+      ...formData
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    
+    const users = JSON.parse(localStorage.getItem('users') || []);
+    const updatedUsers = users.map(user => 
+      user.email === updatedUser.email ? updatedUser : user
+    );
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
     setIsEditing(false);
+    notifications.show({
+      title: 'Success',
+      message: 'Profile updated successfully',
+      color: 'green',
+    });
   };
 
   const handleCancel = () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || initialAdminInfo;
     setFormData({
-      name: initialAdminInfo.name,
-      email: initialAdminInfo.email || 'admin@example.com',
-      profilePicture: initialAdminInfo.profilePicture,
+      name: currentUser.name,
+      email: currentUser.email,
+      profilePicture: currentUser.profilePicture || '',
     });
     setIsEditing(false);
   };
 
   return (
-   
     <Box maw="95vw" mx="auto" my="lg"> 
       <Paper p="xl" shadow="xs" radius="md">
-        <Title order={2} mb="lg" fw={700}>Admin Profile(Edit, Update or Cancel Changes)</Title>
+        <Title order={2} mb="lg" fw={700}>Admin Profile</Title>
+        <Text c="dimmed" mb="xl">Edit, Update or Cancel Changes</Text>
 
         <Stack gap="lg">
           <Group justify="center">
-            <Avatar src={formData.profilePicture} alt={formData.name} size={120} radius="100%" />
+            <Avatar 
+              src={formData.profilePicture} 
+              alt={formData.name} 
+              size={120} 
+              radius="100%"
+            />
           </Group>
 
           <TextInput

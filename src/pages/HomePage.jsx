@@ -195,32 +195,66 @@ function HomePage() {
                 })}
               >
                 keep focused
-              </Button>
-
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{
-                  scale: 1,
-                  transition: {
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: 'reverse'
-                  }
-                }}
-                style={{
-                  position: 'absolute',
-                  top: -5,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 'calc(100% + 10px)',
-                  height: 'calc(100% + 10px)',
-                  borderRadius: '100%',
-                  border: '2px dashed rgba(12, 13, 21, 0.4)',
-                  pointerEvents: 'none',
-                }}
-              />
-            </motion.div>
-          </div>
+           
+            
+          {/* Features Button */}
+          <div style={{ 
+            flex: '0 0 auto', 
+            display: 'flex', 
+            justifyContent: 'center',
+            marginBottom: '1rem'
+          }}>
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{ position: 'relative' }}
+            >
+              <Button 
+                component={Link} 
+                to="/features"
+                size="md"
+                radius="xl"
+                variant="gradient"
+                gradient={{ from: 'black', to: 'green', deg: 105 }}
+                righticon={<IconSparkles size={16} />}
+                styles={(theme) => ({
+                  root: {
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                    },
+                  },
+                })}
+              >
+                keep focused
+              </Button>
+              
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ 
+                  scale: 1,
+                  transition: { 
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: 'reverse'
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  top: -5,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 'calc(100% + 10px)',
+                  height: 'calc(100% + 10px)',
+                  borderRadius: '100%',
+                  border: '2px dashed rgba(12, 13, 21, 0.4)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </motion.div>
+          </div>
+>>>
 
           {/* Badges Section */}
           <div style={{
@@ -267,48 +301,53 @@ function HomePage() {
 
           <Divider mb="md" />
 
-          {/* Login/Signup Buttons - Large and at the bottom */}
-          <div style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '1rem',
-            flexWrap: 'wrap'
-          }}>
-            <Button
-              component={Link}
-              to="/login"
-              size="xl"
-              variant="dark"
-              color="white"
-              leftIcon={<IconTarget size={20} />}
-              style={{
-                minWidth: '140px',
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                padding: '0.75rem 2rem'
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              component={Link}
-              to="/signup"
-              size="xl"
-              color="teal"
-              leftIcon={<IconFlame size={20} />}
-              style={{
-                minWidth: '140px',
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                padding: '0.75rem 2rem'
-              }}
-            >
-              Sign Up
-            </Button>
-          </div>
-        </Paper>
-      </motion.div>
-    </div>
-  );
+
+   
+
+
+          {/* Login/Signup Buttons - Large and at the bottom */}
+          <div style={{ 
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
+            <Button 
+              component={Link} 
+              to="/login" 
+              size="xl" 
+              variant="dark" 
+              color="white" 
+              lefticon={<IconTarget size={20} />}
+              style={{
+                minWidth: '140px',
+                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              Login
+            </Button>
+            <Button 
+              component={Link} 
+              to="/signup" 
+              size="xl" 
+              color="teal" 
+              leftIcon={<IconFlame size={20} />}
+              style={{
+                minWidth: '140px',
+                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                padding: '0.75rem 2rem'
+              }}
+            >
+              Sign Up
+            </Button>
+          </div>
+        </Paper>
+      </motion.div>
+    </div>
+  );
+
 }
 
 export default HomePage;
