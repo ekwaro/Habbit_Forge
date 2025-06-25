@@ -15,6 +15,9 @@ import { saveUserToStorage, removeUserFromStorage } from './utils/localStorage';
 import PublicNavbar from './components1/PublicNavbar';
 import PublicFooter from './components1/PublicFooter'; 
 
+const headerHeight = 100; // Define your header height
+  const mainPaddingTop = headerHeight + 16; // Add a bit extra padding for visual separation, e.g., 16px
+
 
 function App() {
   
@@ -40,8 +43,8 @@ function App() {
 
   return (
     <AppShell
-      header={{ height: 70 }} //header height
-      padding="sm"
+       header={{ height: headerHeight }}//header height
+       padding={mainPaddingTop} 
     >
       <AppShell.Header>
         <PublicNavbar /> 
