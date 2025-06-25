@@ -126,6 +126,9 @@ function SignupPage() {
 
     } catch (error) {
       console.error("Signup error:", error);
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.some((user) => user.email === values.email)) {
+
       notifications.show({
         title: "Error",
         message: "Failed to create account. Please try again.",

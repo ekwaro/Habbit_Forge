@@ -25,21 +25,20 @@ const useLocalStorage = (key, initialValue = []) => {
     setList((prevList) => [...(Array.isArray(prevList) ? prevList : []), item]);
   };
 
-  const removeItem = (item) => {
-    setList((prevList) => (Array.isArray(prevList) ? prevList.filter((i) => i !== item) : []));
-  };
+const removeItem=(id)=>{
+  const newList = list.filter((item)=>item.id !==id)
+  setList(newList)
+}
 
   const clearList = () => {
     setList([]);
   };
 
-  const updateItem = (index, updatedItem) => {
-    setList((prevList) => {
-      if (!Array.isArray(prevList)) return [];
-      const newList = [...prevList];
-      newList[index] = updatedItem;
-      return newList;
-    });
+  const updateItem = (id, updatedHabit) => {
+    const updatedList = list.map((habit) =>
+    habit.id === id ? { ...habit, ...updatedHabit } : habit
+  );
+  setList(updatedList);
   };
 
   return { list, addItem, removeItem, clearList, updateItem };
