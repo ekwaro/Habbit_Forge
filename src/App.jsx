@@ -16,7 +16,7 @@ import PublicNavbar from './components1/PublicNavbar';
 import PublicFooter from './components1/PublicFooter'; 
 
 const headerHeight = 100; // Define your header height
-  const mainPaddingTop = headerHeight + 16; // Add a bit extra padding for visual separation, e.g., 16px
+  const mainPaddingTop = headerHeight + 2; // Add a bit extra padding for visual separation, e.g., 16px
 
 
 function App() {
