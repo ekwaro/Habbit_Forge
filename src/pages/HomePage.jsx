@@ -193,7 +193,7 @@ function HomePage() {
                 radius="xl"
                 variant="gradient"
                 gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={16} />}
+                righticon={<IconSparkles size={16} />}
                 styles={(theme) => ({
                   root: {
                     position: 'relative',
@@ -291,7 +291,7 @@ function HomePage() {
               size="xl" 
               variant="dark" 
               color="white" 
-              leftIcon={<IconTarget size={20} />}
+              lefticon={<IconTarget size={20} />}
               style={{
                 minWidth: '140px',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',

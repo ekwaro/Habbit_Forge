@@ -64,6 +64,7 @@ createRoot(document.getElementById("root")).render(
                <Route path="about" element={<AboutUsPage />} />
                <Route path="contact" element={<ContactUsPage />} />
                <Route path="terms-of-service" element={<TermsOfService />} />
+               
             </Route>   
 
 
@@ -87,9 +88,10 @@ createRoot(document.getElementById("root")).render(
             
           {/* Admin Dashboard Routes */}
           <Route path="/admin" element={<AdminLayout />}>
+          
             {/* Nested Routes for Sidebar items */}
             <Route index element={<DashboardPage />} />
-            <Route path="profile" element={<AdminProfilePage />} />
+             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="categories" element={<HabitCategoriesPage />} />
             <Route path="quotes" element={<MotivationalQuotesPage />} />
             <Route path="tips" element={<HabitTipsPage />} />
