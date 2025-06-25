@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useForm } from "@mantine/form";
 import {
   TextInput,
@@ -25,6 +26,28 @@ const animatedBackground = keyframes`
 function SignupPage() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log("SignupPage mounted");
+    // Check if admin user exists, if not create one
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    console.log("Existing users:", users);
+    
+    const adminExists = users.some(user => user.admin);
+    console.log("Admin exists:", adminExists);
+    
+    if (!adminExists) {
+      const adminUser = {
+        name: "Admin",
+        email: "admin@example.com",
+        password: "admin123",
+        admin: true
+      };
+      users.push(adminUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      console.log("Default admin user created:", adminUser);
+    }
+  }, []);
+
   const form = useForm({
     initialValues: {
       name: "",
@@ -33,39 +56,93 @@ function SignupPage() {
       confirmPassword: "",
     },
     validate: {
-      name: (value) => (value.trim().length > 0 ? null : "Name is required"),
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) =>
-        value.length >= 6 ? null : "Password must be at least 6 characters",
-      confirmPassword: (value, values) =>
-        value === values.password ? null : "Passwords do not match",
+      name: (value) => {
+        console.log("Validating name:", value);
+        return value.trim().length > 0 ? null : "Name is required";
+      },
+      email: (value) => {
+        console.log("Validating email:", value);
+        return /^\S+@\S+$/.test(value) ? null : "Invalid email";
+      },
+      password: (value) => {
+        console.log("Validating password length:", value.length);
+        return value.length >= 6 ? null : "Password must be at least 6 characters";
+      },
+      confirmPassword: (value, values) => {
+        console.log("Validating confirm password:", value, "vs", values.password);
+        return value === values.password ? null : "Passwords do not match";
+      },
     },
   });
 
   const handleSubmit = (values) => {
+    console.log("=== SIGNUP FORM SUBMITTED ===");
+    console.log("Form values:", values);
+    
+    try {
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      console.log("Current users before signup:", users);
+
+      // Check if user already exists
+      const existingUser = users.find(user => user.email === values.email);
+      console.log("Existing user check:", existingUser);
+
+      if (existingUser) {
+        console.log("User already exists!");
+        notifications.show({
+          title: "Error",
+          message: "User with this email already exists",
+          color: "red",
+        });
+        return;
+      }
+
+      // Create new user object
+      const newUser = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        admin: false
+      };
+      console.log("Creating new user:", newUser);
+
+      // Add user to array and save
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      console.log("Users after signup:", JSON.parse(localStorage.getItem("users")));
+
+      console.log("Showing success notification");
+      notifications.show({
+        title: "Success",
+        message: "Account created successfully! Redirecting to login...",
+        color: "green",
+      });
+
+      console.log("Setting timeout for navigation");
+      setTimeout(() => {
+        console.log("Navigating to login page");
+        navigate("/login", { replace: true });
+      }, 1500);
+
+    } catch (error) {
+      console.error("Signup error:", error);
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     if (users.some((user) => user.email === values.email)) {
+
       notifications.show({
         title: "Error",
-        message: "User with this email already exists",
+        message: "Failed to create account. Please try again.",
         color: "red",
       });
-      return;
     }
+  };
 
-    const { confirmPassword, ...userData } = values;
-    users.push(userData);
-    localStorage.setItem("users", JSON.stringify(users));
-
-    notifications.show({
-      title: "Success",
-      message: "Account created successfully! Redirecting to login...",
-      color: "green",
-    });
-
-    setTimeout(() => {
-      navigate("/login", { replace: true });
-    }, 1500);
+  // Debug button click
+  const handleButtonClick = (e) => {
+    console.log("Button clicked!");
+    console.log("Form errors:", form.errors);
+    console.log("Form values:", form.values);
+    console.log("Form validation:", form.validate());
   };
 
   return (
@@ -209,12 +286,13 @@ function SignupPage() {
                 size="md"
                 color="teal"
                 leftIcon={<IconFlame size={18} />}
+                onClick={handleButtonClick}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
                 }}
               >
-               SIGN IN TO IGNITE MY JOURNEY
+                SIGN UP TO IGNITE MY JOURNEY
               </Button>
             </motion.div>
 

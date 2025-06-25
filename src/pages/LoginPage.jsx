@@ -29,6 +29,7 @@ function LoginForm() {
 
   // Initialize Google Sign-In
   useEffect(() => {
+    console.log("LoginForm mounted");
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -50,8 +51,10 @@ function LoginForm() {
   }, []);
 
   const handleGoogleCallback = (response) => {
+    console.log("Google callback triggered");
     try {
       const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
+      console.log("Google user info:", userInfo);
       
       setIsRedirecting(true);
       localStorage.setItem("isAuthenticated", "true");
@@ -62,6 +65,7 @@ function LoginForm() {
           email: userInfo.email,
           picture: userInfo.picture,
           authMethod: "google",
+          admin: false 
         })
       );
 
@@ -72,6 +76,7 @@ function LoginForm() {
       });
 
       setTimeout(() => {
+        console.log("Navigating to user dashboard");
         navigate("/user-dashboard", { replace: true });
       }, 1000);
     } catch (error) {
@@ -90,33 +95,57 @@ function LoginForm() {
       password: "",
     },
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) => (value.length > 0 ? null : "Password is required"),
+      email: (value) => {
+        console.log("Validating login email:", value);
+        return /^\S+@\S+$/.test(value) ? null : "Invalid email";
+      },
+      password: (value) => {
+        console.log("Validating login password length:", value.length);
+        return value.length > 0 ? null : "Password is required";
+      },
     },
   });
 
   const handleSubmit = (values) => {
+    console.log("=== LOGIN FORM SUBMITTED ===");
+    console.log("Login form values:", values);
+    
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
+      console.log("All users in localStorage:", users);
+      
       const user = users.find(
         (u) => u.email === values.email && u.password === values.password
       );
+      console.log("Found user:", user);
 
       if (user) {
+        console.log("User authentication successful");
+        console.log("User admin status:", user.admin);
+        
         setIsRedirecting(true);
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
+        console.log("Saved current user to localStorage:", user);
 
         notifications.show({
           title: "Success",
-          message: "Welcome back!",
-          color: "black",
+          message: `Welcome back ${user.name}!`,
+          color: "green",
         });
 
+        // Determine redirect path based on admin status
+        const redirectPath = user.admin ? "/admin" : "/user-dashboard";
+        console.log("Determined redirect path:", redirectPath);
+        console.log("User is admin:", user.admin);
+
+        // Redirect based on admin status
         setTimeout(() => {
-          navigate("/user-dashboard", { replace: true });
-        }, 100);
+          console.log("Executing navigation to:", redirectPath);
+          navigate(redirectPath, { replace: true });
+        }, 1000);
       } else {
+        console.log("User authentication failed - no matching user found");
         notifications.show({
           title: "Error",
           message: "Invalid email or password",
@@ -124,16 +153,17 @@ function LoginForm() {
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       notifications.show({
         title: "Error",
         message: "Login failed. Please try again.",
         color: "red",
       });
-      console.error("Login error:", error);
     }
   };
 
   const handleGoogleLogin = () => {
+    console.log("Google login button clicked");
     if (window.google) {
       window.google.accounts.id.prompt();
     } else {
@@ -143,6 +173,14 @@ function LoginForm() {
         color: "red",
       });
     }
+  };
+
+  // Debug button click
+  const handleButtonClick = (e) => {
+    console.log("Login button clicked!");
+    console.log("Form errors:", form.errors);
+    console.log("Form values:", form.values);
+    console.log("Form validation:", form.validate());
   };
 
   return (
@@ -252,6 +290,7 @@ function LoginForm() {
                 color="teal"
                 leftIcon={<IconLogin size={18} />}
                 loading={isRedirecting}
+                onClick={handleButtonClick}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -297,7 +336,7 @@ function LoginForm() {
                 fw={600}
                 style={{ display: "inline" }}
               >
-                Sign in to Start your journey
+                Sign up to Start your journey
               </Text>
             </Text>
           </form>

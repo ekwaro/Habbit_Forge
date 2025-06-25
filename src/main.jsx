@@ -42,6 +42,17 @@ createRoot(document.getElementById("root")).render(
       <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
         <BrowserRouter>
           <Routes>
+
+            <Route path="/" element={<App />}>
+               <Route index element={<HomePage />} />
+               <Route path="login" element={<LoginPage />} />
+               <Route path="signup" element={<SignupPage />} />
+               <Route path="about" element={<AboutUsPage />} />
+               <Route path="contact" element={<ContactUsPage />} />
+               <Route path="terms-of-service" element={<TermsOfService />} />
+               
+            </Route>   
+
             {/* <Route path="/" element={<App />} /> */}
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -62,6 +73,23 @@ createRoot(document.getElementById("root")).render(
               />
               <Route path="tips" element={<Tips />} />
             </Route>
+
+            
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+          
+            {/* Nested Routes for Sidebar items */}
+            <Route index element={<DashboardPage />} />
+             <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="categories" element={<HabitCategoriesPage />} />
+            <Route path="quotes" element={<MotivationalQuotesPage />} />
+            <Route path="tips" element={<HabitTipsPage />} />
+            <Route path="analytics" element={<AnalyticsSectionPage />} />
+
+            {/* Handle 404 for admin routes*/}
+            <Route path="*" element={<div>404 Admin Page Not Found</div>} />
+          </Route>
+         
             {/* Add more routes as needed */}
             {/* Catch-all route for 404 Not Found */}
             <Route path="*" element={<NotFoundPage />} />
