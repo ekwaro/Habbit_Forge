@@ -44,7 +44,6 @@ function SignupPage() {
 
   const handleSubmit = (values) => {
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-
     if (users.some((user) => user.email === values.email)) {
       notifications.show({
         title: "Error",

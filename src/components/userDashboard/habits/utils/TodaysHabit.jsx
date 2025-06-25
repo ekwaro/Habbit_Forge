@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 export const isTodayMatchingFrequency = (habit) => {
   const today = dayjs().startOf("day");
-  const start = dayjs(habit.startDate).startOf("day");
+  const start = dayjs(habit.startdate).startOf("day");
   const end = dayjs(habit.endDate).startOf("day");
 
   if (today.isBefore(start) || today.isAfter(end)) return false;
@@ -20,7 +20,7 @@ export const isTodayMatchingFrequency = (habit) => {
 };
 export const getHabitProgress = (habit) => {
   const today = dayjs().startOf("day"); 
-  const startDate = dayjs(habit.startDate).startOf("day");
+  const startDate = dayjs(habit.startdate).startOf("day");
   const endDate = dayjs(habit.endDate).startOf("day");
 
   if (today.isBefore(startDate) || today.isAfter(endDate)) {
@@ -30,5 +30,5 @@ export const getHabitProgress = (habit) => {
   const totalDays = endDate.diff(startDate, "day") + 1; // Include both start and end dates
   const completedDays = habit.completedDates?.length || 0;
   const progress = (completedDays / totalDays) * 100;
-  return Math.min(progress); // Ensure progress does not exceed 100%
+  return Math.round(progress); // Ensure progress does not exceed 100%
 }

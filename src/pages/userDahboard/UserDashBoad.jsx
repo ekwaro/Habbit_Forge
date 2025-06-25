@@ -8,9 +8,13 @@ import {
   Burger,
   AppShellSection,
   ScrollArea,
+  Avatar,
+  Center,
 } from "@mantine/core";
 import { Outlet, useNavigate } from "react-router-dom";
 const UserDashBoard = () => {
+  let username = 'Dominic'
+  const handleLogout=()=>{}
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -24,19 +28,31 @@ const UserDashBoard = () => {
       navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Header>
-        <Group h="100%" px="md">
+      <AppShell.Header withBorder style={{backgroundColor:'#f8f9fa',
+        paddingLeft:20,
+        paddingRight:20
+      }}>
+        <Group h="100%" px="md" justify='space-between' align='center'>
+
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Text fw={700} size='xl' c='teal'>User Dashboard</Text>
+          <Group spaciing='sm'>
+            <Avatar src='https://i.pravatar.cc/150?img=13'
+            radius='xl'
+            size='md'
+            alt={username}
+            />
+            <Text size='sm' fw={500}>{username}</Text>
+            <Button variant='light' c='red' size='xs' onClick={handleLogout}>Logout</Button>
+
+         
+
+          </Group>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar width={{ base: 250 }} hidden={!opened}>
-        <AppShell.Section pr={20}>
+        <AppShell.Section pr={20} mt={20}>
           <ScrollArea style={{ height: "100%" }} mx="auto">
-            <Text size="xl" weight={700} mb="md">
-              Dashboard
-            </Text>
-
-            
             <Button
               variant="gradient"
               fullWidth
@@ -86,13 +102,14 @@ const UserDashBoard = () => {
       </AppShell.Navbar>
       <AppShell.Main>
         <AppShell.Section grow>
-          <Text>Welcome to the user dashboard!</Text>
+          
           <Outlet />
         </AppShell.Section>
       </AppShell.Main>
       <AppShell.Footer>
-        <AppShellSection>
-          <Text>Footer content goes here.</Text>
+        <AppShellSection mx='xl'>
+          <Center><Text>Footer content goes here.</Text></Center>
+          
         </AppShellSection>
       </AppShell.Footer>
     </AppShell>
