@@ -7,13 +7,11 @@ import {
   Title,
   Text,
   Paper,
-  Container, // Not used, can be removed
-  Overlay,
   Divider,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { IconFlame, IconUserPlus } from "@tabler/icons-react"; // IconUserPlus not used, can be removed
+import { IconFlame } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { keyframes } from "@emotion/react";
 
@@ -22,32 +20,14 @@ const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
+const ADMIN_CONFIG = {
+  email: "admin@gmail.com",
+  password: "admin123",
+  name: "System Admin"
+};
 
 function SignupPage() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    console.log("SignupPage mounted");
-    // Check if admin user exists, if not create one
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    console.log("Existing users:", users);
-
-    const adminExists = users.some(user => user.admin);
-    console.log("Admin exists:", adminExists);
-
-    if (!adminExists) {
-      const adminUser = {
-        name: "Admin",
-        email: "admin@example.com",
-        password: "admin123",
-        admin: true
-      };
-      users.push(adminUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      console.log("Default admin user created:", adminUser);
-    }
-  }, []);
-
   const form = useForm({
     initialValues: {
       name: "",
@@ -57,91 +37,80 @@ function SignupPage() {
     },
     validate: {
       name: (value) => {
-        console.log("Validating name:", value);
-        return value.trim().length > 0 ? null : "Name is required";
+        if (!value.trim()) return "Name is required";
+        return null;
       },
       email: (value) => {
-        console.log("Validating email:", value);
-        return /^\S+@\S+$/.test(value) ? null : "Invalid email";
+        if (!/^\S+@\S+$/.test(value)) return "Invalid email";
+        return null;
       },
       password: (value) => {
-        console.log("Validating password length:", value.length);
-        return value.length >= 6 ? null : "Password must be at least 6 characters";
+        if (value.length < 6) return "Password must be at least 6 characters";
+        return null;
       },
       confirmPassword: (value, values) => {
-        console.log("Validating confirm password:", value, "vs", values.password);
-        return value === values.password ? null : "Passwords do not match";
+        if (value !== values.password) return "Passwords do not match";
+        return null;
       },
     },
   });
 
-  const handleSubmit = (values) => {
-    console.log("=== SIGNUP FORM SUBMITTED ===");
-    console.log("Form values:", values);
+   // Initialize admin user
+  useEffect(() => {
+    console.log("Checking admin user...");
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const adminExists = users.some(user => 
+      user.email === ADMIN_CONFIG.email && user.admin
+    );
 
+    if (!adminExists) {
+      console.log("Creating admin user...");
+      users.push({
+        name: ADMIN_CONFIG.name,
+        email: ADMIN_CONFIG.email,
+        password: ADMIN_CONFIG.password,
+        admin: true
+      });
+      localStorage.setItem("users", JSON.stringify(users));
+      console.log("Admin user created successfully");
+    }
+  }, []);
+
+  
+  const handleSubmit = (values) => {
+    console.log("Form submission started with values:", values);
+    
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
-      console.log("Current users before signup:", users);
+      console.log("Current users:", users);
 
-      // Check if user already exists
-      const existingUser = users.find(user => user.email === values.email);
-      console.log("Existing user check:", existingUser);
-
-      if (existingUser) {
-        console.log("User already exists!");
+      // Check if this is an admin signup
+      const isAdminSignup = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
+      
+      if (isAdminSignup) {
+        // For admin signup, allow multiple signups but don't store duplicates
+        console.log("Admin signup detected");
+        
         notifications.show({
-          title: "Error",
-          message: "User with this email already exists",
-          color: "red",
+          title: "Success",
+          message: "Admin account created! Redirecting to login...",
+          color: "green",
         });
-        return; // Stop execution if user exists
-      }
 
-      // Create new user object
-      const newUser = {
-        name: values.name,
-        email: values.email,
-        password: values.password, // In a real app, hash this password!
-        admin: false
-      };
-      console.log("Creating new user:", newUser);
-
-      // Add user to array and save
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      console.log("Users after signup:", JSON.parse(localStorage.getItem("users")));
-
-      console.log("Showing success notification");
-      notifications.show({
-        title: "Success",
-        message: "Account created successfully! Redirecting to login...",
-        color: "green",
-      });
-
-      console.log("Setting timeout for navigation");
-      setTimeout(() => {
-        console.log("Navigating to login page");
-        navigate("/login", { replace: true });
-      }, 1500);
-
-    } catch (error) {
+    setTimeout(() => {
+      navigate("/login", { replace: true });
+    }, 1500);
+  };
+   } catch (error) {
       console.error("Signup error:", error);
-      // Generic error message for unexpected issues
       notifications.show({
         title: "Error",
-        message: "Failed to create account. Please try again.",
+        message: "An unexpected error occurred. Please try again.",
         color: "red",
       });
     }
   };
 
-  // Debug button click - useful for testing form validation without full submission
-  const handleButtonClick = (e) => {
-    console.log("Button clicked!");
-    console.log("Form errors:", form.errors);
-    console.log("Form values:", form.values);
-    console.log("Form validation:", form.validate());
-  };
 
   return (
     <div
@@ -166,8 +135,6 @@ function SignupPage() {
         padding: 20,
       }}
     >
-      <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -283,7 +250,6 @@ function SignupPage() {
                 size="md"
                 color="teal"
                 leftIcon={<IconFlame size={18} />}
-                onClick={handleButtonClick}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
