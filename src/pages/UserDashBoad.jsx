@@ -36,7 +36,6 @@ const UserDashBoard = () => {
               Dashboard
             </Text>
 
-            
             <Button
               variant="gradient"
               fullWidth
@@ -50,10 +49,10 @@ const UserDashBoard = () => {
               variant="gradient"
               m="md"
               onClick={() =>
-                handleNavigate("/user-dashboard/habbits-management")
+                handleNavigate("/user-dashboard/habits-management")
               }
             >
-              Habbits Management
+              Habits Management
             </Button>
             <Button
               fullWidth

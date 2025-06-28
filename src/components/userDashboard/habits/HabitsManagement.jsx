@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Text,
-  Container,
-  ScrollArea,
-} from "@mantine/core";
+import { Button, Text, Container, ScrollArea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import "@mantine/dates/styles.css"; 
+import "@mantine/dates/styles.css";
 
-import HabbitForm from "./HabbitForm";
+import HabitForm from "./HabitForm";
 import useLocalStorage from "../useLocalStorage";
-import { HabbitsList, DailyHabitView } from "./HabbitsList";
+import { HabitsList, DailyHabitView } from "./HabitsList";
 
-const HabbitsManagement = () => {
+const HabitsManagement = () => {
   const [editingQuote, setEditingQuote] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -55,7 +50,7 @@ const HabbitsManagement = () => {
       </Text>
 
       {/* Modal Form */}
-      <HabbitForm
+      <HabitForm
         opened={opened}
         onClose={() => {
           setEditingQuote(null);
@@ -80,7 +75,7 @@ const HabbitsManagement = () => {
         {list?.length === 0 ? (
           <Text>No habits found. Please add one.</Text>
         ) : (
-          <HabbitsList
+          <HabitsList
             list={list}
             removeItem={removeItem}
             updateItem={updateItem}
@@ -103,4 +98,4 @@ const HabbitsManagement = () => {
   );
 };
 
-export default HabbitsManagement;
+export default HabitsManagement;

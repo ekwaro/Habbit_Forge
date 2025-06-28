@@ -26,18 +26,21 @@ import {
 } from "./utils/TodaysHabit";
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
-const HabbitsList = ({
+const HabitsList = ({
   list,
   removeItem,
   updateItem,
   setEditingQuote,
   open,
 }) => {
-  const [activePage, setPage] = useState(1)
-  const pageSize = 5
-  const paginatedList = list.slice((activePage - 1) * pageSize, activePage*pageSize)
+  const [activePage, setPage] = useState(1);
+  const pageSize = 5;
+  const paginatedList = list.slice(
+    (activePage - 1) * pageSize,
+    activePage * pageSize
+  );
   const navigate = useNavigate();
-  console.log("HabbitsList Rendered", list);
+  console.log("HabitsList Rendered", list);
   const rows = paginatedList.map((habit) => (
     <Table.Tr key={habit.id}>
       <Table.Td>{habit.title}</Table.Td>
@@ -59,7 +62,7 @@ const HabbitsList = ({
           mr={5}
           variant="outline"
           onClick={() =>
-            navigate(`/user-dashboard/habbits-management/${habit.id}`)
+            navigate(`/user-dashboard/habits-management/${habit.id}`)
           }
         >
           View
@@ -98,59 +101,61 @@ const HabbitsList = ({
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
       {list.length > pageSize && (
-  <Pagination
-    value={activePage}
-    onChange={setPage}
-    total={Math.ceil(list.length / pageSize)}
-    mt="md"
-    position="center"
-  />
-)}
+        <Pagination
+          value={activePage}
+          onChange={setPage}
+          total={Math.ceil(list.length / pageSize)}
+          mt="md"
+          position="center"
+        />
+      )}
     </>
   );
 };
 
-const HabbitsItem = () => {
+const HabitsItem = () => {
   const { list } = useLocalStorage("habitData", []);
   const params = useParams();
-  console.log("HabbitsItem Rendered", params, list);
+  console.log("HabitsItem Rendered", params, list);
   const habit = list.find((habit) => habit.id.toString() === params.id);
   console.log(params, habit);
   return (
     <>
       <Card withBorder shadow="sm" p="lg" my="md">
         <Group position="apart" mb="md">
-    <Text fw={600} size="xl">
-      Habit Details
-    </Text>
-    {habit && (
-      <Badge color="teal" variant="light" size="lg">
-        {habit.frequency}
-      </Badge>
-    )}
-  </Group>
+          <Text fw={600} size="xl">
+            Habit Details
+          </Text>
+          {habit && (
+            <Badge color="teal" variant="light" size="lg">
+              {habit.frequency}
+            </Badge>
+          )}
+        </Group>
 
-  {!habit ? (
-    <Text c="dimmed" align="center">
-      Habit not found.
-    </Text>
-  ) : (
-    <Stack spacing="xs">
-      <Text fw={700} size="lg" c="blue">
-        {habit.title}
-      </Text>
+        {!habit ? (
+          <Text c="dimmed" align="center">
+            Habit not found.
+          </Text>
+        ) : (
+          <Stack spacing="xs">
+            <Text fw={700} size="lg" c="blue">
+              {habit.title}
+            </Text>
 
-      <Divider my="xs" />
+            <Divider my="xs" />
 
-      <Text size="sm" c="gray">
-        <strong>Start Date:</strong> {dayjs(habit.startDate).format("MMM D, YYYY")}
-      </Text>
-      <Text size="sm" c="gray">
-        <strong>End Date:</strong> {dayjs(habit.endDate).format("MMM D, YYYY")}
-      </Text>
-    </Stack>
-  )}
-        
+            <Text size="sm" c="gray">
+              <strong>Start Date:</strong>{" "}
+              {dayjs(habit.startDate).format("MMM D, YYYY")}
+            </Text>
+            <Text size="sm" c="gray">
+              <strong>End Date:</strong>{" "}
+              {dayjs(habit.endDate).format("MMM D, YYYY")}
+            </Text>
+          </Stack>
+        )}
+
         <Group justify="space-between" mt="md">
           <Card
             mt={20}
@@ -168,7 +173,6 @@ const HabbitsItem = () => {
               curveType="monotone"
               yAxisLabel="Completed"
               margin={{ top: 20, right: 20, bottom: 20, left: 50 }}
-          
               dataKey="date"
               series={[{ name: "Completed", color: "teal" }]}
             />
@@ -244,17 +248,17 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
       .filter((habit) => isTodayMatchingFrequency(habit))
       .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
 
-  const todaysHabbit = useMemo(() => getTodaysHabit(list), [list]);
-  console.log("Today's Habits:", todaysHabbit);
+  const todaysHabit = useMemo(() => getTodaysHabit(list), [list]);
+  console.log("Today's Habits:", todaysHabit);
   console.log(list);
 
-  const markHabbitComplete = (myhabit) => {
+  const markHabitComplete = (myhabit) => {
     const today = dayjs().format("YYYY-MM-DD");
-     const habit = list.find((h) => h.id === myhabit.id);
-  if (!habit) {
-    console.warn("Habit not found for id:", myhabit.id);
-    return;
-  }
+    const habit = list.find((h) => h.id === myhabit.id);
+    if (!habit) {
+      console.warn("Habit not found for id:", myhabit.id);
+      return;
+    }
 
     const alreadyCompleted = habit.completedDates?.includes(today);
 
@@ -274,10 +278,10 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
       </Group>
       <ScrollArea h={350}>
         <Stack>
-          {todaysHabbit.length === 0 ? (
+          {todaysHabit.length === 0 ? (
             <Text>("No daily habits for today.")</Text>
           ) : (
-              todaysHabbit.map((habit) => {             
+            todaysHabit.map((habit) => {
               const progress = getHabitProgress(habit);
               const isCompleted = habit.completedDates?.includes(todayStr);
               return (
@@ -294,7 +298,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                     <Checkbox
                       label={habit.habitName}
                       checked={habit.completedDates?.includes(todayStr)}
-                      onChange={() => markHabbitComplete(habit)}
+                      onChange={() => markHabitComplete(habit)}
                     />
                     <Badge color="teal" variant="light">
                       {habit.frequency}
@@ -336,4 +340,4 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
   );
 };
 
-export { HabbitsList, HabbitsItem, DailyHabitView };
+export { HabitsList, HabitsItem, DailyHabitView };
