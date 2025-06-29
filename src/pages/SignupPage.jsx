@@ -31,6 +31,7 @@ function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: 'user'
     },
     validate: {
       name: (value) => (value.trim().length > 0 ? null : "Name is required"),

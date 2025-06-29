@@ -104,8 +104,10 @@ function LoginForm() {
 
       if (user) {
         setIsRedirecting(true);
+          const currentUser = { ...user, authMethod: "local" };
+        
         localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("currentUser", JSON.stringify(user));
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
         notifications.show({
           title: "Success",
@@ -250,7 +252,7 @@ function LoginForm() {
                 fullWidth
                 size="md"
                 color="teal"
-                leftIcon={<IconLogin size={18} />}
+                 leftSection ={<IconLogin size={18} />}
                 loading={isRedirecting}
                 style={{
                   fontWeight: 600,
@@ -261,6 +263,7 @@ function LoginForm() {
                 CONTINUE JOURNEY
               </Button>
             </motion.div>
+            </form>
 
             <Divider
               label="OR"
@@ -276,7 +279,7 @@ function LoginForm() {
                 size="md"
                 variant="outline"
                 color="black"
-                leftIcon={<IconBrandGoogle size={18} />}
+                leftSection={<IconBrandGoogle size={18} />}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -300,7 +303,7 @@ function LoginForm() {
                 Sign in to Start your journey
               </Text>
             </Text>
-          </form>
+        
         </Paper>
       </motion.div>
     </div>

@@ -1,12 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Card, Center, Container,Text, Loader, Stack, Title, Button } from "@mantine/core";
+import {
+  Card,
+  Center,
+  Container,
+  Text,
+  Loader,
+  Stack,
+  Title,
+  Button,
+  Group,
+} from "@mantine/core";
 import useTip from "./tipsutil";
 const Tips = () => {
-  const {tip, loading, error, fetchtip} = useTip()
- if(tip){
-  console.log(tip)
- }
+  const { tips, loading, error, fetchtip } = useTip();
+  const [tipIndex, setTipIndex] = useState(0);
+  const fetchNextTip = () => {
+    if (tips.length === 0) return;
+    setTipIndex((prev) => (prev + 1 >= tips.length ? 0 : prev + 1));
+  };
+
+  const fetchPrevTip = () => {
+    if (tips.length === 0) return;
+    setTipIndex((prevIndex) =>
+      prevIndex - 1 < tips.length - 1 ? 0 : prevIndex - 1
+    );
+  };
+
+  if (tips) {
+    console.log(tips);
+  }
   return (
     <Container size="sm" py="xl">
       <Stack align="center" spacing="md">
@@ -18,16 +41,28 @@ const Tips = () => {
         ) : error ? (
           <Text c="red">{error}</Text>
         ) : (
-          <Card shadow='md'padding='lg' radius='md' withBorder>
-            {tip?.length > 0 ? (
-  <Text>{tip[0].q}</Text>
-) : (
-  <Text color="dimmed">No tips available.</Text>
-)}
-
+          <Card shadow="md" padding="lg" radius="md" withBorder>
+            {tips?.length > 0 ? (
+              <>
+               <Text>{tips[tipIndex].text}</Text>
+              <Group justify="left" align="center" p="xl" mt="xl">
+                  <Button onClick={fetchPrevTip}  variant="light">
+                    Previous Tip
+                  </Button>
+                  <Button onClick={fetchNextTip}  variant="light">
+                    Get New Tip
+                  </Button>
+                </Group>
+              </>
+             
+            ) : (
+              <>
+                <Text color="dimmed">No tips available.</Text>
+                
+              </>
+            )}
           </Card>
         )}
-        <Button onClick={fetchtip} mt='md'>Get New Tip</Button>
       </Stack>
     </Container>
   );

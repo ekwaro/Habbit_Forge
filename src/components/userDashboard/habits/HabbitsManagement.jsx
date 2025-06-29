@@ -9,7 +9,7 @@ import { useDisclosure } from "@mantine/hooks";
 import "@mantine/dates/styles.css"; 
 
 import HabbitForm from "./HabbitForm";
-import useLocalStorage from "../useLocalStorage";
+import useLocalStorage from "./useLocalStorage";
 import { HabbitsList, DailyHabitView } from "./HabbitsList";
 
 const HabbitsManagement = () => {

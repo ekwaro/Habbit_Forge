@@ -12,9 +12,11 @@ import HabbitsManagement from "./components/userDashboard/habits/HabbitsManageme
 import GoalsManagement from "./components/userDashboard/goals/GoalsManagement.jsx";
 import MotivationalQuotes from "./components/userDashboard/quotes/MotivationalQuotes.jsx";
 import Tips from "./components/userDashboard/tips/Tips.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./components/userDashboard/Overview.jsx";
-import Profile from "./components/userDashboard/Profile.jsx";
+import Profiles from "./components/userDashboard/UserProfile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 
 const theme = {
   colorScheme: "light",
@@ -43,15 +45,14 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <Routes>
             {/* <Route path="/" element={<App />} /> */}
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<App />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
 
             <Route path="/user-dashboard" element={<UserDashBoard />}>
-              <Route index element={<Overview />} />
-              <Route path="overview" element={<Overview />} />
-              <Route path="profile" element={<Profile />} />
+              
+              <Route index element={<Profiles />} />
               <Route path="habbits-management" element={<HabbitsManagement />} />
               <Route path="habbits-management/:id" element={<HabbitsItem />} />
 

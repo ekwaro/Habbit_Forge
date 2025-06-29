@@ -35,7 +35,7 @@ function App() {
       removeUserFromStorage();
     }
   }, [isAuthenticated, user, isLoading]);
-  
+  console.log(user?.email) 
 
 
   return (

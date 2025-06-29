@@ -17,7 +17,7 @@ import "@mantine/dates/styles.css";
 import { DatePicker } from "@mantine/dates";
 import { LineChart } from "@mantine/charts";
 import { useEffect, useState } from "react";
-import useLocalStorage from "../useLocalStorage";
+import useLocalStorage from "./useLocalStorage";
 import { useNavigate, Outlet, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import {
@@ -26,6 +26,7 @@ import {
 } from "./utils/TodaysHabit";
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
+import { IconArrowLeft, IconSignLeftFilled } from "@tabler/icons-react";
 const HabbitsList = ({
   list,
   removeItem,
@@ -113,6 +114,7 @@ const HabbitsList = ({
 const HabbitsItem = () => {
   const { list } = useLocalStorage("habitData", []);
   const params = useParams();
+  const navigate = useNavigate()
   console.log("HabbitsItem Rendered", params, list);
   const habit = list.find((habit) => habit.id.toString() === params.id);
   console.log(params, habit);
@@ -183,6 +185,7 @@ const HabbitsItem = () => {
             <HabitCalenderView habit={habit} />
           </Card>
         </Group>
+        <Button onClick={()=>navigate(-1)} variant='transparent' leftSection={<IconArrowLeft/>}>Back</Button>
       </Card>
     </>
   );
@@ -296,6 +299,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                       checked={habit.completedDates?.includes(todayStr)}
                       onChange={() => markHabbitComplete(habit)}
                     />
+                    <Text>{habit.title}</Text>
                     <Badge color="teal" variant="light">
                       {habit.frequency}
                     </Badge>
