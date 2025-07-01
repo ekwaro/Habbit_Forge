@@ -32,7 +32,7 @@ import HabitCategoriesPage from './pages1/HabitCategoriesPage';
 import MotivationalQuotesPage from './pages1/MotivationalQuotesPage';
 import HabitTipsPage from './pages1/HabitTipsPage';
 import AnalyticsSectionPage from './pages1/AnalyticsSectionPage';
-import DashboardPage1 from './pages1/DashboardPage';
+import DashboardPage1 from './pages1/DashboardPage1';
 import TermsOfService from "./pages1/TermsOfService"; 
 
 const theme = {
@@ -97,7 +97,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/admin" element={<AdminLayout />}>
           
             {/* Nested Routes for Sidebar items */}
-            <Route index element={<DashboardPage />} />
+            <Route index element={<DashboardPage1 />} />
              <Route path="profile" element={<AdminProfilePage />} />
             <Route path="categories" element={<HabitCategoriesPage />} />
             <Route path="quotes" element={<MotivationalQuotesPage />} />
