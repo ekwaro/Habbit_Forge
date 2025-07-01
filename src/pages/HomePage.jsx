@@ -94,7 +94,7 @@ function HomePage() {
                 radius="xl"
                 variant="gradient"
                 gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={20} />} 
+                rightSection={<IconSparkles size={20} />} 
                 styles={{ // Changed to direct object as theme is not used
                   root: {
                     position: 'relative',
@@ -167,7 +167,7 @@ function HomePage() {
                 radius="xl"
                 variant="gradient"
                 gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={16} />} 
+                rightSection={<IconSparkles size={16} />} 
                 styles={{ // Changed to direct object as theme is not used
                   root: {
                     position: 'relative',
@@ -266,7 +266,7 @@ function HomePage() {
               size="xl"
               variant="dark"
               color="white"
-              leftIcon={<IconTarget size={20} />} // Corrected typo: lefticon to leftIcon
+              leftSection={<IconTarget size={20} />} // Corrected typo: lefticon to leftSection
               style={{
                 minWidth: '140px',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
@@ -280,7 +280,7 @@ function HomePage() {
               to="/signup"
               size="xl"
               color="teal"
-              leftIcon={<IconFlame size={20} />}
+              leftSection={<IconFlame size={20} />}
               style={{
                 minWidth: '140px',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
