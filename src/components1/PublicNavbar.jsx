@@ -6,28 +6,44 @@ import {
   Text,
   NavLink,
   Burger, // For the mobile menu icon
-  rem,
   Drawer,  // To create the slide-out mobile menu
   Stack,
-  Flex,   // To arrange links vertically in the drawer
+  Image,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks'; // For managing the drawer's open/close state
-import { IconHome } from '@tabler/icons-react'; // Example icon
+import logo from '../assets/logo.png';
 
 const PublicNavbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure();
   const location = useLocation();
 
-  // Re-usable set of navigation links for both desktop and mobile
+  // Navigation links: Home, About Us, Contact Us, Sign Up, Login
   const navLinks = (
     <>
       <NavLink
         component={Link}
         to="/"
         label="Home"
-        // leftSection={<IconHome style={{ width: rem(18), height: rem(18) }} stroke={1.5} />}
         active={location.pathname === '/'}
-        // onClick={closeDrawer} // Close drawer on link click (for mobile)
+        onClick={closeDrawer}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: 120,
+          fontWeight: 700,
+          fontSize: '1.08rem',
+          borderRadius: 8,
+          transition: 'background 0.18s, color 0.18s',
+          background: location.pathname === '/' ? 'rgba(34,139,230,0.10)' : 'transparent',
+          color: location.pathname === '/' ? '#228be6' : '#222',
+        }}
+        onMouseEnter={e => {
+          e.target.style.background = 'rgba(34,139,230,0.10)';
+          e.target.style.color = '#228be6';
+        }}
+        onMouseLeave={e => {
+          e.target.style.background = location.pathname === '/' ? 'rgba(34,139,230,0.10)' : 'transparent';
+          e.target.style.color = location.pathname === '/' ? '#228be6' : '#222';
+        }}
       />
       <NavLink
         component={Link}
@@ -35,6 +51,24 @@ const PublicNavbar = () => {
         label="About Us"
         active={location.pathname === '/about'}
         onClick={closeDrawer}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: 120,
+          fontWeight: 700,
+          fontSize: '1.08rem',
+          borderRadius: 8,
+          transition: 'background 0.18s, color 0.18s',
+          background: location.pathname === '/about' ? 'rgba(34,139,230,0.10)' : 'transparent',
+          color: location.pathname === '/about' ? '#228be6' : '#222',
+        }}
+        onMouseEnter={e => {
+          e.target.style.background = 'rgba(34,139,230,0.10)';
+          e.target.style.color = '#228be6';
+        }}
+        onMouseLeave={e => {
+          e.target.style.background = location.pathname === '/about' ? 'rgba(34,139,230,0.10)' : 'transparent';
+          e.target.style.color = location.pathname === '/about' ? '#228be6' : '#222';
+        }}
       />
       <NavLink
         component={Link}
@@ -42,6 +76,24 @@ const PublicNavbar = () => {
         label="Contact Us"
         active={location.pathname === '/contact'}
         onClick={closeDrawer}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: 120,
+          fontWeight: 700,
+          fontSize: '1.08rem',
+          borderRadius: 8,
+          transition: 'background 0.18s, color 0.18s',
+          background: location.pathname === '/contact' ? 'rgba(34,139,230,0.10)' : 'transparent',
+          color: location.pathname === '/contact' ? '#228be6' : '#222',
+        }}
+        onMouseEnter={e => {
+          e.target.style.background = 'rgba(34,139,230,0.10)';
+          e.target.style.color = '#228be6';
+        }}
+        onMouseLeave={e => {
+          e.target.style.background = location.pathname === '/contact' ? 'rgba(34,139,230,0.10)' : 'transparent';
+          e.target.style.color = location.pathname === '/contact' ? '#228be6' : '#222';
+        }}
       />
       <NavLink
         component={Link}
@@ -49,6 +101,24 @@ const PublicNavbar = () => {
         label="Sign Up"
         active={location.pathname === '/signup'}
         onClick={closeDrawer}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: 120,
+          fontWeight: 700,
+          fontSize: '1.08rem',
+          borderRadius: 8,
+          transition: 'background 0.18s, color 0.18s',
+          background: location.pathname === '/signup' ? 'rgba(34,139,230,0.10)' : 'transparent',
+          color: location.pathname === '/signup' ? '#228be6' : '#222',
+        }}
+        onMouseEnter={e => {
+          e.target.style.background = 'rgba(34,139,230,0.10)';
+          e.target.style.color = '#228be6';
+        }}
+        onMouseLeave={e => {
+          e.target.style.background = location.pathname === '/signup' ? 'rgba(34,139,230,0.10)' : 'transparent';
+          e.target.style.color = location.pathname === '/signup' ? '#228be6' : '#222';
+        }}
       />
       <NavLink
         component={Link}
@@ -56,48 +126,81 @@ const PublicNavbar = () => {
         label="Login"
         active={location.pathname === '/login'}
         onClick={closeDrawer}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: 120,
+          fontWeight: 700,
+          fontSize: '1.08rem',
+          borderRadius: 8,
+          transition: 'background 0.18s, color 0.18s',
+          background: location.pathname === '/login' ? 'rgba(34,139,230,0.10)' : 'transparent',
+          color: location.pathname === '/login' ? '#228be6' : '#222',
+        }}
+        onMouseEnter={e => {
+          e.target.style.background = 'rgba(34,139,230,0.10)';
+          e.target.style.color = '#228be6';
+        }}
+        onMouseLeave={e => {
+          e.target.style.background = location.pathname === '/login' ? 'rgba(34,139,230,0.10)' : 'transparent';
+          e.target.style.color = location.pathname === '/login' ? '#228be6' : '#222';
+        }}
       />
     </>
   );
 
   return (
-    // This outer Group spans the full header width and justifies content
-    <Group h="100%" px="md" justify="space-between">
-
-      {/* Left Side of Header: Logo & Name + Mobile Burger */}
-      {/* This group holds elements that stick to the left */}
-      <Group gap="xs">
-        {/* Burger only visible on small screens */}
-        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" size="sm" />
-        {/* Logo and App Name - always visible */}
-        {/* You can add your Image component here if you have a logo file */}
-        {/* <Image src="/path/to/your/logo.png" alt="Habits Forge Logo" width={30} height={30} /> */}
-        <Text fw={500} size="lg">Habits Forge</Text>
+    <Group
+      h="100%"
+      px="xl"
+      py={12}
+      justify="space-between"
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(12px)',
+        borderRadius: 18,
+        margin: 16,
+        position: 'relative',
+        zIndex: 10,
+        minHeight: 72,
+        border: '1.5px solid #e3e8f0',
+        boxShadow: '0 6px 32px 0 rgba(60, 120, 200, 0.10)',
+      }}
+    >
+      {/* Left Side: Logo & Mobile Burger */}
+      <Group gap="md" align="center">
+        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" size="md" color="#228be6" />
+        <Image src={logo} alt="Habits Forge Logo" width={48} height={48} style={{ borderRadius: 14, background: 'transparent', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.10)' }} />
       </Group>
-
-      {/* Right Side of Header: Desktop Navigation Links */}
-      {/* This group holds desktop links, hidden on small screens */}
-      <Group gap="md" visibleFrom="sm"
-           style={{
-          display: 'flex',       // Ensure it is a flex container
-          flexDirection: 'row',  // Force children to lay out horizontally
+      {/* Right Side: Desktop Navigation Links */}
+      <Group
+        gap={8}
+        visibleFrom="sm"
+        align="center"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
           alignItems: 'center',
-          flexWrap: 'nowrap',   // Vertically align items in the middle
-        }}>
-        {navLinks} {/* Render the desktop nav links here */}
+          flexWrap: 'nowrap',
+          marginLeft: 'auto',
+        }}
+      >
+        {navLinks.props.children}
       </Group>
-
-      {/* Mobile Navigation Drawer - Appears on small screens when burger is clicked */}
+      {/* Mobile Navigation Drawer */}
       <Drawer
         opened={drawerOpened}
         onClose={closeDrawer}
         title="Navigation"
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-        hiddenFrom="md" // Drawer itself is hidden from desktop sizes
-        position="left" // Typically mobile drawers slide from left or right
+        hiddenFrom="md"
+        position="left"
+        styles={{
+          body: { padding: 0 },
+          content: { background: 'rgba(255,255,255,0.98)', borderRadius: 16 },
+        }}
       >
-        <Stack>
-          {navLinks} {/* Re-use the same nav links for the vertical drawer menu */}
+        <Stack gap={0} p="md">
+          {navLinks.props.children}
         </Stack>
       </Drawer>
     </Group>
