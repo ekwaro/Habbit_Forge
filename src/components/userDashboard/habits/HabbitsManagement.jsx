@@ -4,64 +4,73 @@ import {
   Text,
   Container,
   ScrollArea,
+  Loader,
+  Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import "@mantine/dates/styles.css"; 
+import "@mantine/dates/styles.css";
 
 import HabbitForm from "./HabbitForm";
-import useLocalStorage from "./useLocalStorage";
+import useStrapiHabits from "./useLocalStorage";
 import { HabbitsList, DailyHabitView } from "./HabbitsList";
 
 const HabbitsManagement = () => {
-  const [editingQuote, setEditingQuote] = useState(null);
+  const [editingHabit, setEditingHabit] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { list, addItem, removeItem, clearList, updateItem } = useLocalStorage(
-    "habitData",
-    []
-  );
+  const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN; 
+  const {
+    list,
+    loading,
+    addItem,
+    removeItem,
+    clearList,
+    updateItem,
+  } = useStrapiHabits(authToken);
 
-  const handleSubmit = (values) => {
-    const habit = {
-      id: editingQuote?.id || Date.now(),
+  const handleSubmit = (habit) => {
+   /** 
+    * const habit = {
       title: values.title,
       description: values.description,
       frequency: values.frequency,
-      startdate: values.startdate,
+      startDate: values.starDdate,
       endDate: values.endDate,
-      targetDate: values.targetDate,
-      completedDates: editingQuote?.completedDates || [],
+      partnerId: values.partnerId
+     completedDates: editingHabit?.completedDates || [],
     };
+    * */ 
 
     try {
-      if (editingQuote) {
-        // If editing an existing habit, update it
-        updateItem(editingQuote.id, habit);
+      if (editingHabit) {
+        updateItem(editingHabit.id, habit);
       } else {
         addItem(habit);
       }
     } catch (error) {
       console.error("Error adding/updating habit:", error);
     } finally {
-      setEditingQuote(null);
+      setEditingHabit(null);
       close();
     }
   };
 
+
+
+  
   return (
     <Container>
       <Text size="xl" weight={700} mb="md">
         Habits Management
       </Text>
 
-      {/* Modal Form */}
       <HabbitForm
         opened={opened}
         onClose={() => {
-          setEditingQuote(null);
+          setEditingHabit(null);
           close();
         }}
-        initialValues={editingQuote}
+        initialValues={editingHabit}
         onSubmit={handleSubmit}
       />
 
@@ -69,7 +78,7 @@ const HabbitsManagement = () => {
         variant="gradient"
         fullWidth
         onClick={() => {
-          setEditingQuote(null);
+          setEditingHabit(null);
           open();
         }}
       >
@@ -77,19 +86,29 @@ const HabbitsManagement = () => {
       </Button>
 
       <ScrollArea mt={20} style={{ height: "60vh" }}>
-        {list?.length === 0 ? (
+        {loading ? (
+          <Stack align="center" mt="md">
+            <Loader />
+            <Text>Loading habits...</Text>
+          </Stack>
+        ) : list?.length === 0 ? (
           <Text>No habits found. Please add one.</Text>
         ) : (
           <HabbitsList
             list={list}
             removeItem={removeItem}
             updateItem={updateItem}
-            setEditingQuote={setEditingQuote}
+            setEditingQuote={setEditingHabit}
             open={open}
           />
         )}
 
-        <Button mt="md" color="yellow" variant="outline" onClick={clearList}>
+        <Button
+          mt="md"
+          color="yellow"
+          variant="outline"
+          onClick={clearList}
+        >
           Clear All
         </Button>
       </ScrollArea>

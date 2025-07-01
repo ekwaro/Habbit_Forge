@@ -7,17 +7,19 @@ import {
   Badge,
   ScrollArea,
   Stack,
+  Center,
+  Loader,
   Checkbox,
   Pagination,
   Progress,
   Divider,
   Container,
 } from "@mantine/core";
+import useStrapiHabits from "./useLocalStorage";
 import "@mantine/dates/styles.css";
 import { DatePicker } from "@mantine/dates";
 import { LineChart } from "@mantine/charts";
 import { useEffect, useState } from "react";
-import useLocalStorage from "./useLocalStorage";
 import { useNavigate, Outlet, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import {
@@ -36,14 +38,18 @@ const HabbitsList = ({
 }) => {
   const [activePage, setPage] = useState(1)
   const pageSize = 5
-  const paginatedList = list.slice((activePage - 1) * pageSize, activePage*pageSize)
+  console.log(list)
+  const paginatedList =(Array.isArray(list)?list:[]).slice((activePage - 1) * pageSize, activePage*pageSize)
+
+
   const navigate = useNavigate();
-  console.log("HabbitsList Rendered", list);
+  console.log("HabbitsList Rendered", paginatedList);
   const rows = paginatedList.map((habit) => (
     <Table.Tr key={habit.id}>
+     
       <Table.Td>{habit.title}</Table.Td>
       <Table.Td>{habit.frequency}</Table.Td>
-      <Table.Td>{new Date(habit.startdate).toLocaleDateString()}</Table.Td>
+      <Table.Td>{new Date(habit.startDate).toLocaleDateString()}</Table.Td>
       <Table.Td>{new Date(habit.endDate).toLocaleDateString()}</Table.Td>
       <Table.Td>
         <Button
@@ -98,11 +104,11 @@ const HabbitsList = ({
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
-      {list.length > pageSize && (
+      {list?.length > pageSize && (
   <Pagination
     value={activePage}
     onChange={setPage}
-    total={Math.ceil(list.length / pageSize)}
+    total={Math.ceil(list?.length / pageSize)}
     mt="md"
     position="center"
   />
@@ -111,49 +117,65 @@ const HabbitsList = ({
   );
 };
 
+
 const HabbitsItem = () => {
-  const { list } = useLocalStorage("habitData", []);
-  const params = useParams();
-  const navigate = useNavigate()
-  console.log("HabbitsItem Rendered", params, list);
-  const habit = list.find((habit) => habit.id.toString() === params.id);
-  console.log(params, habit);
+  const { id } = useParams();
+  console.log(typeof(id))
+  const navigate = useNavigate();
+  const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN;
+
+  const { list, loading } = useStrapiHabits(authToken);
+  console.log(list)
+
+  const habit = Array.isArray(list.data)?list.data.find((habit) => habit.id.toString() === id):null;
+
+  if (loading) {
+    return (
+      <Center mt="xl">
+        <Loader />
+        <Text ml="sm">Loading habit details...</Text>
+      </Center>
+    );
+  }
+
   return (
-    <>
-      <Card withBorder shadow="sm" p="lg" my="md">
-        <Group position="apart" mb="md">
-    <Text fw={600} size="xl">
-      Habit Details
-    </Text>
-    {habit && (
-      <Badge color="teal" variant="light" size="lg">
-        {habit.frequency}
-      </Badge>
-    )}
-  </Group>
+    <Card withBorder shadow="sm" p="lg" my="md">
+      <Group justify="space-between" mb="md">
+        <Text fw={600} size="xl">
+          Habit Details
+        </Text>
+        {habit && (
+          <Badge color="teal" variant="light" size="lg">
+            {habit.frequency}
+          </Badge>
+        )}
+      </Group>
 
-  {!habit ? (
-    <Text c="dimmed" align="center">
-      Habit not found.
-    </Text>
-  ) : (
-    <Stack spacing="xs">
-      <Text fw={700} size="lg" c="blue">
-        {habit.title}
-      </Text>
+      {!habit ? (
+        <Text c="dimmed" align="center">
+          Habit not found.
+        </Text>
+      ) : (
+        <Stack spacing="xs">
+          <Text fw={700} size="lg" c="blue">
+            {habit.title}
+          </Text>
 
-      <Divider my="xs" />
+          <Divider my="xs" />
 
-      <Text size="sm" c="gray">
-        <strong>Start Date:</strong> {dayjs(habit.startDate).format("MMM D, YYYY")}
-      </Text>
-      <Text size="sm" c="gray">
-        <strong>End Date:</strong> {dayjs(habit.endDate).format("MMM D, YYYY")}
-      </Text>
-    </Stack>
-  )}
-        
-        <Group justify="space-between" mt="md">
+          <Text size="sm" c="gray">
+            <strong>Start Date:</strong>{" "}
+            {dayjs(habit.startDate).format("MMM D, YYYY")}
+          </Text>
+          <Text size="sm" c="gray">
+            <strong>End Date:</strong>{" "}
+            {dayjs(habit.endDate).format("MMM D, YYYY")}
+          </Text>
+        </Stack>
+      )}
+
+      {habit && (
+        <Group justify="space-between" mt="md" wrap="wrap">
           <Card
             mt={20}
             withBorder
@@ -170,11 +192,11 @@ const HabbitsItem = () => {
               curveType="monotone"
               yAxisLabel="Completed"
               margin={{ top: 20, right: 20, bottom: 20, left: 50 }}
-          
               dataKey="date"
               series={[{ name: "Completed", color: "teal" }]}
             />
           </Card>
+
           <Card
             mt={20}
             withBorder
@@ -185,9 +207,17 @@ const HabbitsItem = () => {
             <HabitCalenderView habit={habit} />
           </Card>
         </Group>
-        <Button onClick={()=>navigate(-1)} variant='transparent' leftSection={<IconArrowLeft/>}>Back</Button>
-      </Card>
-    </>
+      )}
+
+      <Button
+        onClick={() => navigate(-1)}
+        variant="transparent"
+        leftSection={<IconArrowLeft />}
+        mt="md"
+      >
+        Back
+      </Button>
+    </Card>
   );
 };
 const HabitCalenderView = ({ habit }) => {
@@ -235,31 +265,22 @@ const HabitCalenderView = ({ habit }) => {
 
 const DailyHabitView = ({ list, removeItem, updateItem }) => {
   const todayStr = dayjs().format("YYYY-MM-DD");
-  // This component can be used to display a detailed view of a daily habit
-  // It can include progress indicators, notes, and other relevant information
+
   const isTodayInRange = (startdate, endDate) => {
-    const today = dayjs(new Date()).startOf("day");
-    console.log(today, dayjs(startdate), endDate);
+    const today = dayjs().startOf("day");
     return dayjs(startdate) <= today && today <= dayjs(endDate);
   };
-  const getTodaysHabit = (habits) =>
-    habits
+
+  const getTodaysHabit = (habits) => (Array.isArray(habits)?habits:[])
+    
       .filter((habit) => isTodayMatchingFrequency(habit))
       .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
 
-  const todaysHabbit = useMemo(() => getTodaysHabit(list), [list]);
-  console.log("Today's Habits:", todaysHabbit);
-  console.log(list);
+  const todaysHabits = useMemo(() => getTodaysHabit(list), [list]);
 
-  const markHabbitComplete = (myhabit) => {
-    const today = dayjs().format("YYYY-MM-DD");
-     const habit = list.find((h) => h.id === myhabit.id);
-  if (!habit) {
-    console.warn("Habit not found for id:", myhabit.id);
-    return;
-  }
-
-    const alreadyCompleted = habit.completedDates?.includes(today);
+  const markHabitComplete = (habit) => {
+    const today = todayStr;
+    const alreadyCompleted = habit.completedDates?.includes(today) ?? false;
 
     const updatedHabit = {
       ...habit,
@@ -267,22 +288,26 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
         ? habit.completedDates.filter((date) => date !== today)
         : [...(habit.completedDates || []), today],
     };
-    updateItem(myhabit.id, updatedHabit);
+
+    updateItem(habit.id, updatedHabit);
   };
+
   return (
     <Card withBorder shadow="sm" p="lg" my="md">
       <Group position="apart" mb="xs">
-        <Text weight={500}>Today's Habit</Text>
+        <Text fw={500}>Today's Habits</Text>
         <Text>{dayjs().format("dddd, MMM D")}</Text>
       </Group>
+
       <ScrollArea h={350}>
         <Stack>
-          {todaysHabbit.length === 0 ? (
-            <Text>("No daily habits for today.")</Text>
+          {todaysHabits.length === 0 ? (
+            <Text c="dimmed">No daily habits for today.</Text>
           ) : (
-              todaysHabbit.map((habit) => {             
+            todaysHabits.map((habit) => {
               const progress = getHabitProgress(habit);
-              const isCompleted = habit.completedDates?.includes(todayStr);
+              const isCompleted = habit.completedDates?.includes(todayStr) ?? false;
+
               return (
                 <Card
                   withBorder
@@ -293,26 +318,26 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                     backgroundColor: isCompleted ? "#d4edda" : "#f8d7da",
                   }}
                 >
-                  <Group position="apart" mb="xs">
+                  <Group position="apart" mb="xs" align="center">
                     <Checkbox
-                      label={habit.habitName}
-                      checked={habit.completedDates?.includes(todayStr)}
-                      onChange={() => markHabbitComplete(habit)}
+                      label={habit.title}
+                      checked={isCompleted}
+                      onChange={() => markHabitComplete(habit)}
                     />
-                    <Text>{habit.title}</Text>
                     <Badge color="teal" variant="light">
                       {habit.frequency}
                     </Badge>
                   </Group>
+
                   <Text size="sm" mt="xs" c="dimmed">
-                    {`Start: ${dayjs(habit.startDate).format(
-                      "MMM D, YYYY"
-                    )} | End: ${dayjs(habit.endDate).format("MMM D, YYYY")}`}
+                    {`Start: ${dayjs(habit.startdate).format("MMM D, YYYY")} | End: ${dayjs(habit.endDate).format("MMM D, YYYY")}`}
                   </Text>
+
                   <Progress value={progress} mt="md" size="sm" radius="xl" />
                   <Text size="xs" c="dimmed" mt={6}>
                     {progress}% completed
                   </Text>
+
                   <Group mt="sm" position="right">
                     <Button
                       size="xs"
@@ -339,5 +364,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
     </Card>
   );
 };
+
+
 
 export { HabbitsList, HabbitsItem, DailyHabitView };

@@ -1,15 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: 'localhost',  // explicitly bind to localhost
-    port: 5173,         // ensure port consistency
+    host: 'localhost',
+    port: 5173,
     hmr: {
-      protocol: 'ws',   // websocket protocol
+      protocol: 'ws',
       host: 'localhost',
       port: 5173,
-    }}
+    },
+    fs: {
+      strict: false,
+    },
+    // 
+    historyApiFallback: true,
+  },
 })

@@ -22,13 +22,18 @@ const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
-
+const ADMIN_CONFIG = {
+  email: "admin@gmail.com",
+  password: "admin123",
+  name: "System Admin"
+};
 function LoginForm() {
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Initialize Google Sign-In
   useEffect(() => {
+    console.log("LoginForm mounted");
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -50,8 +55,10 @@ function LoginForm() {
   }, []);
 
   const handleGoogleCallback = (response) => {
+    console.log("Google callback triggered");
     try {
       const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
+      console.log("Google user info:", userInfo);
       
       setIsRedirecting(true);
       localStorage.setItem("isAuthenticated", "true");
@@ -62,6 +69,7 @@ function LoginForm() {
           email: userInfo.email,
           picture: userInfo.picture,
           authMethod: "google",
+          admin: false 
         })
       );
 
@@ -72,6 +80,7 @@ function LoginForm() {
       });
 
       setTimeout(() => {
+        console.log("Navigating to user dashboard");
         navigate("/user-dashboard", { replace: true });
       }, 1000);
     } catch (error) {
@@ -90,35 +99,90 @@ function LoginForm() {
       password: "",
     },
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) => (value.length > 0 ? null : "Password is required"),
+      email: (value) => {
+        console.log("Validating login email:", value);
+        return /^\S+@\S+$/.test(value) ? null : "Invalid email";
+      },
+      password: (value) => {
+        console.log("Validating login password length:", value.length);
+        return value.length > 0 ? null : "Password is required";
+      },
     },
   });
 
   const handleSubmit = (values) => {
+    console.log("=== LOGIN FORM SUBMITTED ===");
+    console.log("Login form values:", values);
+    
     try {
+          // Check if this is admin login first
+      const isAdminLogin = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
+      
+      if (isAdminLogin) {
+        console.log("Admin login detected");
+        setIsRedirecting(true);
+        
+        const adminUser = {
+          name: ADMIN_CONFIG.name,
+          email: ADMIN_CONFIG.email,
+          admin: true
+        };
+        
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("currentUser", JSON.stringify(adminUser));
+        console.log("Saved admin user to localStorage:", adminUser);
+
+        notifications.show({
+          title: "Success",
+          message: `Welcome back ${adminUser.name}!`,
+          color: "green",
+        });
+
+        setTimeout(() => {
+          console.log("Executing navigation to: /admin");
+          navigate("/admin", { replace: true });
+        }, 1000);
+        return;
+      }
+
+
+
+
+       // For regular users, check localStorage
       const users = JSON.parse(localStorage.getItem("users") || "[]");
+      console.log("All users in localStorage:", users);
+      
       const user = users.find(
-        (u) => u.email === values.email && u.password === values.password
+        (u) => u.email === values.email && u.password === values.password && !u.admin
       );
+      console.log("Found regular user:", user);
 
       if (user) {
+        console.log("Regular user authentication successful");
+        
         setIsRedirecting(true);
           const currentUser = { ...user, authMethod: "local" };
         
         localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        console.log("Saved current user to localStorage:", user);
+
 
         notifications.show({
           title: "Success",
-          message: "Welcome back!",
-          color: "black",
+          message: `Welcome back ${user.name}!`,
+          color: "green",
         });
 
+
+
+        // Redirect based on admin status
         setTimeout(() => {
+          console.log("Executing navigation to: /user-dashboard");
           navigate("/user-dashboard", { replace: true });
-        }, 100);
+        }, 1000);
       } else {
+        console.log("User authentication failed - no matching user found");
         notifications.show({
           title: "Error",
           message: "Invalid email or password",
@@ -126,16 +190,17 @@ function LoginForm() {
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       notifications.show({
         title: "Error",
         message: "Login failed. Please try again.",
         color: "red",
       });
-      console.error("Login error:", error);
     }
   };
 
   const handleGoogleLogin = () => {
+    console.log("Google login button clicked");
     if (window.google) {
       window.google.accounts.id.prompt();
     } else {
@@ -147,10 +212,17 @@ function LoginForm() {
     }
   };
 
+  // Debug button click
+  const handleButtonClick = (e) => {
+    console.log("Login button clicked!");
+    console.log("Form errors:", form.errors);
+    console.log("Form values:", form.values);
+    console.log("Form validation:", form.validate());
+  };
+
   return (
     <div
       style={{
-        position: "fixed",
         top: 0,
         left: 0,
         right: 0,
@@ -254,6 +326,7 @@ function LoginForm() {
                 color="teal"
                  leftSection ={<IconLogin size={18} />}
                 loading={isRedirecting}
+                onClick={handleButtonClick}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -300,7 +373,7 @@ function LoginForm() {
                 fw={600}
                 style={{ display: "inline" }}
               >
-                Sign in to Start your journey
+                Sign up to Start your journey
               </Text>
             </Text>
         

@@ -12,30 +12,23 @@ const animatedBackground = keyframes`
 
 function HomePage() {
   return (
-   <div
-  style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingTop: 40,
-    paddingBottom: 40,
-    background: `
-      linear-gradient(135deg, #b2f2bb80 0%, #96f2d780 100%),
-      url('https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg')
-    `,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundBlendMode: 'overlay', // Makes gradient interact with image
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    animation: `${animatedBackground} 20s linear infinite`,
-    overflow: 'hidden'
-  }}
->
+    <div
+      style={{
+        background: `
+          linear-gradient(135deg, #b2f2bb80 0%, #96f2d780 100%),
+          url('https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg')
+        `,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay', // Makes gradient interact with image
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        animation: `${animatedBackground} 20s linear infinite`,
+        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))', // Added fallback 0px for robustness
+      }}
+    >
       <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
 
       <motion.div
@@ -43,57 +36,38 @@ function HomePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         style={{
-          position: 'relative',
           zIndex: 2,
           width: '100%',
           maxWidth: '90vw',
-          maxHeight: '95vh',
           padding: '10px',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          // Removed maxHeight: '95vh' to prevent content cutoff
         }}
       >
-
         <Paper
-  style={{
-    backgroundColor: 'rgba(230, 240, 230, 0.15)', // Very transparent
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    border: 'none' // Remove border if too distracting
-  }}
->
-        {/* <Paper
-  shadow="lg"
-  radius="lg"
-  p="lg"
-  withBorder
-  style={{
-    backgroundColor: 'rgba(195, 200, 168, 0.85)',
-    backdropFilter: 'blur(10px)', // Only keep one instance
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    overflow: 'hidden'
-  }}
-> */}
-          {/* Header Section */}
+          style={{
+            backgroundColor: 'rgba(230, 240, 230, 0.15)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            border: 'none'
+          }}
+        >
           <div style={{ textAlign: 'center' }}>
-            <Title 
-              order={1} 
-              align="center" 
-              mb="sm" 
-              style={{ 
+            <Title
+              order={1}
+              align="center"
+              mb="sm"
+              style={{
                 fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-                lineHeight: 1.2 
+                lineHeight: 1.2
               }}
             >
               **SMALL STEPS. LASTING CHANGE**
             </Title>
 
-            <Text align="center" size="md" color="dark"  mb="sm">
-             <strong>Your personal path to building better habits.</strong>  
+            <Text align="center" size="md" color="dark" mb="sm">
+              <strong>Your personal path to building better habits.</strong>
             </Text>
 
             <Text align="center" size="sm" color="dark" mb="md">
@@ -101,27 +75,27 @@ function HomePage() {
             </Text>
           </div>
 
-          {/* Features Button - Keep original */}
-          <div style={{ 
-            flex: '0 0 auto', 
-            display: 'flex', 
+          {/* "Fuel growth" Button */}
+          <div style={{
+            flex: '0 0 auto',
+            display: 'flex',
             justifyContent: 'center',
             marginBottom: '1rem'
           }}>
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               style={{ position: 'relative' }}
             >
-              <Button 
-                component={Link} 
+              <Button
+                component={Link}
                 to="/features"
                 size="md"
                 radius="xl"
                 variant="gradient"
                 gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={20} />}
-                styles={(theme) => ({
+                rightIcon={<IconSparkles size={20} />} 
+                styles={{ // Changed to direct object as theme is not used
                   root: {
                     position: 'relative',
                     overflow: 'hidden',
@@ -129,16 +103,16 @@ function HomePage() {
                       transform: 'translateY(-2px)',
                     },
                   },
-                })}
+                }}
               >
                 Fuel growth
               </Button>
-              
+
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ 
+                animate={{
                   scale: 1,
-                  transition: { 
+                  transition: {
                     duration: 1.5,
                     repeat: Infinity,
                     repeatType: 'reverse'
@@ -161,10 +135,10 @@ function HomePage() {
 
           {/* Quote Section */}
           <div style={{ flex: '0 0 auto', marginBottom: '1rem' }}>
-            <Blockquote 
-              color="white" 
-              cite="Arigye Dorcus" 
-              style={{ 
+            <Blockquote
+              color="white"
+              cite="Arigye Dorcus"
+              style={{
                 fontSize: 'clamp(0.8rem, 2vw, 1rem)',
                 margin: '0 auto',
                 maxWidth: '500px'
@@ -174,27 +148,27 @@ function HomePage() {
             </Blockquote>
           </div>
 
-          {/* Features Button */}
-          <div style={{ 
-            flex: '0 0 auto', 
-            display: 'flex', 
+          {/* "Keep focused" Button (original, non-duplicated) */}
+          <div style={{
+            flex: '0 0 auto',
+            display: 'flex',
             justifyContent: 'center',
             marginBottom: '1rem'
           }}>
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               style={{ position: 'relative' }}
             >
-              <Button 
-                component={Link} 
+              <Button
+                component={Link}
                 to="/features"
                 size="md"
                 radius="xl"
                 variant="gradient"
                 gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={16} />}
-                styles={(theme) => ({
+                rightIcon={<IconSparkles size={16} />} 
+                styles={{ // Changed to direct object as theme is not used
                   root: {
                     position: 'relative',
                     overflow: 'hidden',
@@ -202,16 +176,16 @@ function HomePage() {
                       transform: 'translateY(-2px)',
                     },
                   },
-                })}
+                }}
               >
                 keep focused
               </Button>
-              
+
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ 
+                animate={{
                   scale: 1,
-                  transition: { 
+                  transition: {
                     duration: 1.5,
                     repeat: Infinity,
                     repeatType: 'reverse'
@@ -232,41 +206,42 @@ function HomePage() {
             </motion.div>
           </div>
 
+
           {/* Badges Section */}
-          <div style={{ 
-            flex: '0 0 auto', 
-            display: 'flex', 
+          <div style={{
+            flex: '0 0 auto',
+            display: 'flex',
             justifyContent: 'center',
             marginBottom: '1.5rem'
           }}>
-            <Group 
-              position="center" 
+            <Group
+              position="center"
               spacing="xs"
               style={{
                 flexWrap: 'wrap',
                 justifyContent: 'center'
               }}
             >
-              <Badge 
-                color="black" 
-                size="sm" 
-                variant="filled" 
+              <Badge
+                color="black"
+                size="sm"
+                variant="filled"
                 leftSection={<IconSparkles size={12} />}
                 style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
               >
                 Build Habits
               </Badge>
-              <Badge 
-                color="black" 
-                size="sm" 
+              <Badge
+                color="black"
+                size="sm"
                 variant="filled"
                 style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
               >
                 Stay Consistent
               </Badge>
-              <Badge 
-                color="black" 
-                size="sm" 
+              <Badge
+                color="black"
+                size="sm"
                 variant="filled"
                 style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
               >
@@ -278,20 +253,20 @@ function HomePage() {
           <Divider mb="md" />
 
           {/* Login/Signup Buttons - Large and at the bottom */}
-          <div style={{ 
+          <div style={{
             flex: '0 0 auto',
             display: 'flex',
             justifyContent: 'center',
             gap: '1rem',
             flexWrap: 'wrap'
           }}>
-            <Button 
-              component={Link} 
-              to="/login" 
-              size="xl" 
-              variant="dark" 
-              color="white" 
-              leftIcon={<IconTarget size={20} />}
+            <Button
+              component={Link}
+              to="/login"
+              size="xl"
+              variant="dark"
+              color="white"
+              leftIcon={<IconTarget size={20} />} // Corrected typo: lefticon to leftIcon
               style={{
                 minWidth: '140px',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
@@ -300,11 +275,11 @@ function HomePage() {
             >
               Login
             </Button>
-            <Button 
-              component={Link} 
-              to="/signup" 
-              size="xl" 
-              color="teal" 
+            <Button
+              component={Link}
+              to="/signup"
+              size="xl"
+              color="teal"
               leftIcon={<IconFlame size={20} />}
               style={{
                 minWidth: '140px',

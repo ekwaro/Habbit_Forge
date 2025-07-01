@@ -12,11 +12,28 @@ import HabbitsManagement from "./components/userDashboard/habits/HabbitsManageme
 import GoalsManagement from "./components/userDashboard/goals/GoalsManagement.jsx";
 import MotivationalQuotes from "./components/userDashboard/quotes/MotivationalQuotes.jsx";
 import Tips from "./components/userDashboard/tips/Tips.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
+//import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./components/userDashboard/Overview.jsx";
 import Profiles from "./components/userDashboard/UserProfile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
-import SignupPage from "./pages/SignupPage.jsx";
+
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import DashboardPage from "./pages/DashboardPage";
+
+
+import AboutUsPage from "./pages1/AboutUsPage";
+import ContactUsPage from "./pages1/ContactUsPage";
+
+import AdminLayout from './components1/AdminLayout';
+import AdminProfilePage from './pages1/AdminProfilePage';
+import HabitCategoriesPage from './pages1/HabitCategoriesPage';
+import MotivationalQuotesPage from './pages1/MotivationalQuotesPage';
+import HabitTipsPage from './pages1/HabitTipsPage';
+import AnalyticsSectionPage from './pages1/AnalyticsSectionPage';
+import DashboardPage1 from './pages1/DashboardPage';
+import TermsOfService from "./pages1/TermsOfService"; 
 
 const theme = {
   colorScheme: "light",
@@ -44,10 +61,21 @@ createRoot(document.getElementById("root")).render(
       <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
         <BrowserRouter>
           <Routes>
+
+            <Route path="/" element={<App />}>
+               <Route index element={<HomePage />} />
+               <Route path="login" element={<LoginPage />} />
+               <Route path="signup" element={<SignupPage />} />
+               <Route path="about" element={<AboutUsPage />} />
+               <Route path="contact" element={<ContactUsPage />} />
+               <Route path="terms-of-service" element={<TermsOfService />} />
+               
+            </Route>   
+
             {/* <Route path="/" element={<App />} /> */}
-            <Route path="/" element={<App />} />
+            {/* <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/signup" element={<SignupPage />} /> */}
             {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
 
             <Route path="/user-dashboard" element={<UserDashBoard />}>
@@ -63,6 +91,23 @@ createRoot(document.getElementById("root")).render(
               />
               <Route path="tips" element={<Tips />} />
             </Route>
+
+            
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+          
+            {/* Nested Routes for Sidebar items */}
+            <Route index element={<DashboardPage />} />
+             <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="categories" element={<HabitCategoriesPage />} />
+            <Route path="quotes" element={<MotivationalQuotesPage />} />
+            <Route path="tips" element={<HabitTipsPage />} />
+            <Route path="analytics" element={<AnalyticsSectionPage />} />
+
+            {/* Handle 404 for admin routes*/}
+            <Route path="*" element={<div>404 Admin Page Not Found</div>} />
+          </Route>
+         
             {/* Add more routes as needed */}
             {/* Catch-all route for 404 Not Found */}
             <Route path="*" element={<NotFoundPage />} />

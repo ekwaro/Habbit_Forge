@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useForm } from "@mantine/form";
 import {
   TextInput,
@@ -6,13 +7,11 @@ import {
   Title,
   Text,
   Paper,
-  Container,
-  Overlay,
   Divider,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { IconFlame, IconUserPlus } from "@tabler/icons-react";
+import { IconFlame } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { keyframes } from "@emotion/react";
 
@@ -21,10 +20,14 @@ const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
+const ADMIN_CONFIG = {
+  email: "admin@gmail.com",
+  password: "admin123",
+  name: "System Admin"
+};
 
 function SignupPage() {
   const navigate = useNavigate();
-
   const form = useForm({
     initialValues: {
       name: "",
@@ -34,45 +37,85 @@ function SignupPage() {
       role: 'user'
     },
     validate: {
-      name: (value) => (value.trim().length > 0 ? null : "Name is required"),
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) =>
-        value.length >= 6 ? null : "Password must be at least 6 characters",
-      confirmPassword: (value, values) =>
-        value === values.password ? null : "Passwords do not match",
+      name: (value) => {
+        if (!value.trim()) return "Name is required";
+        return null;
+      },
+      email: (value) => {
+        if (!/^\S+@\S+$/.test(value)) return "Invalid email";
+        return null;
+      },
+      password: (value) => {
+        if (value.length < 6) return "Password must be at least 6 characters";
+        return null;
+      },
+      confirmPassword: (value, values) => {
+        if (value !== values.password) return "Passwords do not match";
+        return null;
+      },
     },
   });
 
-  const handleSubmit = (values) => {
+   // Initialize admin user
+  useEffect(() => {
+    console.log("Checking admin user...");
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-    if (users.some((user) => user.email === values.email)) {
-      notifications.show({
-        title: "Error",
-        message: "User with this email already exists",
-        color: "red",
+    const adminExists = users.some(user => 
+      user.email === ADMIN_CONFIG.email && user.admin
+    );
+
+    if (!adminExists) {
+      console.log("Creating admin user...");
+      users.push({
+        name: ADMIN_CONFIG.name,
+        email: ADMIN_CONFIG.email,
+        password: ADMIN_CONFIG.password,
+        admin: true
       });
-      return;
+      localStorage.setItem("users", JSON.stringify(users));
+      console.log("Admin user created successfully");
     }
+  }, []);
 
-    const { confirmPassword, ...userData } = values;
-    users.push(userData);
-    localStorage.setItem("users", JSON.stringify(users));
+  
+  const handleSubmit = (values) => {
+    console.log("Form submission started with values:", values);
+    
+    try {
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      console.log("Current users:", users);
 
-    notifications.show({
-      title: "Success",
-      message: "Account created successfully! Redirecting to login...",
-      color: "green",
-    });
+      // Check if this is an admin signup
+      const isAdminSignup = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
+      
+      if (isAdminSignup) {
+        // For admin signup, allow multiple signups but don't store duplicates
+        console.log("Admin signup detected");
+        
+        notifications.show({
+          title: "Success",
+          message: "Admin account created! Redirecting to login...",
+          color: "green",
+        });
 
     setTimeout(() => {
       navigate("/login", { replace: true });
     }, 1500);
   };
+   } catch (error) {
+      console.error("Signup error:", error);
+      notifications.show({
+        title: "Error",
+        message: "An unexpected error occurred. Please try again.",
+        color: "red",
+      });
+    }
+  };
+
 
   return (
     <div
       style={{
-        position: "fixed",
         top: 0,
         left: 0,
         right: 0,
@@ -93,8 +136,6 @@ function SignupPage() {
         padding: 20,
       }}
     >
-      <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -215,7 +256,7 @@ function SignupPage() {
                   letterSpacing: 0.5,
                 }}
               >
-               SIGN IN TO IGNITE MY JOURNEY
+                SIGN UP TO IGNITE MY JOURNEY
               </Button>
             </motion.div>
 
