@@ -1,297 +1,197 @@
-import { Button, Group, Text, Title, Paper, Space, Image, Divider, Blockquote, Badge, Overlay } from '@mantine/core';
+import { Button, Group, Text, Title, Paper, Badge } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { IconFlame, IconTarget, IconSparkles } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
-import { keyframes } from '@emotion/react';
-
-// Define keyframes separately
-const animatedBackground = keyframes`
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
-`;
 
 function HomePage() {
   return (
     <div
       style={{
-        background: `
-          linear-gradient(135deg, #b2f2bb80 0%, #96f2d780 100%),
-          url('https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg')
-        `,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay', // Makes gradient interact with image
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        animation: `${animatedBackground} 20s linear infinite`,
-        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))', // Added fallback 0px for robustness
+        minHeight: '100vh',
+        backgroundColor: '#FFF8F0', // Cream background
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+      {/* Main content container */}
+      <div
         style={{
-          zIndex: 2,
-          width: '100%',
-          maxWidth: '90vw',
-          padding: '10px',
+          flex: 1,
+          padding: '2rem',
           display: 'flex',
           flexDirection: 'column',
-          // Removed maxHeight: '95vh' to prevent content cutoff
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          paddingTop: '80px',
+          position: 'relative',
         }}
       >
-        <Paper
+        {/* Sideways image container - shows entire image */}
+        <div
           style={{
-            backgroundColor: 'rgba(230, 240, 230, 0.15)',
-            backdropFilter: 'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
-            border: 'none'
+            position: 'absolute',
+            right: 200,
+            top: '100%',
+            transform: 'translateY(-50%) rotate(90deg)',
+            width: '50%', // Height becomes width when rotated
+            height: '50%', // Narrow strip
+            backgroundImage: 'url(https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg)',
+            backgroundSize: 'contain', // Show entire image
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            zIndex: 0,
+            opacity: 0.7,
+            borderLeft: '4px solid #E67E22',
+            transformOrigin: 'right center',
+          }}
+        />
+
+        {/* Content with higher z-index to appear above image */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            maxWidth: 'calc(100% - 140px)', // Adjust for image strip
           }}
         >
-          <div style={{ textAlign: 'center' }}>
-            <Title
-              order={1}
-              align="center"
-              mb="sm"
-              style={{
-                fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-                lineHeight: 1.2
-              }}
-            >
-              **SMALL STEPS. LASTING CHANGE**
-            </Title>
+          <Title
+            order={1}
+            style={{
+              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+              lineHeight: 1.2,
+              color: '#E67E22',
+              fontWeight: 800,
+              marginBottom: '1.5rem',
+            }}
+          >
+            SMALL STEPS. LASTING CHANGE
+          </Title>
 
-            <Text align="center" size="md" color="dark" mb="sm">
-              <strong>Your personal path to building better habits.</strong>
-            </Text>
+          <Text 
+            size="xl" 
+            mb="md" 
+            style={{ 
+              color: '#333', 
+              fontWeight: 600,
+              maxWidth: '600px',
+            }}
+          >
+            Your personal path to building better habits.
+          </Text>
 
-            <Text align="center" size="sm" color="dark" mb="md">
-              <strong>Track your goals, stay consistent, and transform your daily routine.</strong>
-            </Text>
-          </div>
+          <Text 
+            size="lg" 
+            mb="xl" 
+            style={{ 
+              color: '#555', 
+              fontWeight: 500,
+              maxWidth: '600px',
+            }}
+          >
+            Track your goals, stay consistent, and transform your daily routine.
+          </Text>
 
-          {/* "Fuel growth" Button */}
-          <div style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '1rem'
-          }}>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{ position: 'relative' }}
-            >
+          <Group spacing="xl" mb="xl">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 component={Link}
                 to="/features"
-                size="md"
+                size="lg"
                 radius="xl"
                 variant="gradient"
-                gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={20} />} 
-                styles={{ // Changed to direct object as theme is not used
-                  root: {
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                    },
-                  },
+                gradient={{ from: 'orange', to: '#E67E22', deg: 105 }}
+                rightIcon={<IconSparkles size={20} />}
+                style={{
+                  fontSize: '1.1rem',
+                  padding: '0.75rem 2rem',
+                  fontWeight: 600,
                 }}
               >
-                Fuel growth
+                Fuel Growth
               </Button>
-
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{
-                  scale: 1,
-                  transition: {
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: 'reverse'
-                  }
-                }}
-                style={{
-                  position: 'absolute',
-                  top: -5,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 'calc(100% + 10px)',
-                  height: 'calc(100% + 10px)',
-                  borderRadius: '50%',
-                  border: '2px dashed rgba(12, 10, 18, 0.4)',
-                  pointerEvents: 'none',
-                }}
-              />
             </motion.div>
-          </div>
 
-          {/* Quote Section */}
-          <div style={{ flex: '0 0 auto', marginBottom: '1rem' }}>
-            <Blockquote
-              color="white"
-              cite="Arigye Dorcus"
-              style={{
-                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                margin: '0 auto',
-                maxWidth: '500px'
-              }}
-            >
-              <strong>"Every action you take is a vote for the type of person you wish to become."</strong>
-            </Blockquote>
-          </div>
-
-          {/* "Keep focused" Button (original, non-duplicated) */}
-          <div style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '1rem'
-          }}>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{ position: 'relative' }}
-            >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 component={Link}
                 to="/features"
-                size="md"
+                size="lg"
                 radius="xl"
                 variant="gradient"
-                gradient={{ from: 'black', to: 'green', deg: 105 }}
-                rightIcon={<IconSparkles size={16} />} 
-                styles={{ // Changed to direct object as theme is not used
-                  root: {
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                    },
-                  },
-                }}
-              >
-                keep focused
-              </Button>
-
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{
-                  scale: 1,
-                  transition: {
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: 'reverse'
-                  }
-                }}
+                gradient={{ from: '#E67E22', to: 'orange', deg: 105 }}
+                rightIcon={<IconTarget size={20} />}
                 style={{
-                  position: 'absolute',
-                  top: -5,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 'calc(100% + 10px)',
-                  height: 'calc(100% + 10px)',
-                  borderRadius: '100%',
-                  border: '2px dashed rgba(12, 13, 21, 0.4)',
-                  pointerEvents: 'none',
+                  fontSize: '1.1rem',
+                  padding: '0.75rem 2rem',
+                  fontWeight: 600,
                 }}
-              />
+              >
+                Keep Focused
+              </Button>
             </motion.div>
-          </div>
+          </Group>
 
-
-          {/* Badges Section */}
-          <div style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '1.5rem'
-          }}>
-            <Group
-              position="center"
-              spacing="xs"
+          <Paper
+            p="md"
+            mb="xl"
+            style={{
+              backgroundColor: 'rgba(230, 126, 34, 0.1)',
+              borderLeft: '4px solid #E67E22',
+              maxWidth: '600px',
+            }}
+          >
+            <Text
+              size="lg"
               style={{
-                flexWrap: 'wrap',
-                justifyContent: 'center'
+                fontStyle: 'italic',
+                color: '#333',
+                fontWeight: 500,
+                lineHeight: 1.6,
               }}
             >
-              <Badge
-                color="black"
-                size="sm"
-                variant="filled"
-                leftSection={<IconSparkles size={12} />}
-                style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
-              >
-                Build Habits
-              </Badge>
-              <Badge
-                color="black"
-                size="sm"
-                variant="filled"
-                style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
-              >
-                Stay Consistent
-              </Badge>
-              <Badge
-                color="black"
-                size="sm"
-                variant="filled"
-                style={{ fontSize: 'clamp(0.7rem, 1.5vw, 0.9rem)' }}
-              >
-                Reach Goals
-              </Badge>
-            </Group>
-          </div>
+              "Every action you take is a vote for the type of person you wish to become."
+              <br />
+              <span style={{ fontSize: '0.9em', color: '#666' }}>- Arigye Dorcus</span>
+            </Text>
+          </Paper>
 
-          <Divider mb="md" />
-
-          {/* Login/Signup Buttons - Large and at the bottom */}
-          <div style={{
-            flex: '0 0 auto',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '1rem',
-            flexWrap: 'wrap'
-          }}>
-            <Button
-              component={Link}
-              to="/login"
-              size="xl"
-              variant="dark"
-              color="white"
-              leftIcon={<IconTarget size={20} />} // Corrected typo: lefticon to leftIcon
-              style={{
-                minWidth: '140px',
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                padding: '0.75rem 2rem'
-              }}
+          <Group spacing="md" mb="xl">
+            <Badge 
+              color="orange" 
+              size="xl" 
+              variant="filled" 
+              leftSection={<IconSparkles size={16} />}
+              style={{ fontSize: '1rem', padding: '0.6rem 1.2rem' }}
             >
-              Login
-            </Button>
-            <Button
-              component={Link}
-              to="/signup"
-              size="xl"
-              color="teal"
-              leftIcon={<IconFlame size={20} />}
-              style={{
-                minWidth: '140px',
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                padding: '0.75rem 2rem'
-              }}
+              Build Habits
+            </Badge>
+            <Badge 
+              color="orange" 
+              size="xl" 
+              variant="filled"
+              leftSection={<IconFlame size={16} />}
+              style={{ fontSize: '1rem', padding: '0.6rem 1.2rem' }}
             >
-              Sign Up
-            </Button>
-          </div>
-        </Paper>
-      </motion.div>
+              Stay Consistent
+            </Badge>
+            <Badge 
+              color="orange" 
+              size="xl" 
+              variant="filled"
+              leftSection={<IconTarget size={16} />}
+              style={{ fontSize: '1rem', padding: '0.6rem 1.2rem' }}
+            >
+              Reach Goals
+            </Badge>
+          </Group>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -12,86 +12,28 @@ import {
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // 👈 IMPORTANT: Added useEffect
 import { IconBrandGoogle, IconLogin } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { keyframes } from "@emotion/react";
+import { useAuth0 } from "@auth0/auth0-react";
 
-// Define keyframes for animated background
 const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
+
 const ADMIN_CONFIG = {
   email: "admin@gmail.com",
   password: "admin123",
   name: "System Admin"
 };
+
 function LoginForm() {
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Initialize Google Sign-In
-  useEffect(() => {
-    console.log("LoginForm mounted");
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    script.onload = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: 'YOUR_GOOGLE_CLIENT_ID',
-          callback: handleGoogleCallback,
-        });
-      }
-    };
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  const handleGoogleCallback = (response) => {
-    console.log("Google callback triggered");
-    try {
-      const userInfo = JSON.parse(atob(response.credential.split('.')[1]));
-      console.log("Google user info:", userInfo);
-      
-      setIsRedirecting(true);
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          name: userInfo.name,
-          email: userInfo.email,
-          picture: userInfo.picture,
-          authMethod: "google",
-          admin: false 
-        })
-      );
-
-      notifications.show({
-        title: "Success",
-        message: `Welcome ${userInfo.name}!`,
-        color: "green",
-      });
-
-      setTimeout(() => {
-        console.log("Navigating to user dashboard");
-        navigate("/user-dashboard", { replace: true });
-      }, 1000);
-    } catch (error) {
-      console.error("Google login error:", error);
-      notifications.show({
-        title: "Error",
-        message: "Google sign-in failed. Please try again.",
-        color: "red",
-      });
-    }
-  };
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // 👈 IMPORTANT: Added separate loading state
+  const { loginWithRedirect, user, isAuthenticated, isLoading } = useAuth0(); // 👈 IMPORTANT: Added isLoading
 
   const form = useForm({
     initialValues: {
@@ -99,38 +41,57 @@ function LoginForm() {
       password: "",
     },
     validate: {
-      email: (value) => {
-        console.log("Validating login email:", value);
-        return /^\S+@\S+$/.test(value) ? null : "Invalid email";
-      },
-      password: (value) => {
-        console.log("Validating login password length:", value.length);
-        return value.length > 0 ? null : "Password is required";
-      },
+      email: (value) =>
+        /^\S+@\S+$/.test(value) ? null : "Invalid email",
+      password: (value) =>
+        value.length > 0 ? null : "Password is required",
     },
   });
 
+  // 👈 IMPORTANT: Moved Auth0 user handling to useEffect
+  useEffect(() => {
+    if (isAuthenticated && user && !isRedirecting && !isLoading) {
+      handleAuth0User(user);
+    }
+  }, [isAuthenticated, user, isLoading]);
+
+  const handleAuth0User = (user) => {
+    setIsRedirecting(true);
+    const loggedInUser = {
+      name: user.name || user.nickname || user.email,
+      email: user.email,
+      picture: user.picture,
+      authMethod: "auth0",
+      admin: false
+    };
+
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
+
+    notifications.show({
+      title: "Success",
+      message: `Welcome ${loggedInUser.name}!`,
+      color: "green",
+    });
+
+    navigate("/user-dashboard", { replace: true });
+  };
+
   const handleSubmit = (values) => {
-    console.log("=== LOGIN FORM SUBMITTED ===");
-    console.log("Login form values:", values);
-    
     try {
-          // Check if this is admin login first
-      const isAdminLogin = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
-      
+      const isAdminLogin =
+        values.email === ADMIN_CONFIG.email && 
+        values.password === ADMIN_CONFIG.password;
+
       if (isAdminLogin) {
-        console.log("Admin login detected");
         setIsRedirecting(true);
-        
         const adminUser = {
           name: ADMIN_CONFIG.name,
           email: ADMIN_CONFIG.email,
           admin: true
         };
-        
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(adminUser));
-        console.log("Saved admin user to localStorage:", adminUser);
 
         notifications.show({
           title: "Success",
@@ -139,32 +100,22 @@ function LoginForm() {
         });
 
         setTimeout(() => {
-          console.log("Executing navigation to: /admin");
           navigate("/admin", { replace: true });
         }, 1000);
         return;
       }
 
-
-
-
-       // For regular users, check localStorage
       const users = JSON.parse(localStorage.getItem("users") || "[]");
-      console.log("All users in localStorage:", users);
-      
       const user = users.find(
-        (u) => u.email === values.email && u.password === values.password && !u.admin
+        (u) => u.email === values.email && 
+               u.password === values.password && 
+               !u.admin
       );
-      console.log("Found regular user:", user);
 
       if (user) {
-        console.log("Regular user authentication successful");
-        
         setIsRedirecting(true);
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
-        console.log("Saved current user to localStorage:", user);
-
 
         notifications.show({
           title: "Success",
@@ -172,15 +123,10 @@ function LoginForm() {
           color: "green",
         });
 
-
-
-        // Redirect based on admin status
         setTimeout(() => {
-          console.log("Executing navigation to: /user-dashboard");
           navigate("/user-dashboard", { replace: true });
         }, 1000);
       } else {
-        console.log("User authentication failed - no matching user found");
         notifications.show({
           title: "Error",
           message: "Invalid email or password",
@@ -197,25 +143,29 @@ function LoginForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login button clicked");
-    if (window.google) {
-      window.google.accounts.id.prompt();
-    } else {
+  // 👈 IMPORTANT: Improved Google login handler
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await loginWithRedirect({
+        connection: "google-oauth2", // 👈 IMPORTANT: Verify this matches your Auth0 connection name
+        authorizationParams: {
+          prompt: "login",
+          scope: "openid profile email", // 👈 IMPORTANT: Ensure you get profile data
+          redirect_uri:"http://localhost:5174" 
+        },
+        appState: {
+          returnTo: "/user-dashboard" // 👈 IMPORTANT: Where to redirect after login
+        }
+      });
+    } catch (error) {
       notifications.show({
-        title: "Error",
-        message: "Google Sign-In not loaded. Please refresh and try again.",
+        title: "Google Login Error",
+        message: error.message || "Failed to login with Google",
         color: "red",
       });
+      setIsGoogleLoading(false);
     }
-  };
-
-  // Debug button click
-  const handleButtonClick = (e) => {
-    console.log("Login button clicked!");
-    console.log("Form errors:", form.errors);
-    console.log("Form values:", form.values);
-    console.log("Form validation:", form.validate());
   };
 
   return (
@@ -265,12 +215,7 @@ function LoginForm() {
             border: "none",
           }}
         >
-          <Title
-            order={2}
-            align="center"
-            mb="md"
-            style={{ color: "black", fontWeight: 700 }}
-          >
+          <Title order={2} align="center" mb="md" style={{ color: "black", fontWeight: 700 }}>
             WELCOME BACK
           </Title>
 
@@ -288,12 +233,8 @@ function LoginForm() {
               {...form.getInputProps("email")}
               mb="md"
               styles={{
-                input: {
-                  backgroundColor: "rgba(255,255,255,0.9)",
-                },
-                label: {
-                  color: "black",
-                },
+                input: { backgroundColor: "rgba(255,255,255,0.9)" },
+                label: { color: "black" },
               }}
             />
 
@@ -304,15 +245,9 @@ function LoginForm() {
               {...form.getInputProps("password")}
               mb="xl"
               styles={{
-                input: {
-                  backgroundColor: "rgba(255,255,255,0.9)",
-                },
-                innerInput: {
-                  backgroundColor: "transparent",
-                },
-                label: {
-                  color: "black",
-                },
+                input: { backgroundColor: "rgba(255,255,255,0.9)" },
+                innerInput: { backgroundColor: "transparent" },
+                label: { color: "black" },
               }}
             />
 
@@ -324,7 +259,7 @@ function LoginForm() {
                 color="teal"
                 leftIcon={<IconLogin size={18} />}
                 loading={isRedirecting}
-                onClick={handleButtonClick}
+                disabled={isGoogleLoading} // 👈 IMPORTANT: Disable during Google login
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -350,6 +285,8 @@ function LoginForm() {
                 variant="outline"
                 color="black"
                 leftIcon={<IconBrandGoogle size={18} />}
+                loading={isGoogleLoading}
+                disabled={isRedirecting} // 👈 IMPORTANT: Disable during redirect
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,

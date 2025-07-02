@@ -44,7 +44,7 @@ const theme = {
 // Auth0 configuration - Replace these with your actual Auth0 values
 const auth0Config = {
   domain: "dev-z2vowf3m4m0hawqt.us.auth0.com", 
-  clientId: "dRfUlsak6MpWy6stvv5j1x9uWIxzlSeT",
+  clientId: "5Uw4Fnn5EmdsVnSsCpTl3KLsyxF27LxJ",
   authorizationParams: {
     redirect_uri: window.location.origin,
   },
