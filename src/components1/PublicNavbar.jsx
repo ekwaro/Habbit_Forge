@@ -1,209 +1,164 @@
-// src/components/PublicNavbar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Group,
   Text,
-  NavLink,
-  Burger, // For the mobile menu icon
-  Drawer,  // To create the slide-out mobile menu
+
+  Burger,
+  Drawer,
   Stack,
-  Image,
+  Button,
+  Flex,
+  Box,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks'; // For managing the drawer's open/close state
-import logo from '../assets/logo.png';
+import { useDisclosure } from '@mantine/hooks';
+
 
 const PublicNavbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure();
   const location = useLocation();
 
-  // Navigation links: Home, About Us, Contact Us, Sign Up, Login
-  const navLinks = (
+
+  const regularLinks = (
+
     <>
-      <NavLink
+      <Button
         component={Link}
         to="/"
-        label="Home"
-        active={location.pathname === '/'}
+
+        variant={location.pathname === '/' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm" // Medium size buttons
         onClick={closeDrawer}
-        style={{
-          whiteSpace: 'nowrap',
-          minWidth: 120,
-          fontWeight: 700,
-          fontSize: '1.08rem',
-          borderRadius: 8,
-          transition: 'background 0.18s, color 0.18s',
-          background: location.pathname === '/' ? 'rgba(34,139,230,0.10)' : 'transparent',
-          color: location.pathname === '/' ? '#228be6' : '#222',
-        }}
-        onMouseEnter={e => {
-          e.target.style.background = 'rgba(34,139,230,0.10)';
-          e.target.style.color = '#228be6';
-        }}
-        onMouseLeave={e => {
-          e.target.style.background = location.pathname === '/' ? 'rgba(34,139,230,0.10)' : 'transparent';
-          e.target.style.color = location.pathname === '/' ? '#228be6' : '#222';
-        }}
-      />
-      <NavLink
+        px="md" // Moderate padding
+        style={{ minWidth: '80px' }} // Fixed minimum width
+      >
+        Home
+      </Button>
+      <Button
+
         component={Link}
         to="/about"
-        label="About Us"
-        active={location.pathname === '/about'}
+        variant={location.pathname === '/about' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm"
         onClick={closeDrawer}
-        style={{
-          whiteSpace: 'nowrap',
-          minWidth: 120,
-          fontWeight: 700,
-          fontSize: '1.08rem',
-          borderRadius: 8,
-          transition: 'background 0.18s, color 0.18s',
-          background: location.pathname === '/about' ? 'rgba(34,139,230,0.10)' : 'transparent',
-          color: location.pathname === '/about' ? '#228be6' : '#222',
-        }}
-        onMouseEnter={e => {
-          e.target.style.background = 'rgba(34,139,230,0.10)';
-          e.target.style.color = '#228be6';
-        }}
-        onMouseLeave={e => {
-          e.target.style.background = location.pathname === '/about' ? 'rgba(34,139,230,0.10)' : 'transparent';
-          e.target.style.color = location.pathname === '/about' ? '#228be6' : '#222';
-        }}
-      />
-      <NavLink
+
+        px="md"
+        style={{ minWidth: '80px' }}
+      >
+        About
+      </Button>
+      <Button
+
         component={Link}
         to="/contact"
-        label="Contact Us"
-        active={location.pathname === '/contact'}
+        variant={location.pathname === '/contact' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm"
         onClick={closeDrawer}
-        style={{
-          whiteSpace: 'nowrap',
-          minWidth: 120,
-          fontWeight: 700,
-          fontSize: '1.08rem',
-          borderRadius: 8,
-          transition: 'background 0.18s, color 0.18s',
-          background: location.pathname === '/contact' ? 'rgba(34,139,230,0.10)' : 'transparent',
-          color: location.pathname === '/contact' ? '#228be6' : '#222',
-        }}
-        onMouseEnter={e => {
-          e.target.style.background = 'rgba(34,139,230,0.10)';
-          e.target.style.color = '#228be6';
-        }}
-        onMouseLeave={e => {
-          e.target.style.background = location.pathname === '/contact' ? 'rgba(34,139,230,0.10)' : 'transparent';
-          e.target.style.color = location.pathname === '/contact' ? '#228be6' : '#222';
-        }}
-      />
-      <NavLink
-        component={Link}
-        to="/signup"
-        label="Sign Up"
-        active={location.pathname === '/signup'}
-        onClick={closeDrawer}
-        style={{
-          whiteSpace: 'nowrap',
-          minWidth: 120,
-          fontWeight: 700,
-          fontSize: '1.08rem',
-          borderRadius: 8,
-          transition: 'background 0.18s, color 0.18s',
-          background: location.pathname === '/signup' ? 'rgba(34,139,230,0.10)' : 'transparent',
-          color: location.pathname === '/signup' ? '#228be6' : '#222',
-        }}
-        onMouseEnter={e => {
-          e.target.style.background = 'rgba(34,139,230,0.10)';
-          e.target.style.color = '#228be6';
-        }}
-        onMouseLeave={e => {
-          e.target.style.background = location.pathname === '/signup' ? 'rgba(34,139,230,0.10)' : 'transparent';
-          e.target.style.color = location.pathname === '/signup' ? '#228be6' : '#222';
-        }}
-      />
-      <NavLink
-        component={Link}
-        to="/login"
-        label="Login"
-        active={location.pathname === '/login'}
-        onClick={closeDrawer}
-        style={{
-          whiteSpace: 'nowrap',
-          minWidth: 120,
-          fontWeight: 700,
-          fontSize: '1.08rem',
-          borderRadius: 8,
-          transition: 'background 0.18s, color 0.18s',
-          background: location.pathname === '/login' ? 'rgba(34,139,230,0.10)' : 'transparent',
-          color: location.pathname === '/login' ? '#228be6' : '#222',
-        }}
-        onMouseEnter={e => {
-          e.target.style.background = 'rgba(34,139,230,0.10)';
-          e.target.style.color = '#228be6';
-        }}
-        onMouseLeave={e => {
-          e.target.style.background = location.pathname === '/login' ? 'rgba(34,139,230,0.10)' : 'transparent';
-          e.target.style.color = location.pathname === '/login' ? '#228be6' : '#222';
-        }}
-      />
+
+        px="md"
+        style={{ minWidth: '80px' }}
+      >
+        Contact
+      </Button>
+
     </>
   );
 
   return (
-    <Group
-      h="100%"
-      px="xl"
-      py={12}
-      justify="space-between"
-      style={{
-        background: 'rgba(255, 255, 255, 0.85)',
-        backdropFilter: 'blur(12px)',
-        borderRadius: 18,
-        margin: 16,
-        position: 'relative',
-        zIndex: 10,
-        minHeight: 72,
-        border: '1.5px solid #e3e8f0',
-        boxShadow: '0 6px 32px 0 rgba(60, 120, 200, 0.10)',
-      }}
-    >
-      {/* Left Side: Logo & Mobile Burger */}
-      <Group gap="md" align="center">
-        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" size="md" color="#228be6" />
-        <Image src={logo} alt="Habits Forge Logo" width={48} height={48} style={{ borderRadius: 14, background: 'transparent', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.10)' }} />
+
+    <Box py={4} px="md" style={{ height: '56px', borderBottom: '1px solid #e9ecef' }}> 
+      {/* Reduced vertical padding and added subtle border */}
+      <Group h="100%" justify="space-between">
+        {/* Left Side */}
+        <Group gap="xs">
+          <Burger 
+            opened={drawerOpened} 
+            onClick={toggleDrawer} 
+            hiddenFrom="sm" 
+            size="sm"
+          />
+          <Text fw={700} size="lg" style={{ letterSpacing: '0.5px' }}>HABIT FORGE</Text>
+        </Group>
+
+        {/* Right Side: Desktop Navigation */}
+        <Flex gap={4} align="center" visibleFrom="sm"> 
+          {/* Tight gap between buttons */}
+          {regularLinks}
+          <Button
+            component={Link}
+            to="/login"
+            variant="outline"
+            color="blue"
+            radius="xl"
+            size="sm"
+            onClick={closeDrawer}
+            px="md"
+            style={{ minWidth: '80px' }}
+          >
+            Login
+          </Button>
+          <Button
+            component={Link}
+            to="/signup"
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+            radius="xl"
+            size="sm"
+            onClick={closeDrawer}
+            px="md"
+            style={{ minWidth: '80px' }}
+          >
+            Sign Up
+          </Button>
+        </Flex>
+
+        {/* Mobile Navigation Drawer */}
+        <Drawer
+          opened={drawerOpened}
+          onClose={closeDrawer}
+          title="Menu"
+          size="sm"
+          overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+          hiddenFrom="sm"
+          position="left"
+        >
+          <Stack gap={4}> {/* Tight gap */}
+            {regularLinks}
+            <Button
+              component={Link}
+              to="/login"
+              variant="outline"
+              color="blue"
+              radius="xl"
+              size="sm"
+              onClick={closeDrawer}
+              fullWidth
+            >
+              Login
+            </Button>
+            <Button
+              component={Link}
+              to="/signup"
+              variant="gradient"
+              gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+              radius="xl"
+              size="sm"
+              onClick={closeDrawer}
+              fullWidth
+            >
+              Sign Up
+            </Button>
+          </Stack>
+        </Drawer>
       </Group>
-      {/* Right Side: Desktop Navigation Links */}
-      <Group
-        gap={8}
-        visibleFrom="sm"
-        align="center"
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          flexWrap: 'nowrap',
-          marginLeft: 'auto',
-        }}
-      >
-        {navLinks.props.children}
-      </Group>
-      {/* Mobile Navigation Drawer */}
-      <Drawer
-        opened={drawerOpened}
-        onClose={closeDrawer}
-        title="Navigation"
-        overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-        hiddenFrom="md"
-        position="left"
-        styles={{
-          body: { padding: 0 },
-          content: { background: 'rgba(255,255,255,0.98)', borderRadius: 16 },
-        }}
-      >
-        <Stack gap={0} p="md">
-          {navLinks.props.children}
-        </Stack>
-      </Drawer>
-    </Group>
+    </Box>
+
   );
 };
 

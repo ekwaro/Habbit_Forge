@@ -20,6 +20,7 @@ const animatedBackground = keyframes`
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 `;
+
 const ADMIN_CONFIG = {
   email: "admin@gmail.com",
   password: "admin123",
@@ -56,53 +57,44 @@ function SignupPage() {
     },
   });
 
-   // Initialize admin user
-  useEffect(() => {
-    console.log("Checking admin user...");
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const adminExists = users.some(user => 
-      user.email === ADMIN_CONFIG.email && user.admin
-    );
-
-    if (!adminExists) {
-      console.log("Creating admin user...");
-      users.push({
-        name: ADMIN_CONFIG.name,
-        email: ADMIN_CONFIG.email,
-        password: ADMIN_CONFIG.password,
-        admin: true
-      });
-      localStorage.setItem("users", JSON.stringify(users));
-      console.log("Admin user created successfully");
-    }
-  }, []);
-
-  
   const handleSubmit = (values) => {
-    console.log("Form submission started with values:", values);
-    
     try {
       const users = JSON.parse(localStorage.getItem("users") || "[]");
-      console.log("Current users:", users);
-
-      // Check if this is an admin signup
-      const isAdminSignup = values.email === ADMIN_CONFIG.email && values.password === ADMIN_CONFIG.password;
       
-      if (isAdminSignup) {
-        // For admin signup, allow multiple signups but don't store duplicates
-        console.log("Admin signup detected");
-        
-        notifications.show({
-          title: "Success",
-          message: "Admin account created! Redirecting to login...",
-          color: "green",
-        });
+      // Check if user already exists (for non-admin users)
+      if (values.email !== ADMIN_CONFIG.email) {
+        const existingUser = users.find(user => user.email === values.email);
+        if (existingUser) {
+          notifications.show({
+            title: "Error",
+            message: "User with this email already exists",
+            color: "red",
+          });
+          return;
+        }
+      }
 
-    setTimeout(() => {
-      navigate("/login", { replace: true });
-    }, 1500);
-  };
-   } catch (error) {
+      // Create new user (admin or regular)
+      const newUser = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        admin: values.email === ADMIN_CONFIG.email
+      };
+
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      notifications.show({
+        title: "Success",
+        message: "Account created successfully! Redirecting to login...",
+        color: "green",
+      });
+
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 1500);
+    } catch (error) {
       console.error("Signup error:", error);
       notifications.show({
         title: "Error",
@@ -111,7 +103,6 @@ function SignupPage() {
       });
     }
   };
-
 
   return (
     <div
