@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Group,
   Text,
+
   Burger,
   Drawer,
   Stack,
@@ -12,15 +13,19 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
+
 const PublicNavbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure();
   const location = useLocation();
 
+
   const regularLinks = (
+
     <>
       <Button
         component={Link}
         to="/"
+
         variant={location.pathname === '/' ? 'light' : 'subtle'}
         color="gray"
         radius="xl"
@@ -32,6 +37,7 @@ const PublicNavbar = () => {
         Home
       </Button>
       <Button
+
         component={Link}
         to="/about"
         variant={location.pathname === '/about' ? 'light' : 'subtle'}
@@ -39,12 +45,14 @@ const PublicNavbar = () => {
         radius="xl"
         size="sm"
         onClick={closeDrawer}
+
         px="md"
         style={{ minWidth: '80px' }}
       >
         About
       </Button>
       <Button
+
         component={Link}
         to="/contact"
         variant={location.pathname === '/contact' ? 'light' : 'subtle'}
@@ -52,15 +60,18 @@ const PublicNavbar = () => {
         radius="xl"
         size="sm"
         onClick={closeDrawer}
+
         px="md"
         style={{ minWidth: '80px' }}
       >
         Contact
       </Button>
+
     </>
   );
 
   return (
+
     <Box py={4} px="md" style={{ height: '56px', borderBottom: '1px solid #e9ecef' }}> 
       {/* Reduced vertical padding and added subtle border */}
       <Group h="100%" justify="space-between">
@@ -147,6 +158,7 @@ const PublicNavbar = () => {
         </Drawer>
       </Group>
     </Box>
+
   );
 };
 

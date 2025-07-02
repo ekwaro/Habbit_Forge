@@ -114,6 +114,8 @@ function LoginForm() {
 
       if (user) {
         setIsRedirecting(true);
+          const currentUser = { ...user, authMethod: "local" };
+        
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
 
@@ -257,7 +259,7 @@ function LoginForm() {
                 fullWidth
                 size="md"
                 color="teal"
-                leftIcon={<IconLogin size={18} />}
+                 leftSection ={<IconLogin size={18} />}
                 loading={isRedirecting}
                 disabled={isGoogleLoading} // 👈 IMPORTANT: Disable during Google login
                 style={{
@@ -269,6 +271,7 @@ function LoginForm() {
                 CONTINUE JOURNEY
               </Button>
             </motion.div>
+            </form>
 
             <Divider
               label="OR"
@@ -284,9 +287,11 @@ function LoginForm() {
                 size="md"
                 variant="outline"
                 color="black"
+
                 leftIcon={<IconBrandGoogle size={18} />}
                 loading={isGoogleLoading}
                 disabled={isRedirecting} // 👈 IMPORTANT: Disable during redirect
+
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -310,7 +315,7 @@ function LoginForm() {
                 Sign up to Start your journey
               </Text>
             </Text>
-          </form>
+        
         </Paper>
       </motion.div>
     </div>

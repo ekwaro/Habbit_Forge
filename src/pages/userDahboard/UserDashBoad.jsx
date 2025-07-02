@@ -13,8 +13,13 @@ import {
 } from "@mantine/core";
 import { Outlet, useNavigate } from "react-router-dom";
 const UserDashBoard = () => {
-  let username = 'Dominic'
-  const handleLogout=()=>{}
+  let user = JSON.parse(localStorage.getItem('currentUser'))
+
+
+  const handleLogout=()=>{
+    localStorage.removeItem('currentUser')
+    navigate('/login')
+  }
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -38,11 +43,12 @@ const UserDashBoard = () => {
           <Text fw={700} size='xl' c='teal'>User Dashboard</Text>
           <Group spaciing='sm'>
             <Avatar src='https://i.pravatar.cc/150?img=13'
+            
             radius='xl'
             size='md'
-            alt={username}
+            alt={user?.name}
             />
-            <Text size='sm' fw={500}>{username}</Text>
+            <Text size='sm' fw={500}>{user?.name}</Text>
             <Button variant='light' c='red' size='xs' onClick={handleLogout}>Logout</Button>
 
          

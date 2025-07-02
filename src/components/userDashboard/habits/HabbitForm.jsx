@@ -1,56 +1,92 @@
-import { TextInput } from "@mantine/core";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
-import { Modal,Pagination, Textarea, Button, Select } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import dayjs from "dayjs";
+import {
+  Modal,
+  TextInput,
+  Textarea,
+  Button,
+  Autocomplete,
+  Select,
+} from "@mantine/core";
 
 const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
+  const STRAPI_AUTH_TOKEN = import.meta.env.VITE_STRAPI_AUTH_TOKEN;
+  const [users, setUsers] = useState([]);
+
+
+  // Fetch users
+  useEffect(() => {
+    fetch("http://localhost:1337/api/users", {
+      headers: {
+        Authorization: `Bearer ${STRAPI_AUTH_TOKEN}`,
+      },
+    })
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch(console.error);
+  }, []);
+
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
       title: "",
       description: "",
       frequency: "",
-      startdate: "", // Assuming startdate is a string in 'YYYY-MM-DD' format
-      endDate: "", // Assuming endDate is a string in 'YYYY-MM-DD' format
-      targetDate: "", // Assuming targetDate is a string in 'YYYY-MM-DD' format
+      startDate: "",
+      endDate: "",
+      partnerSearch: "",
+      partnerId: '',
       ...initialValues,
     },
     validate: {
       title: (value) =>
-        value.length < 2 ? "Title must be at least 2 characters long" : null,
+        value.length < 2 ? "Title must be at least 2 characters" : null,
       description: (value) =>
-        value.length < 5
-          ? "Description must be at least 5 characters long"
-          : null,
-      startdate: (value) => {
+        value.length < 5 ? "Description must be at least 5 characters" : null,
+      startDate: (value) => {
         const date = new Date(value);
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        console.log(date, today)
+        today.setHours(0, 0, 0, 0);
         return date < today ? "Start date must be in the future" : null;
       },
       endDate: (value) => {
-        const startDate = new Date(form.values.startdate);
-        const endDate = new Date(value);
-        return endDate < startDate ? "End date must be after start date" : null;
+        const start = new Date(form.values.startDate);
+        const end = new Date(value); 
+        return end < start ? "End date must be after start date" : null;
       },
-
-      frequency: (value) => (value.length < 1 ? "Frequency is required" : null),
+      frequency: (value) => (!value ? "Frequency is required" : null),
+      partnerId: (value, values) => {
+        if (!value && !values.partnerSearch) {
+          return "Please select an accountability partner";
+        }
+        return null;
+      },
     },
   });
+
   useEffect(() => {
     if (initialValues) {
-      form.setValues(initialValues);
+      form.setValues({
+        ...initialValues,
+        partnerSearch: "", //  prefill display string
+      });
     }
   }, [initialValues]);
 
-  const handleSubmit = (values) => {
-    if (onSubmit) {
-      onSubmit(values);
-    }
-    form.reset();
-    close(); // Close the modal after submission
-  };
+  const handleSubmit = async (values) => {
+    const formatted = {
+      ...values,      
+      startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
+      endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
+     
+    };
+  
+    const {partnerSearch, ...dataToSend } = formatted;
+  onSubmit(dataToSend)
+  console.log(formatted);
+};
   return (
     <Modal
       opened={opened}
@@ -61,44 +97,67 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
       title={initialValues ? "Update Habit" : "Add New Habit"}
       size="lg"
     >
+      
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
-          type="text"
-          mt={10}
-          placeholder="Habit Title"
-          label="Add Habit"
+          label="Habit Title"
+          placeholder="Enter habit title"
           required
           {...form.getInputProps("title")}
         />
+
         <Textarea
-          placeholder="Habit Description"
-          required
           label="Habit Description"
-          mt={10}
+          placeholder="Describe your habit"
+          required
+          mt="sm"
           {...form.getInputProps("description")}
         />
+
         <Select
           label="Frequency"
           placeholder="Pick one"
           data={["Daily", "Weekly", "Monthly"]}
-          {...form.getInputProps("frequency")}
-          mb="md"
-          mt="md"
-          withAsterisk
-        />
-        <TextInput
-          type="date"
           required
-          label="startDate"
-          {...form.getInputProps("startdate")}
+          mt="sm"
+          {...form.getInputProps("frequency")}
         />
+
         <TextInput
           type="date"
-          label="endDate"
+          label="Start Date"
+          required
+          mt="sm"
+          {...form.getInputProps("startDate")}
+        />
+
+        <TextInput
+          type="date"
+          label="End Date"
+          required
+          mt="sm"
           {...form.getInputProps("endDate")}
         />
 
-        <Button type="submit" mt={10}>
+        <Autocomplete
+          label="Accountability Partner"
+          placeholder="Search by username or email"
+          searchable
+          nothingFound="No users found"
+          mt="sm"
+          value={form.values.partnerSearch}
+          onChange={(val) => form.setFieldValue("partnerSearch", val)}
+          onOptionSubmit={(val) => {
+            const selectedUser = users.find(
+              (u) => `${u.username} (${u.email})` === val
+            );
+            form.setFieldValue("partnerSearch", val);
+            form.setFieldValue("partnerId", selectedUser?.id);
+          }}
+          data={users?.map((u) => `${u.username} (${u.email})`)}
+        />
+
+        <Button fullWidth type="submit" mt="lg">
           {initialValues ? "Update Habit" : "Create Habit"}
         </Button>
       </form>

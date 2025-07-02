@@ -34,7 +34,7 @@ const getLocalStorageCount = (key) => {
   }
 };
 
-function DashboardPage() {
+function DashboardPage1() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalCategories: 0,
@@ -185,4 +185,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
+export default DashboardPage1;

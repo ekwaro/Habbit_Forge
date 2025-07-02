@@ -35,6 +35,7 @@ function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: 'user'
     },
     validate: {
       name: (value) => {

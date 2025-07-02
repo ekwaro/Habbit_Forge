@@ -105,12 +105,14 @@ function HomePage() {
                 size="lg"
                 radius="xl"
                 variant="gradient"
+
                 gradient={{ from: 'orange', to: '#E67E22', deg: 105 }}
                 rightIcon={<IconSparkles size={20} />}
                 style={{
                   fontSize: '1.1rem',
                   padding: '0.75rem 2rem',
                   fontWeight: 600,
+
                 }}
               >
                 Fuel Growth
@@ -124,12 +126,14 @@ function HomePage() {
                 size="lg"
                 radius="xl"
                 variant="gradient"
+
                 gradient={{ from: '#E67E22', to: 'orange', deg: 105 }}
                 rightIcon={<IconTarget size={20} />}
                 style={{
                   fontSize: '1.1rem',
                   padding: '0.75rem 2rem',
                   fontWeight: 600,
+
                 }}
               >
                 Keep Focused
@@ -161,6 +165,7 @@ function HomePage() {
             </Text>
           </Paper>
 
+
           <Group spacing="md" mb="xl">
             <Badge 
               color="orange" 
@@ -186,6 +191,7 @@ function HomePage() {
               variant="filled"
               leftSection={<IconTarget size={16} />}
               style={{ fontSize: '1rem', padding: '0.6rem 1.2rem' }}
+
             >
               Reach Goals
             </Badge>
