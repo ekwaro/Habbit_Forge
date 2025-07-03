@@ -21,6 +21,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage"; // 
 
 
 import AboutUsPage from "./pages1/AboutUsPage";
@@ -75,6 +76,7 @@ function MainApp() {
             <Route index element={<HomePage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
+             <Route path="/forgot-password" element={<ForgotPasswordPage />} /> 
             <Route path="about" element={<AboutUsPage />} />
             <Route path="contact" element={<ContactUsPage />} />
             <Route path="terms-of-service" element={<TermsOfService />} />

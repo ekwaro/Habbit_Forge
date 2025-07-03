@@ -9,7 +9,6 @@ import {
   Paper,
   Divider,
   SegmentedControl,
-  Loader,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
@@ -181,8 +180,20 @@ export default function LoginPage() {
                 label="Password"
                 placeholder="Your password"
                 {...form.getInputProps("password")}
-                mb="xl"
+                mb="md"
               />
+
+              <Text ta="right" size="sm" mt="xs">
+                <Text
+                  component={Link}
+                  to="/forgot-password"
+                  fw={500}
+                  td="underline"
+                  color="blue"
+                >
+                  Forgot Password?
+                </Text>
+              </Text>
 
               <Button
                 fullWidth
