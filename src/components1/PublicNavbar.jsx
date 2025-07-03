@@ -3,15 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Group,
   Text,
-
   Burger,
   Drawer,
   Stack,
   Button,
   Flex,
   Box,
+  Image,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import logo from '../assets/logo.png';
 
 
 const PublicNavbar = () => {
@@ -83,7 +84,13 @@ const PublicNavbar = () => {
             hiddenFrom="sm" 
             size="sm"
           />
-          <Text fw={700} size="lg" style={{ letterSpacing: '0.5px' }}>HABIT FORGE</Text>
+          <Image
+            src={logo}
+            alt="Habit Forge Logo"
+            width={48}
+            height={48}
+            style={{ borderRadius: '50%', boxShadow: '0 1px 6px 0 rgba(34,139,230,0.10)', objectFit: 'cover' }}
+          />
         </Group>
 
         {/* Right Side: Desktop Navigation */}
