@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Title,
@@ -10,11 +10,14 @@ import {
   Stack,
   Paper,
   ActionIcon,
-  Badge, // Using Badge for tip display, or you can use Text/Card
   rem,
   Divider,
   Anchor,
   Card,
+  Loader,
+  Alert,
+  Blockquote,
+  Box,
 } from '@mantine/core';
 import {
   IconPlus,
@@ -23,7 +26,21 @@ import {
   IconCheck,
   IconX,
   IconLink,
+  IconAlertCircle,
+  IconSparkles,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { keyframes } from '@emotion/react';
+
+// Define your Strapi API URLs
+const STRAPI_TIPS_API_URL = 'http://localhost:1337/api/habit-tips';
+const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/habit-resources';
+
+// Animated background keyframes
+const animatedBackground = keyframes`
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+`;
 
 function HabitTipsPage() {
   // --- STATE FOR TEXT-BASED HABIT TIPS ---
@@ -31,6 +48,8 @@ function HabitTipsPage() {
   const [tips, setTips] = useState([]);
   const [editingTipId, setEditingTipId] = useState(null);
   const [editingTipContent, setEditingTipContent] = useState('');
+  const [isLoadingTips, setIsLoadingTips] = useState(true);
+  const [errorTips, setErrorTips] = useState(null);
 
   // --- STATE FOR ONLINE RESOURCE LINKS ---
   const [newResourceName, setNewResourceName] = useState('');
@@ -39,84 +58,132 @@ function HabitTipsPage() {
   const [editingResourceId, setEditingResourceId] = useState(null);
   const [editingResourceName, setEditingResourceName] = useState('');
   const [editingResourceLink, setEditingResourceLink] = useState('');
+  const [isLoadingResources, setIsLoadingResources] = useState(true);
+  const [errorResources, setErrorResources] = useState(null);
 
-  // --- REFS FOR ROBUST LOCAL STORAGE SAVING ON UNLOAD ---
-  const tipsRef = useRef([]);
-  const resourcesRef = useRef([]);
-
-  useEffect(() => {
-    tipsRef.current = tips;
-  }, [tips]);
-
-  useEffect(() => {
-    resourcesRef.current = resources;
-  }, [resources]);
-
-  // --- LOCAL STORAGE LOAD & UNLOAD LISTENER (Combined for both data types) ---
-  useEffect(() => {
-    // Load tips
-    const storedTips = localStorage.getItem('habitTips');
-    if (storedTips) {
-      try {
-        setTips(JSON.parse(storedTips));
-      } catch (e) {
-        console.error("Failed to parse habit tips from local storage:", e);
-        localStorage.removeItem('habitTips');
+  // Helper function to parse Strapi errors (remains the same)
+  const parseStrapiError = async (response) => {
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    try {
+      const errorJson = await response.json();
+      if (errorJson.error && errorJson.error.message) {
+        errorMessage = errorJson.error.message;
       }
+    } catch (parseError) {
+      console.error("Failed to parse Strapi error response:", parseError);
     }
+    return errorMessage;
+  };
 
-    // Load resources
-    const storedResources = localStorage.getItem('habitTipResources');
-    if (storedResources) {
+  // --- useEffect for Fetching Text-Based Habit Tips ---
+  useEffect(() => {
+    const fetchTips = async () => {
+      setIsLoadingTips(true);
+      setErrorTips(null);
       try {
-        setResources(JSON.parse(storedResources));
+        const response = await fetch(STRAPI_TIPS_API_URL);
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const data = await response.json();
+        const formattedTips = data.data.map(item => ({
+          id: item.id.toString(),
+          // FIX: Access content directly on 'item'
+          content: item.content,
+        }));
+        setTips(formattedTips);
       } catch (e) {
-        console.error("Failed to parse habit tip resources from local storage:", e);
-        localStorage.removeItem('habitTipResources');
+        console.error("Failed to fetch tips:", e);
+        setErrorTips(`Failed to load tips: ${e.message}. Ensure Strapi is running and 'Habit Tip' permissions are set.`);
+      } finally {
+        setIsLoadingTips(false);
       }
-    }
-
-    // Handle beforeunload event for robust saving
-    const handleBeforeUnload = () => {
-      localStorage.setItem('habitTips', JSON.stringify(tipsRef.current));
-      localStorage.setItem('habitTipResources', JSON.stringify(resourcesRef.current));
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    fetchTips();
+  }, []);
 
-    // Cleanup: remove the event listener when component unmounts
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+  // --- useEffect for Fetching Online Resource Links ---
+  useEffect(() => {
+    const fetchResources = async () => {
+      setIsLoadingResources(true);
+      setErrorResources(null);
+      try {
+        const response = await fetch(STRAPI_RESOURCES_API_URL);
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const data = await response.json();
+        const formattedResources = data.data.map(item => ({
+          id: item.id.toString(),
+          // FIX: Access name and link directly on 'item'
+          name: item.name,
+          link: item.link,
+        }));
+        setResources(formattedResources);
+      } catch (e) {
+        console.error("Failed to fetch resources:", e);
+        setErrorResources(`Failed to load resources: ${e.message}. Ensure Strapi is running and 'Habit Resource' permissions are set.`);
+      } finally {
+        setIsLoadingResources(false);
+      }
     };
-  }, []); // Empty dependency array: runs only once on mount/unmount
 
-  // --- LOCAL STORAGE SAVE EFFECTS (Separate for each data type) ---
-  useEffect(() => {
-    localStorage.setItem('habitTips', JSON.stringify(tips));
-  }, [tips]);
-
-  useEffect(() => {
-    localStorage.setItem('habitTipResources', JSON.stringify(resources));
-  }, [resources]);
+    fetchResources();
+  }, []);
 
   // --- CRUD OPERATIONS FOR TEXT-BASED HABIT TIPS ---
 
-  const handleAddTip = () => {
+  const handleAddTip = async () => {
     const trimmedContent = newTipContent.trim();
     if (trimmedContent) {
-      const newTip = {
-        id: Date.now().toString(),
-        content: trimmedContent,
-      };
-      setTips((prevTips) => [...prevTips, newTip]);
-      setNewTipContent('');
+      setErrorTips(null);
+      try {
+        const response = await fetch(STRAPI_TIPS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // Strapi expects 'data' wrapper for sending new entries
+          body: JSON.stringify({ data: { content: trimmedContent } }),
+        });
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const addedTip = await response.json();
+        setTips((prevTips) => [
+          ...prevTips,
+          // FIX: Access content directly on 'addedTip.data'
+          { id: addedTip.data.id.toString(), content: addedTip.data.content },
+        ]);
+        setNewTipContent('');
+      } catch (e) {
+        console.error("Failed to add tip:", e);
+        setErrorTips(`Failed to add tip: ${e.message}. Check Strapi permissions for 'create'.`);
+      }
+    } else {
+      alert('Tip content cannot be empty.');
     }
   };
 
-  const handleDeleteTip = (id) => {
-    setTips((prevTips) => prevTips.filter((tip) => tip.id !== id));
-    if (editingTipId === id) {
-      handleCancelTipEdit();
+  const handleDeleteTip = async (id) => {
+    setErrorTips(null);
+    try {
+      const response = await fetch(`${STRAPI_TIPS_API_URL}/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const errorMessage = await parseStrapiError(response);
+        throw new Error(errorMessage);
+      }
+      setTips((prevTips) => prevTips.filter((tip) => tip.id !== id));
+      if (editingTipId === id) {
+        handleCancelTipEdit();
+      }
+    } catch (e) {
+      console.error("Failed to delete tip:", e);
+      setErrorTips(`Failed to delete tip: ${e.message}. Check Strapi permissions for 'delete'.`);
     }
   };
 
@@ -125,16 +192,39 @@ function HabitTipsPage() {
     setEditingTipContent(tip.content);
   };
 
-  const handleUpdateTip = (id) => {
+  const handleUpdateTip = async (id) => {
     const trimmedContent = editingTipContent.trim();
     if (trimmedContent) {
-      setTips((prevTips) =>
-        prevTips.map((tip) =>
-          tip.id === id ? { ...tip, content: trimmedContent } : tip
-        )
-      );
-      setEditingTipId(null);
-      setEditingTipContent('');
+      setErrorTips(null);
+      try {
+        const response = await fetch(`${STRAPI_TIPS_API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          // Strapi expects 'data' wrapper for sending updates
+          body: JSON.stringify({ data: { content: trimmedContent } }),
+        });
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const updatedTipData = await response.json();
+        setTips((prevTips) =>
+          prevTips.map((tip) =>
+            tip.id === id ? {
+              id: updatedTipData.data.id.toString(),
+              // FIX: Access content directly on 'updatedTipData.data'
+              content: updatedTipData.data.content
+            } : tip
+          )
+        );
+        setEditingTipId(null);
+        setEditingTipContent('');
+      } catch (e) {
+        console.error("Failed to update tip:", e);
+        setErrorTips(`Failed to update tip: ${e.message}. Check Strapi permissions for 'update'.`);
+      }
+    } else {
+      alert('Tip content cannot be empty.');
     }
   };
 
@@ -145,30 +235,58 @@ function HabitTipsPage() {
 
   // --- CRUD OPERATIONS FOR ONLINE RESOURCE LINKS (HABIT TIPS) ---
 
-  const handleAddResource = () => {
+  const handleAddResource = async () => {
     const trimmedName = newResourceName.trim();
     const trimmedLink = newResourceLink.trim();
-    // Basic URL validation
     const isValidUrl = trimmedLink.startsWith('http://') || trimmedLink.startsWith('https://');
 
     if (trimmedName && trimmedLink && isValidUrl) {
-      const newResource = {
-        id: Date.now().toString(),
-        name: trimmedName,
-        link: trimmedLink,
-      };
-      setResources((prevResources) => [...prevResources, newResource]);
-      setNewResourceName('');
-      setNewResourceLink('');
+      setErrorResources(null);
+      try {
+        const response = await fetch(STRAPI_RESOURCES_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // Strapi expects 'data' wrapper for sending new entries
+          body: JSON.stringify({ data: { name: trimmedName, link: trimmedLink } }),
+        });
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const addedResource = await response.json();
+        setResources((prevResources) => [
+          ...prevResources,
+          // FIX: Access name and link directly on 'addedResource.data'
+          { id: addedResource.data.id.toString(), name: addedResource.data.name, link: addedResource.data.link },
+        ]);
+        setNewResourceName('');
+        setNewResourceLink('');
+      } catch (e) {
+        console.error("Failed to add resource:", e);
+        setErrorResources(`Failed to add resource: ${e.message}. Check Strapi permissions for 'create'.`);
+      }
     } else {
       alert('Please provide a name and a valid URL (starting with http:// or https://) for the resource.');
     }
   };
 
-  const handleDeleteResource = (id) => {
-    setResources((prevResources) => prevResources.filter((resource) => resource.id !== id));
-    if (editingResourceId === id) {
-      handleCancelResourceEdit();
+  const handleDeleteResource = async (id) => {
+    setErrorResources(null);
+    try {
+      const response = await fetch(`${STRAPI_RESOURCES_API_URL}/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const errorMessage = await parseStrapiError(response);
+        throw new Error(errorMessage);
+      }
+      setResources((prevResources) => prevResources.filter((resource) => resource.id !== id));
+      if (editingResourceId === id) {
+        handleCancelResourceEdit();
+      }
+    } catch (e) {
+      console.error("Failed to delete resource:", e);
+      setErrorResources(`Failed to delete resource: ${e.message}. Check Strapi permissions for 'delete'.`);
     }
   };
 
@@ -178,20 +296,42 @@ function HabitTipsPage() {
     setEditingResourceLink(resource.link);
   };
 
-  const handleUpdateResource = (id) => {
+  const handleUpdateResource = async (id) => {
     const trimmedName = editingResourceName.trim();
     const trimmedLink = editingResourceLink.trim();
     const isValidUrl = trimmedLink.startsWith('http://') || trimmedLink.startsWith('https://');
 
     if (trimmedName && trimmedLink && isValidUrl) {
-      setResources((prevResources) =>
-        prevResources.map((resource) =>
-          resource.id === id ? { ...resource, name: trimmedName, link: trimmedLink } : resource
-        )
-      );
-      setEditingResourceId(null);
-      setEditingResourceName('');
-      setEditingResourceLink('');
+      setErrorResources(null);
+      try {
+        const response = await fetch(`${STRAPI_RESOURCES_API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          // Strapi expects 'data' wrapper for sending updates
+          body: JSON.stringify({ data: { name: trimmedName, link: trimmedLink } }),
+        });
+        if (!response.ok) {
+          const errorMessage = await parseStrapiError(response);
+          throw new Error(errorMessage);
+        }
+        const updatedResourceData = await response.json();
+        setResources((prevResources) =>
+          prevResources.map((resource) =>
+            resource.id === id ? {
+              id: updatedResourceData.data.id.toString(),
+              // FIX: Access name and link directly on 'updatedResourceData.data'
+              name: updatedResourceData.data.name,
+              link: updatedResourceData.data.link,
+            } : resource
+          )
+        );
+        setEditingResourceId(null);
+        setEditingResourceName('');
+        setEditingResourceLink('');
+      } catch (e) {
+        console.error("Failed to update resource:", e);
+        setErrorResources(`Failed to update resource: ${e.message}. Check Strapi permissions for 'update'.`);
+      }
     } else {
       alert('Please provide a name and a valid URL (starting with http:// or https://) for the resource.');
     }
@@ -204,232 +344,337 @@ function HabitTipsPage() {
   };
 
   return (
-    <Container size="xl" my="lg">
-      <Paper p="xl" shadow="xs" radius="md">
-        <Title order={2} mb="lg" fw={700}>Habit Tips & Tricks Management</Title>
-        <Text mb="md">Manage valuable tips, strategies, and resources for building good habits.</Text>
+    <Box
+      style={{
+        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 0',
+        animation: `${animatedBackground} 20s linear infinite`,
+      }}
+    >
+      <Container size="lg" px="md">
+        <Paper
+          p="xl"
+          shadow="xl"
+          radius="lg"
+          style={{
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1.5px solid #e3e8f0',
+            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <Title
+              order={1}
+              mb="sm"
+              style={{
+                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                color: '#222',
+                lineHeight: 1.1,
+              }}
+            >
+              Habit Tips & Tricks Management
+            </Title>
+            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
+              Manage valuable tips, strategies, and resources for building good habits.
+            </Text>
+            <Blockquote
+              color="blue"
+              cite="Stephen Covey"
+              style={{
+                fontSize: '1.1rem',
+                margin: '0 auto',
+                maxWidth: 500,
+                background: 'rgba(34,139,230,0.07)',
+                borderRadius: 8,
+                padding: '16px 24px',
+              }}
+              icon={<IconSparkles size={32} color="#228be6" />}
+            >
+              <strong>"The key is not to prioritize what's on your schedule, but to schedule your priorities."</strong>
+            </Blockquote>
+          </div>
 
-        <Divider my="xl" label="Habit Tips" labelPosition="center" />
+          <Divider my="xl" label="Habit Tips" labelPosition="center" />
 
-        {/* Section 1: Text-Based Habit Tips */}
-        <Card withBorder p="lg" radius="md" mb="xl">
-          <Title order={3} mb="lg">Add New Tip</Title>
-          <Textarea
-            label="Tip Content"
-            placeholder="e.g., Start small, track your progress, find an accountability partner."
-            value={newTipContent}
-            onChange={(event) => setNewTipContent(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleAddTip();
-              }
-            }}
-            rows={4}
-            autosize
-            minRows={2}
-            mb="md"
-          />
-          <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip}>
-            Add Tip
-          </Button>
-
-          <Divider my="xl" label="Uploaded Tips" labelPosition="center" />
-
-          <Stack>
-            {tips.length === 0 ? (
-              <Text c="dimmed" ta="center">No tips added yet. Add one above!</Text>
-            ) : (
-              tips.map((tip) => (
-                <Card key={tip.id} withBorder p="md" radius="sm" shadow="sm">
-                  <Group justify="space-between" align="flex-start" wrap="nowrap">
-                    {editingTipId === tip.id ? (
-                      <Textarea
-                        flex={1}
-                        value={editingTipContent}
-                        onChange={(event) => setEditingTipContent(event.currentTarget.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter' && !event.shiftKey) {
-                            event.preventDefault();
-                            handleUpdateTip(tip.id);
-                          }
-                        }}
-                        autoFocus
-                        rows={3}
-                        autosize
-                        minRows={2}
-                      />
-                    ) : (
-                      <Text style={{ flexGrow: 1 }}>{tip.content}</Text>
-                    )}
-
-                    <Group gap="xs" ml="md">
-                      {editingTipId === tip.id ? (
-                        <>
-                          <ActionIcon
-                            variant="filled"
-                            color="green"
-                            onClick={() => handleUpdateTip(tip.id)}
-                            size="lg"
-                            aria-label="Update tip"
-                          >
-                            <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="filled"
-                            color="red"
-                            onClick={handleCancelTipEdit}
-                            size="lg"
-                            aria-label="Cancel edit"
-                          >
-                            <IconX style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                        </>
-                      ) : (
-                        <>
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            onClick={() => handleEditTip(tip)}
-                            size="lg"
-                            aria-label="Edit tip"
-                          >
-                            <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="light"
-                            color="red"
-                            onClick={() => handleDeleteTip(tip.id)}
-                            size="lg"
-                            aria-label="Delete tip"
-                          >
-                            <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                        </>
-                      )}
-                    </Group>
-                  </Group>
-                </Card>
-              ))
-            )}
-          </Stack>
-        </Card>
-
-        <Divider my="xl" label="Habit Resource Links" labelPosition="center" />
-
-        {/* Section 2: Online Habit Resource Links */}
-        <Card withBorder p="lg" radius="md">
-          <Title order={3} mb="lg">Add New Resource Link</Title>
-          <Stack spacing="md">
-            <TextInput
-              label="Resource Name"
-              placeholder="e.g., Atomic Habits Book, Habit Tracker App"
-              value={newResourceName}
-              onChange={(event) => setNewResourceName(event.currentTarget.value)}
+          {/* Section 1: Text-Based Habit Tips */}
+          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Tip</Title>
+            <Textarea
+              label="Tip Content"
+              placeholder="e.g., Start small, track your progress, find an accountability partner."
+              value={newTipContent}
+              onChange={(event) => setNewTipContent(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  handleAddTip();
+                }
+              }}
+              rows={4}
+              autosize
+              minRows={2}
+              mb="md"
             />
-            <TextInput
-              label="Resource Link (URL)"
-              placeholder="e.g., https://www.atomichabits.com"
-              value={newResourceLink}
-              onChange={(event) => setNewResourceLink(event.currentTarget.value)}
-              type="url"
-            />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource}>
-              Add Resource
+            <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              Add Tip
             </Button>
-          </Stack>
 
-          <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+            <Divider my="xl" label="Uploaded Tips" labelPosition="center" />
 
-          <Stack>
-            {resources.length === 0 ? (
-              <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
-            ) : (
-              resources.map((resource) => (
-                <Card key={resource.id} withBorder p="md" radius="sm" shadow="sm">
-                  <Group justify="space-between" align="center" wrap="nowrap">
-                    {editingResourceId === resource.id ? (
-                      <Stack flex={1} spacing="xs">
-                        <TextInput
-                          placeholder="Resource Name"
-                          value={editingResourceName}
-                          onChange={(event) => setEditingResourceName(event.currentTarget.value)}
-                          autoFocus
-                          size="sm"
-                        />
-                        <TextInput
-                          placeholder="Resource Link (URL)"
-                          value={editingResourceLink}
-                          onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
-                          type="url"
-                          size="sm"
-                        />
-                      </Stack>
-                    ) : (
-                      <Anchor
-                        href={resource.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ flexGrow: 1 }}
-                        leftSection={<IconLink size={14} />}
-                      >
-                        {resource.name}
-                      </Anchor>
-                    )}
-
-                    <Group gap="xs" ml="md">
-                      {editingResourceId === resource.id ? (
-                        <>
-                          <ActionIcon
-                            variant="filled"
-                            color="green"
-                            onClick={() => handleUpdateResource(resource.id)}
-                            size="lg"
-                            aria-label="Update resource"
-                          >
-                            <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="filled"
-                            color="red"
-                            onClick={handleCancelResourceEdit}
-                            size="lg"
-                            aria-label="Cancel edit"
-                          >
-                            <IconX style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                        </>
-                      ) : (
-                        <>
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            onClick={() => handleEditResource(resource)}
-                            size="lg"
-                            aria-label="Edit resource"
-                          >
-                            <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                          <ActionIcon
-                            variant="light"
-                            color="red"
-                            onClick={() => handleDeleteResource(resource.id)}
-                            size="lg"
-                            aria-label="Delete resource"
-                          >
-                            <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                          </ActionIcon>
-                        </>
-                      )}
-                    </Group>
-                  </Group>
-                </Card>
-              ))
+            {errorTips && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorTips}
+              </Alert>
             )}
-          </Stack>
-        </Card>
-      </Paper>
-    </Container>
+
+            {isLoadingTips ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading tips...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {tips.length === 0 ? (
+                  <Text c="dimmed" ta="center">No tips added yet. Add one above!</Text>
+                ) : (
+                  tips.map((tip, idx) => (
+                    <motion.div
+                      key={tip.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="flex-start" wrap="nowrap">
+                          {editingTipId === tip.id ? (
+                            <Textarea
+                              flex={1}
+                              value={editingTipContent}
+                              onChange={(event) => setEditingTipContent(event.currentTarget.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !event.shiftKey) {
+                                  event.preventDefault();
+                                  handleUpdateTip(tip.id);
+                                }
+                              }}
+                              autoFocus
+                              rows={3}
+                              autosize
+                              minRows={2}
+                            />
+                          ) : (
+                            <Text style={{ flexGrow: 1 }}>{tip.content}</Text>
+                          )}
+
+                          <Group gap="xs" ml="md">
+                            {editingTipId === tip.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateTip(tip.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update tip"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelTipEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditTip(tip)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit tip"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteTip(tip.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete tip"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
+
+          <Divider my="xl" label="Habit Resource Links" labelPosition="center" />
+
+          {/* Section 2: Online Habit Resource Links */}
+          <Card withBorder p="lg" radius="lg" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Resource Link</Title>
+            <Stack spacing="md">
+              <TextInput
+                label="Resource Name"
+                placeholder="e.g., Atomic Habits Book, Habit Tracker App"
+                value={newResourceName}
+                onChange={(event) => setNewResourceName(event.currentTarget.value)}
+              />
+              <TextInput
+                label="Resource Link (URL)"
+                placeholder="e.g., https://www.atomichabits.com"
+                value={newResourceLink}
+                onChange={(event) => setNewResourceLink(event.currentTarget.value)}
+                type="url"
+              />
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} radius="xl" size="md" style={{ fontWeight: 700 }}>
+                Add Resource
+              </Button>
+            </Stack>
+
+            <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+
+            {errorResources && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorResources}
+              </Alert>
+            )}
+
+            {isLoadingResources ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading resources...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {resources.length === 0 ? (
+                  <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
+                ) : (
+                  resources.map((resource, idx) => (
+                    <motion.div
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="center" wrap="nowrap">
+                          {editingResourceId === resource.id ? (
+                            <Stack flex={1} spacing="xs">
+                              <TextInput
+                                placeholder="Resource Name"
+                                value={editingResourceName}
+                                onChange={(event) => setEditingResourceName(event.currentTarget.value)}
+                                autoFocus
+                                size="sm"
+                              />
+                              <TextInput
+                                placeholder="Resource Link (URL)"
+                                value={editingResourceLink}
+                                onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
+                                type="url"
+                                size="sm"
+                              />
+                            </Stack>
+                          ) : (
+                            <Anchor
+                              href={resource.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ flexGrow: 1 }}
+                              leftSection={<IconLink size={14} />}
+                            >
+                              {resource.name}
+                            </Anchor>
+                          )}
+
+                          <Group gap="xs" ml="md">
+                            {editingResourceId === resource.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update resource"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelResourceEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditResource(resource)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit resource"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete resource"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 

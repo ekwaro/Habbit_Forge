@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { 
-  getUserFromStorage, 
-  saveToStorage, 
+import {
+  Container,
+  Title,
+  Text,
+  Paper,
+  Image,
+  Button,
+  Group,
+  Divider,
+  Stack,
+} from '@mantine/core';
+import {
+  getUserFromStorage,
+  saveToStorage,
   getFromStorage,
-  clearStorage 
+  clearStorage,
 } from '../utils/localStorage';
 
 function Profile() {
@@ -13,11 +24,7 @@ function Profile() {
   const [userPreferences, setUserPreferences] = useState({});
 
   useEffect(() => {
-    // Load stored user data
-    const userData = getUserFromStorage();
-    setStoredUser(userData);
-
-    // Load user preferences
+    setStoredUser(JSON.parse(localStorage.getItem('currentUser')));
     const preferences = getFromStorage('userPreferences');
     setUserPreferences(preferences || {});
   }, []);
@@ -27,7 +34,7 @@ function Profile() {
       theme: 'dark',
       notifications: true,
       language: 'en',
-      savedAt: new Date().toISOString()
+      savedAt: new Date().toISOString(),
     };
     saveToStorage('userPreferences', preferences);
     setUserPreferences(preferences);
@@ -39,85 +46,94 @@ function Profile() {
     setUserPreferences({});
   };
 
-  if (!isAuthenticated) {
-    return <div>Please log in to view your profile.</div>;
-  }
-
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>User Profile</h1>
-      
-      {/* Current Auth0 User Data */}
-      <div style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-        <h2>Current User (from Auth0)</h2>
-        {user && (
-          <div>
-            <p><strong>Name:</strong> {user.name}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Email Verified:</strong> {user.email_verified ? 'Yes' : 'No'}</p>
-            {user.picture && <img src={user.picture} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />}
-          </div>
-        )}
-      </div>
+    <Container size="sm" py="xl">
+      <Title order={2} mb="lg">
+        User Profile
+      </Title>
 
-      {/* Stored User Data */}
-      <div style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-        <h2>Stored User Data (from localStorage)</h2>
+      {/* Auth0 user (commented out if not used) */}
+      {/* <Paper withBorder p="md" mb="lg">
+        <Title order={4} mb="sm">Current User (Auth0)</Title>
+        {user ? (
+          <Stack>
+            <Text><strong>Name:</strong> {user.name}</Text>
+            <Text><strong>Email:</strong> {user.email}</Text>
+            <Text><strong>Email Verified:</strong> {user.email_verified ? 'Yes' : 'No'}</Text>
+            {user.picture && (
+              <Image
+                src={user.picture}
+                alt="Profile"
+                width={80}
+                height={80}
+                radius="xl"
+              />
+            )}
+          </Stack>
+        ) : (
+          <Text>No Auth0 user data</Text>
+        )}
+      </Paper> */}
+
+      {/* Stored User */}
+      <Paper withBorder p="md" mb="lg" radius="md">
+        <Title order={4} mb="sm">Your Profiles</Title>
         {storedUser ? (
-          <div>
-            <p><strong>Name:</strong> {storedUser.name}</p>
-            <p><strong>Email:</strong> {storedUser.email}</p>
-            <p><strong>Email Verified:</strong> {storedUser.email_verified ? 'Yes' : 'No'}</p>
-            {storedUser.picture && <img src={storedUser.picture} alt="Stored Profile" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />}
-          </div>
+          <Stack>
+            <Text><strong>Name:</strong> {storedUser.name}</Text>
+            <Text><strong>Email:</strong> {storedUser.email}</Text>
+            <Text><strong>Email Verified:</strong> {storedUser.email_verified ? 'Yes' : 'No'}</Text>
+            {storedUser.picture && (
+              <Image
+                src={storedUser.picture}
+                alt="Stored Profile"
+                width={80}
+                height={80}
+                radius="xl"
+              />
+            )}
+          </Stack>
         ) : (
-          <p>No stored user data found</p>
+          <Text c="dimmed">No stored user data found</Text>
         )}
-      </div>
+      </Paper>
 
-      {/* User Preferences */}
-      <div style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-        <h2>User Preferences</h2>
+      {/* Preferences */}
+      <Paper withBorder p="md" mb="lg" radius="md">
+        <Title order={4} mb="sm">User Preferences</Title>
         {Object.keys(userPreferences).length > 0 ? (
-          <div>
-            <p><strong>Theme:</strong> {userPreferences.theme}</p>
-            <p><strong>Notifications:</strong> {userPreferences.notifications ? 'Enabled' : 'Disabled'}</p>
-            <p><strong>Language:</strong> {userPreferences.language}</p>
-            <p><strong>Saved At:</strong> {userPreferences.savedAt}</p>
-          </div>
+          <Stack>
+            <Text><strong>Theme:</strong> {userPreferences.theme}</Text>
+            <Text><strong>Notifications:</strong> {userPreferences.notifications ? 'Enabled' : 'Disabled'}</Text>
+            <Text><strong>Language:</strong> {userPreferences.language}</Text>
+            <Text><strong>Saved At:</strong> {userPreferences.savedAt}</Text>
+          </Stack>
         ) : (
-          <p>No preferences saved</p>
+          <Text c="dimmed">No preferences saved</Text>
         )}
-      </div>
+      </Paper>
 
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <button 
-          onClick={savePreferences}
-          style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
+      <Divider my="md" />
+
+      {/* Action buttons */}
+      <Group position="apart" mt="md" grow>
+        <Button color="teal" onClick={savePreferences}>
           Save Preferences
-        </button>
-        
-        <button 
+        </Button>
+        <Button
+          color="blue"
           onClick={() => {
-            const userData = getUserFromStorage();
-            console.log('Current stored user:', userData);
-            alert('Check console for stored user data');
+            console.log('Stored user:', storedUser);
+            alert('Check the console for stored user data.');
           }}
-          style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
         >
           Show Stored Data
-        </button>
-        
-        <button 
-          onClick={clearAllData}
-          style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
+        </Button>
+        <Button color="red" onClick={clearAllData}>
           Clear All Storage
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Group>
+    </Container>
   );
 }
 

@@ -1,7 +1,8 @@
 // src/components/PublicFooter.jsx
-import React from 'react';
+import React from 'react'
 import { Group, Text, Anchor, Box } from '@mantine/core';
 import { Link } from 'react-router-dom';
+
 
 const PublicFooter = () => {
   return (
@@ -49,6 +50,7 @@ const PublicFooter = () => {
           </Group>
         </Group>
       </Box>
+
     </Box>
   );
 };

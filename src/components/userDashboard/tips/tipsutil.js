@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 
 
 const useTip=()=>{
-    const [tip, setTip] = useState([])
+    const [tips, setTips] = useState([])
 const [loading, setLoading] = useState(false)
 const [error, setError] = useState('')
 
@@ -12,10 +12,10 @@ const fetchTip=async()=>{
     setError('')
 
     try{
-        const res = await fetch("https://api.allorigins.win/get?url=https://zenquotes.io/api/random")
+        const res = await fetch("http://localhost:1337/api/tips")
         if(!res.ok)throw new Error('Failed to fetch Tip')
         const data = await res.json()
-        setTip(data[0])
+        setTips(data.data)
     }
     catch(err){
         setError('Could not fetch tip, please try again')
@@ -30,7 +30,7 @@ useEffect(()=>{
     fetchTip();
 },[]);
 
-return {tip, loading, error, fetchTip}
+return {tips, loading, error, fetchTip}
 
 }
 

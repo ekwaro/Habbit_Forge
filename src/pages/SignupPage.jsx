@@ -53,6 +53,7 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: 'user'
     },
     validate: {
       username: (value) => (value.length > 3 ? null : "Minimum 4 characters"),

@@ -19,7 +19,7 @@ const headerHeight = 100; // Define your header height
   const mainPaddingTop = headerHeight + 2; // Add a bit extra padding for visual separation, e.g., 16px
 
 
-function App() {
+function App({ colorScheme, toggleColorScheme }) {
   
   const { user, isAuthenticated, isLoading } = useAuth0(); 
   
@@ -38,22 +38,25 @@ function App() {
       removeUserFromStorage();
     }
   }, [isAuthenticated, user, isLoading]);
-  
+  console.log(user?.email) 
 
 
   return (
     <AppShell
        header={{ height: headerHeight }}//header height
-       padding={mainPaddingTop} 
+       padding={mainPaddingTop}
+       layout="alt"
     >
       <AppShell.Header>
-        <PublicNavbar /> 
+        <PublicNavbar colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} /> 
       </AppShell.Header>
       
       <AppShell.Main>
         <Outlet/>
-        <PublicFooter/>
       </AppShell.Main>
+      <AppShell.Footer>
+        <PublicFooter/>
+      </AppShell.Footer>
     </AppShell>
   );
 }

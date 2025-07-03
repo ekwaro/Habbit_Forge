@@ -85,8 +85,17 @@ export default function LoginPage() {
         }
       );
 
+
       localStorage.setItem("authToken", jwt);
       localStorage.setItem("user", JSON.stringify(userWithRole.data));
+
+      if (user) {
+        setIsRedirecting(true);
+          const currentUser = { ...user, authMethod: "local" };
+        
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("currentUser", JSON.stringify(user));
+main
 
       notifications.show({
         title: "Success",
@@ -162,9 +171,52 @@ export default function LoginPage() {
 
               <Button
                 fullWidth
+
                 type="submit"
                 leftIcon={<IconLogin size={18} />}
                 loading={loading}
+
+                size="md"
+                color="teal"
+                 leftSection ={<IconLogin size={18} />}
+                loading={isRedirecting}
+                disabled={isGoogleLoading} // 👈 IMPORTANT: Disable during Google login
+                style={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  marginBottom: "1rem",
+                }}
+              >
+                CONTINUE JOURNEY
+              </Button>
+            </motion.div>
+            </form>
+
+            <Divider
+              label="OR"
+              labelPosition="center"
+              my="lg"
+              style={{ borderTopColor: "rgba(255,255,255,0.3)" }}
+            />
+
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={handleGoogleLogin}
+                fullWidth
+                size="md"
+                variant="outline"
+                color="black"
+
+                leftIcon={<IconBrandGoogle size={18} />}
+                loading={isGoogleLoading}
+                disabled={isRedirecting} // 👈 IMPORTANT: Disable during redirect
+
+                style={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  borderColor: "rgba(20, 19, 19, 0.5)",
+                }}
+
               >
                 Continue Journey
               </Button>
@@ -186,7 +238,11 @@ export default function LoginPage() {
             <Text component={Link} to="/signup" fw={500} td="underline">
               Sign up
             </Text>
+
           </Text>
+
+        
+
         </Paper>
       </motion.div>
     </div>

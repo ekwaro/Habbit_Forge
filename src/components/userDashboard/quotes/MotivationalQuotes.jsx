@@ -1,47 +1,102 @@
-import { Container,Card, Text } from '@mantine/core'
-import React, { useState, useEffect } from 'react'
+import { useEffect, useState } from "react";
+import {
+  Paper,
+  Text,
+  Title,
+  Loader,
+  Center,
+  Stack,
+  Button,
+  Group,
+} from "@mantine/core";
+import { IconRefresh } from "@tabler/icons-react";
 
 const MotivationalQuotes = () => {
-  const [quotes, setQuotes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  useEffect(() => {
-    const fetchQuotes = async () => {
-      try {
-const res = await fetch("https://goquotes-api.herokuapp.com/api/v1/random?count=1");
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = await response.json()
-        setQuotes(data.results)
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setLoading(false)
-      }
+  const [quotes, setQuote] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [quoteIndex, setQuoteIndex] = useState(0);
+
+  const fetchQuote = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "http://localhost:1337/api/quotes?populate=*"
+      );
+      const data = await response.json();
+      console.log(data);
+      setQuote(data.data);
+      setQuoteIndex(0);
+    } catch (error) {
+      console.error("Failed to fetch quote:", error);
+      setQuote(null);
+    } finally {
+      setLoading(false);
     }
-    fetchQuotes()
-  }, [])
+  };
+
+  useEffect(() => {
+    fetchQuote();
+  }, []);
+  const displayNextQuote = () => {
+    if (quotes.length === 0) return;
+    setQuoteIndex((prevIndex) =>
+      prevIndex + 1 >= quotes.length ? 0 : prevIndex + 1
+    );
+  };
+  const displayPreviousQuote = () => {
+    setQuoteIndex((prev) => (prev - 1 < 0 ? quotes.length - 1 : prev - 1));
+  };
+  if (loading) {
+    return (
+      <Center mt="md">
+        <Loader color="teal" />
+      </Center>
+    );
+  }
+
+  if (!quotes || quotes.length === 0) {
+    return (
+      <Center mt="md">
+        <Text color="red">No quotes available.</Text>
+        <Button onClick={fetchQuote} mt="sm">
+          Try Again
+        </Button>
+      </Center>
+    );
+  }
+  const current = quotes[quoteIndex];
+
   return (
-    <Container size='sm' py='xl'>
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Text size="xl" weight={700} mb="md">Motivational Quotes</Text>
-        {loading && <Text>Loading...</Text>}
-        {error && <Text color="red">{error}</Text>}
-        {!loading && !error && (
-          <Stack>
-            {quotes.map((quote) => (
-              <Card key={quote._id} shadow="sm" padding="lg">
-                <Text size="md" italic>"{quote.content}"</Text>
-                <Text size="sm" color="dimmed">- {quote.author}</Text>
-              </Card>
-            ))}
-          </Stack>
-        )}
-      </Card>
+    <Paper shadow="md" p="lg" radius="md" withBorder mt="md">
+      <Stack spacing="sm">
+        <Text size="lg" italic>
+          “{current?.text}”
+        </Text>
+        <Text size="sm" align="right" c="dimmed">
+          — {current?.author || "Unknown"}
+        </Text>
 
-    </Container>    
-  )
-}
+        <Group position="apart">
+          <Button size="xs" variant="light" onClick={displayPreviousQuote}>
+            Previous
+          </Button>
 
-export default MotivationalQuotes
+          <Button size="xs" variant="light" onClick={displayNextQuote}>
+            Next Quote
+          </Button>
+
+          <Button
+            size="xs"
+            variant="light"
+            onClick={fetchQuote}
+            leftSection={<IconRefresh size={14} />}
+          >
+            Refresh All
+          </Button>
+        </Group>
+      </Stack>
+    </Paper>
+  );
+};
+
+export default MotivationalQuotes;

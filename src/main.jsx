@@ -12,8 +12,9 @@ import HabbitsManagement from "./components/userDashboard/habits/HabbitsManageme
 import GoalsManagement from "./components/userDashboard/goals/GoalsManagement.jsx";
 import MotivationalQuotes from "./components/userDashboard/quotes/MotivationalQuotes.jsx";
 import Tips from "./components/userDashboard/tips/Tips.jsx";
+//import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./components/userDashboard/Overview.jsx";
-import Profile from "./components/userDashboard/Profile.jsx";
+import Profiles from "./components/userDashboard/UserProfile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
 
 import HomePage from "./pages/HomePage";
@@ -31,8 +32,9 @@ import HabitCategoriesPage from './pages1/HabitCategoriesPage';
 import MotivationalQuotesPage from './pages1/MotivationalQuotesPage';
 import HabitTipsPage from './pages1/HabitTipsPage';
 import AnalyticsSectionPage from './pages1/AnalyticsSectionPage';
-import DashboardPage1 from './pages1/DashboardPage';
+import DashboardPage1 from './pages1/DashboardPage1';
 import TermsOfService from "./pages1/TermsOfService"; 
+import { useLocalStorage } from "@mantine/hooks";
 
 const theme = {
   colorScheme: "light",
@@ -50,6 +52,57 @@ const auth0Config = {
   },
 };
 
+function MainApp() {
+  const [colorScheme, setColorScheme] = useLocalStorage({
+    key: "mantine-color-scheme",
+    defaultValue: "light",
+  });
+  const toggleColorScheme = (value) => {
+    setColorScheme(
+      value === "light" || value === "dark"
+        ? value
+        : colorScheme === "dark"
+        ? "light"
+        : "dark"
+    );
+  };
+
+  return (
+    <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} />}>
+            <Route index element={<HomePage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignupPage />} />
+            <Route path="about" element={<AboutUsPage />} />
+            <Route path="contact" element={<ContactUsPage />} />
+            <Route path="terms-of-service" element={<TermsOfService />} />
+          </Route>
+          <Route path="/user-dashboard" element={<UserDashBoard />}>
+            <Route index element={<Profiles />} />
+            <Route path="habbits-management" element={<HabbitsManagement />} />
+            <Route path="habbits-management/:id" element={<HabbitsItem />} />
+            <Route path="goals-management" element={<GoalsManagement />} />
+            <Route path="motivational-quotes" element={<MotivationalQuotes />} />
+            <Route path="tips" element={<Tips />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<DashboardPage1 />} />
+            <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="categories" element={<HabitCategoriesPage />} />
+            <Route path="quotes" element={<MotivationalQuotesPage />} />
+            <Route path="tips" element={<HabitTipsPage />} />
+            <Route path="analytics" element={<AnalyticsSectionPage />} />
+            <Route path="*" element={<div>404 Admin Page Not Found</div>} />
+          </Route>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </MantineProvider>
+  );
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Auth0Provider
@@ -57,63 +110,7 @@ createRoot(document.getElementById("root")).render(
       clientId={auth0Config.clientId}
       authorizationParams={auth0Config.authorizationParams}
     >
-      <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-        <BrowserRouter>
-          <Routes>
-
-            <Route path="/" element={<App />}>
-               <Route index element={<HomePage />} />
-               <Route path="login" element={<LoginPage />} />
-               <Route path="signup" element={<SignupPage />} />
-               <Route path="about" element={<AboutUsPage />} />
-               <Route path="contact" element={<ContactUsPage />} />
-               <Route path="terms-of-service" element={<TermsOfService />} />
-               
-            </Route>   
-
-            {/* <Route path="/" element={<App />} /> */}
-            {/* <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} /> */}
-            {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-
-            <Route path="/user-dashboard" element={<UserDashBoard />}>
-              <Route index element={<Overview />} />
-              <Route path="overview" element={<Overview />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="habbits-management" element={<HabbitsManagement />} />
-              <Route path="habbits-management/:id" element={<HabbitsItem />} />
-
-              <Route path="goals-management" element={<GoalsManagement />} />
-              <Route
-                path="motivational-quotes"
-                element={<MotivationalQuotes />}
-              />
-              <Route path="tips" element={<Tips />} />
-            </Route>
-
-            
-          {/* Admin Dashboard Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-          
-            {/* Nested Routes for Sidebar items */}
-            <Route index element={<DashboardPage />} />
-             <Route path="profile" element={<AdminProfilePage />} />
-            <Route path="categories" element={<HabitCategoriesPage />} />
-            <Route path="quotes" element={<MotivationalQuotesPage />} />
-            <Route path="tips" element={<HabitTipsPage />} />
-            <Route path="analytics" element={<AnalyticsSectionPage />} />
-
-            {/* Handle 404 for admin routes*/}
-            <Route path="*" element={<div>404 Admin Page Not Found</div>} />
-          </Route>
-         
-            {/* Add more routes as needed */}
-            {/* Catch-all route for 404 Not Found */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </MantineProvider>
+      <MainApp />
     </Auth0Provider>
   </StrictMode>
 );
