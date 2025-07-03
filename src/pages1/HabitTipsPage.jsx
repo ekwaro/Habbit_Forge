@@ -14,8 +14,10 @@ import {
   Divider,
   Anchor,
   Card,
-  Loader, // Added for loading indicator
-  Alert, // Added for error messages
+  Loader,
+  Alert,
+  Blockquote,
+  Box,
 } from '@mantine/core';
 import {
   IconPlus,
@@ -24,12 +26,21 @@ import {
   IconCheck,
   IconX,
   IconLink,
-  IconAlertCircle, // For error alerts
+  IconAlertCircle,
+  IconSparkles,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { keyframes } from '@emotion/react';
 
 // Define your Strapi API URLs
 const STRAPI_TIPS_API_URL = 'http://localhost:1337/api/habit-tips';
 const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/habit-resources';
+
+// Animated background keyframes
+const animatedBackground = keyframes`
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+`;
 
 function HabitTipsPage() {
   // --- STATE FOR TEXT-BASED HABIT TIPS ---
@@ -333,258 +344,337 @@ function HabitTipsPage() {
   };
 
   return (
-    <Container size="xl" my="lg">
-      <Paper p="xl" shadow="xs" radius="md">
-        <Title order={2} mb="lg" fw={700}>Habit Tips & Tricks Management</Title>
-        <Text mb="md">Manage valuable tips, strategies, and resources for building good habits.</Text>
+    <Box
+      style={{
+        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 0',
+        animation: `${animatedBackground} 20s linear infinite`,
+      }}
+    >
+      <Container size="lg" px="md">
+        <Paper
+          p="xl"
+          shadow="xl"
+          radius="lg"
+          style={{
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1.5px solid #e3e8f0',
+            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <Title
+              order={1}
+              mb="sm"
+              style={{
+                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                color: '#222',
+                lineHeight: 1.1,
+              }}
+            >
+              Habit Tips & Tricks Management
+            </Title>
+            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
+              Manage valuable tips, strategies, and resources for building good habits.
+            </Text>
+            <Blockquote
+              color="blue"
+              cite="Stephen Covey"
+              style={{
+                fontSize: '1.1rem',
+                margin: '0 auto',
+                maxWidth: 500,
+                background: 'rgba(34,139,230,0.07)',
+                borderRadius: 8,
+                padding: '16px 24px',
+              }}
+              icon={<IconSparkles size={32} color="#228be6" />}
+            >
+              <strong>"The key is not to prioritize what's on your schedule, but to schedule your priorities."</strong>
+            </Blockquote>
+          </div>
 
-        <Divider my="xl" label="Habit Tips" labelPosition="center" />
+          <Divider my="xl" label="Habit Tips" labelPosition="center" />
 
-        {/* Section 1: Text-Based Habit Tips */}
-        <Card withBorder p="lg" radius="md" mb="xl">
-          <Title order={3} mb="lg">Add New Tip</Title>
-          <Textarea
-            label="Tip Content"
-            placeholder="e.g., Start small, track your progress, find an accountability partner."
-            value={newTipContent}
-            onChange={(event) => setNewTipContent(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleAddTip();
-              }
-            }}
-            rows={4}
-            autosize
-            minRows={2}
-            mb="md"
-          />
-          <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip}>
-            Add Tip
-          </Button>
-
-          <Divider my="xl" label="Uploaded Tips" labelPosition="center" />
-
-          {errorTips && (
-            <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
-              {errorTips}
-            </Alert>
-          )}
-
-          {isLoadingTips ? (
-            <Group position="center" mt="md">
-              <Loader />
-              <Text>Loading tips...</Text>
-            </Group>
-          ) : (
-            <Stack>
-              {tips.length === 0 ? (
-                <Text c="dimmed" ta="center">No tips added yet. Add one above!</Text>
-              ) : (
-                tips.map((tip) => (
-                  <Card key={tip.id} withBorder p="md" radius="sm" shadow="sm">
-                    <Group justify="space-between" align="flex-start" wrap="nowrap">
-                      {editingTipId === tip.id ? (
-                        <Textarea
-                          flex={1}
-                          value={editingTipContent}
-                          onChange={(event) => setEditingTipContent(event.currentTarget.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter' && !event.shiftKey) {
-                              event.preventDefault();
-                              handleUpdateTip(tip.id);
-                            }
-                          }}
-                          autoFocus
-                          rows={3}
-                          autosize
-                          minRows={2}
-                        />
-                      ) : (
-                        <Text style={{ flexGrow: 1 }}>{tip.content}</Text>
-                      )}
-
-                      <Group gap="xs" ml="md">
-                        {editingTipId === tip.id ? (
-                          <>
-                            <ActionIcon
-                              variant="filled"
-                              color="green"
-                              onClick={() => handleUpdateTip(tip.id)}
-                              size="lg"
-                              aria-label="Update tip"
-                            >
-                              <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="filled"
-                              color="red"
-                              onClick={handleCancelTipEdit}
-                              size="lg"
-                              aria-label="Cancel edit"
-                            >
-                              <IconX style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        ) : (
-                          <>
-                            <ActionIcon
-                              variant="light"
-                              color="blue"
-                              onClick={() => handleEditTip(tip)}
-                              size="lg"
-                              aria-label="Edit tip"
-                            >
-                              <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="light"
-                              color="red"
-                              onClick={() => handleDeleteTip(tip.id)}
-                              size="lg"
-                              aria-label="Delete tip"
-                            >
-                              <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        )}
-                      </Group>
-                    </Group>
-                  </Card>
-                ))
-              )}
-            </Stack>
-          )}
-        </Card>
-
-        <Divider my="xl" label="Habit Resource Links" labelPosition="center" />
-
-        {/* Section 2: Online Habit Resource Links */}
-        <Card withBorder p="lg" radius="md">
-          <Title order={3} mb="lg">Add New Resource Link</Title>
-          <Stack spacing="md">
-            <TextInput
-              label="Resource Name"
-              placeholder="e.g., Atomic Habits Book, Habit Tracker App"
-              value={newResourceName}
-              onChange={(event) => setNewResourceName(event.currentTarget.value)}
+          {/* Section 1: Text-Based Habit Tips */}
+          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Tip</Title>
+            <Textarea
+              label="Tip Content"
+              placeholder="e.g., Start small, track your progress, find an accountability partner."
+              value={newTipContent}
+              onChange={(event) => setNewTipContent(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  handleAddTip();
+                }
+              }}
+              rows={4}
+              autosize
+              minRows={2}
+              mb="md"
             />
-            <TextInput
-              label="Resource Link (URL)"
-              placeholder="e.g., https://www.atomichabits.com"
-              value={newResourceLink}
-              onChange={(event) => setNewResourceLink(event.currentTarget.value)}
-              type="url"
-            />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource}>
-              Add Resource
+            <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              Add Tip
             </Button>
-          </Stack>
 
-          <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+            <Divider my="xl" label="Uploaded Tips" labelPosition="center" />
 
-          {errorResources && (
-            <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
-              {errorResources}
-            </Alert>
-          )}
+            {errorTips && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorTips}
+              </Alert>
+            )}
 
-          {isLoadingResources ? (
-            <Group position="center" mt="md">
-              <Loader />
-              <Text>Loading resources...</Text>
-            </Group>
-          ) : (
-            <Stack>
-              {resources.length === 0 ? (
-                <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
-              ) : (
-                resources.map((resource) => (
-                  <Card key={resource.id} withBorder p="md" radius="sm" shadow="sm">
-                    <Group justify="space-between" align="center" wrap="nowrap">
-                      {editingResourceId === resource.id ? (
-                        <Stack flex={1} spacing="xs">
-                          <TextInput
-                            placeholder="Resource Name"
-                            value={editingResourceName}
-                            onChange={(event) => setEditingResourceName(event.currentTarget.value)}
-                            autoFocus
-                            size="sm"
-                          />
-                          <TextInput
-                            placeholder="Resource Link (URL)"
-                            value={editingResourceLink}
-                            onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
-                            type="url"
-                            size="sm"
-                          />
-                        </Stack>
-                      ) : (
-                        <Anchor
-                          href={resource.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ flexGrow: 1 }}
-                          leftSection={<IconLink size={14} />}
-                        >
-                          {resource.name}
-                        </Anchor>
-                      )}
+            {isLoadingTips ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading tips...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {tips.length === 0 ? (
+                  <Text c="dimmed" ta="center">No tips added yet. Add one above!</Text>
+                ) : (
+                  tips.map((tip, idx) => (
+                    <motion.div
+                      key={tip.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="flex-start" wrap="nowrap">
+                          {editingTipId === tip.id ? (
+                            <Textarea
+                              flex={1}
+                              value={editingTipContent}
+                              onChange={(event) => setEditingTipContent(event.currentTarget.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !event.shiftKey) {
+                                  event.preventDefault();
+                                  handleUpdateTip(tip.id);
+                                }
+                              }}
+                              autoFocus
+                              rows={3}
+                              autosize
+                              minRows={2}
+                            />
+                          ) : (
+                            <Text style={{ flexGrow: 1 }}>{tip.content}</Text>
+                          )}
 
-                      <Group gap="xs" ml="md">
-                        {editingResourceId === resource.id ? (
-                          <>
-                            <ActionIcon
-                              variant="filled"
-                              color="green"
-                              onClick={() => handleUpdateResource(resource.id)}
-                              size="lg"
-                              aria-label="Update resource"
-                            >
-                              <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="filled"
-                              color="red"
-                              onClick={handleCancelResourceEdit}
-                              size="lg"
-                              aria-label="Cancel edit"
-                            >
-                              <IconX style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        ) : (
-                          <>
-                            <ActionIcon
-                              variant="light"
-                              color="blue"
-                              onClick={() => handleEditResource(resource)}
-                              size="lg"
-                              aria-label="Edit resource"
-                            >
-                              <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="light"
-                              color="red"
-                              onClick={() => handleDeleteResource(resource.id)}
-                              size="lg"
-                              aria-label="Delete resource"
-                            >
-                              <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        )}
-                      </Group>
-                    </Group>
-                  </Card>
-                ))
-              )}
+                          <Group gap="xs" ml="md">
+                            {editingTipId === tip.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateTip(tip.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update tip"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelTipEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditTip(tip)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit tip"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteTip(tip.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete tip"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
+
+          <Divider my="xl" label="Habit Resource Links" labelPosition="center" />
+
+          {/* Section 2: Online Habit Resource Links */}
+          <Card withBorder p="lg" radius="lg" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Resource Link</Title>
+            <Stack spacing="md">
+              <TextInput
+                label="Resource Name"
+                placeholder="e.g., Atomic Habits Book, Habit Tracker App"
+                value={newResourceName}
+                onChange={(event) => setNewResourceName(event.currentTarget.value)}
+              />
+              <TextInput
+                label="Resource Link (URL)"
+                placeholder="e.g., https://www.atomichabits.com"
+                value={newResourceLink}
+                onChange={(event) => setNewResourceLink(event.currentTarget.value)}
+                type="url"
+              />
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} radius="xl" size="md" style={{ fontWeight: 700 }}>
+                Add Resource
+              </Button>
             </Stack>
-          )}
-        </Card>
-      </Paper>
-    </Container>
+
+            <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+
+            {errorResources && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorResources}
+              </Alert>
+            )}
+
+            {isLoadingResources ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading resources...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {resources.length === 0 ? (
+                  <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
+                ) : (
+                  resources.map((resource, idx) => (
+                    <motion.div
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="center" wrap="nowrap">
+                          {editingResourceId === resource.id ? (
+                            <Stack flex={1} spacing="xs">
+                              <TextInput
+                                placeholder="Resource Name"
+                                value={editingResourceName}
+                                onChange={(event) => setEditingResourceName(event.currentTarget.value)}
+                                autoFocus
+                                size="sm"
+                              />
+                              <TextInput
+                                placeholder="Resource Link (URL)"
+                                value={editingResourceLink}
+                                onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
+                                type="url"
+                                size="sm"
+                              />
+                            </Stack>
+                          ) : (
+                            <Anchor
+                              href={resource.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ flexGrow: 1 }}
+                              leftSection={<IconLink size={14} />}
+                            >
+                              {resource.name}
+                            </Anchor>
+                          )}
+
+                          <Group gap="xs" ml="md">
+                            {editingResourceId === resource.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update resource"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelResourceEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditResource(resource)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit resource"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete resource"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 

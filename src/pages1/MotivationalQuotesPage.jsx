@@ -14,8 +14,10 @@ import {
   Divider,
   Anchor,
   Card,
-  Loader, // Added for loading indicator
-  Alert, // Added for error messages
+  Loader,
+  Alert,
+  Blockquote,
+  Box,
 } from '@mantine/core';
 import {
   IconPlus,
@@ -24,12 +26,21 @@ import {
   IconCheck,
   IconX,
   IconLink,
-  IconAlertCircle, // For error alerts
+  IconAlertCircle,
+  IconSparkles,
 } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { keyframes } from '@emotion/react';
 
 // Define your Strapi API URLs
 const STRAPI_QUOTES_API_URL = 'http://localhost:1337/api/motivational-quotes';
 const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/quote-resources';
+
+// Animated background keyframes
+const animatedBackground = keyframes`
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+`;
 
 function MotivationalQuotesPage() {
   // --- STATE FOR TEXT-BASED QUOTES ---
@@ -366,266 +377,337 @@ function MotivationalQuotesPage() {
   };
 
   return (
-    <Container size="xl" my="lg">
-      <Paper p="xl" shadow="xs" radius="md">
-        <Title order={2} mb="lg" fw={700}>Motivational Quotes Management</Title>
-        <Text mb="md">Add, edit, or delete motivational quotes and external resource links for your users.</Text>
+    <Box
+      style={{
+        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 0',
+        animation: `${animatedBackground} 20s linear infinite`,
+      }}
+    >
+      <Container size="lg" px="md">
+        <Paper
+          p="xl"
+          shadow="xl"
+          radius="lg"
+          style={{
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1.5px solid #e3e8f0',
+            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <Title
+              order={1}
+              mb="sm"
+              style={{
+                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                color: '#222',
+                lineHeight: 1.1,
+              }}
+            >
+              Motivational Quotes Management
+            </Title>
+            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
+              Add, edit, or delete motivational quotes and external resource links for your users.
+            </Text>
+            <Blockquote
+              color="blue"
+              cite="Zig Ziglar"
+              style={{
+                fontSize: '1.1rem',
+                margin: '0 auto',
+                maxWidth: 500,
+                background: 'rgba(34,139,230,0.07)',
+                borderRadius: 8,
+                padding: '16px 24px',
+              }}
+              icon={<IconSparkles size={32} color="#228be6" />}
+            >
+              <strong>"People often say that motivation doesn't last. Well, neither does bathing – that's why we recommend it daily."</strong>
+            </Blockquote>
+          </div>
 
-        ---
+          <Divider my="xl" label="Text-Based Quotes" labelPosition="center" />
 
-        <Divider my="xl" label="Text-Based Quotes" labelPosition="center" />
-
-        {/* Section 1: Text-Based Motivational Quotes */}
-        <Card withBorder p="lg" radius="md" mb="xl">
-          <Title order={3} mb="lg">Add New Quote</Title>
-          <Textarea
-            label="Quote Content"
-            placeholder="Enter a motivational quote"
-            value={newQuoteContent}
-            onChange={(event) => setNewQuoteContent(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) { // Prevent adding on Shift+Enter
-                event.preventDefault(); // Prevent new line
-                handleAddQuote();
-              }
-            }}
-            rows={4}
-            autosize
-            minRows={2}
-            mb="md"
-          />
-          <Button leftSection={<IconPlus size={16} />} onClick={handleAddQuote}>
-            Add Quote
-          </Button>
-
-          ---
-
-          <Divider my="xl" label="Uploaded Quotes" labelPosition="center" />
-
-          {errorQuotes && (
-            <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
-              {errorQuotes}
-            </Alert>
-          )}
-
-          {isLoadingQuotes ? (
-            <Group justify="center" mt="md">
-              <Loader />
-              <Text>Loading quotes...</Text>
-            </Group>
-          ) : (
-            <Stack>
-              {quotes.length === 0 ? (
-                <Text c="dimmed" ta="center">No quotes added yet. Add one above!</Text>
-              ) : (
-                quotes.map((quote) => (
-                  <Card key={quote.id} withBorder p="md" radius="sm" shadow="sm">
-                    <Group justify="space-between" align="flex-start" wrap="nowrap">
-                      {editingQuoteId === quote.id ? (
-                        <Textarea
-                          flex={1}
-                          value={editingQuoteContent}
-                          onChange={(event) => setEditingQuoteContent(event.currentTarget.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter' && !event.shiftKey) {
-                              event.preventDefault();
-                              handleUpdateQuote(quote.id);
-                            }
-                          }}
-                          autoFocus
-                          rows={3}
-                          autosize
-                          minRows={2}
-                        />
-                      ) : (
-                        <Text style={{ flexGrow: 1 }}>{quote.content}</Text>
-                      )}
-
-                      <Group gap="xs" ml="md">
-                        {editingQuoteId === quote.id ? (
-                          <>
-                            <ActionIcon
-                              variant="filled"
-                              color="green"
-                              onClick={() => handleUpdateQuote(quote.id)}
-                              size="lg"
-                              aria-label="Update quote"
-                            >
-                              <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="filled"
-                              color="red"
-                              onClick={handleCancelQuoteEdit}
-                              size="lg"
-                              aria-label="Cancel edit"
-                            >
-                              <IconX style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        ) : (
-                          <>
-                            <ActionIcon
-                              variant="light"
-                              color="blue"
-                              onClick={() => handleEditQuote(quote)}
-                              size="lg"
-                              aria-label="Edit quote"
-                            >
-                              <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="light"
-                              color="red"
-                              onClick={() => handleDeleteQuote(quote.id)}
-                              size="lg"
-                              aria-label="Delete quote"
-                            >
-                              <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        )}
-                      </Group>
-                    </Group>
-                  </Card>
-                ))
-              )}
-            </Stack>
-          )}
-        </Card>
-
-        ---
-
-        <Divider my="xl" label="Online Quote Resources" labelPosition="center" />
-
-        {/* Section 2: Online Quote Resources */}
-        <Card withBorder p="lg" radius="md">
-          <Title order={3} mb="lg">Add New Resource</Title>
-          <Stack spacing="md">
-            <TextInput
-              label="Resource Name"
-              placeholder="e.g., BrainyQuote, GoodReads"
-              value={newResourceName}
-              onChange={(event) => setNewResourceName(event.currentTarget.value)}
+          {/* Section 1: Text-Based Motivational Quotes */}
+          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Quote</Title>
+            <Textarea
+              label="Quote Content"
+              placeholder="Enter a motivational quote"
+              value={newQuoteContent}
+              onChange={(event) => setNewQuoteContent(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  handleAddQuote();
+                }
+              }}
+              rows={4}
+              autosize
+              minRows={2}
+              mb="md"
             />
-            <TextInput
-              label="Resource Link (URL)"
-              placeholder="e.g., https://www.brainyquote.com"
-              value={newResourceLink}
-              onChange={(event) => setNewResourceLink(event.currentTarget.value)}
-              type="url"
-            />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource}>
-              Add Resource
+            <Button leftSection={<IconPlus size={16} />} onClick={handleAddQuote} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              Add Quote
             </Button>
-          </Stack>
 
-          ---
+            <Divider my="xl" label="Uploaded Quotes" labelPosition="center" />
 
-          <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+            {errorQuotes && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorQuotes}
+              </Alert>
+            )}
 
-          {errorResources && (
-            <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
-              {errorResources}
-            </Alert>
-          )}
+            {isLoadingQuotes ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading quotes...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {quotes.length === 0 ? (
+                  <Text c="dimmed" ta="center">No quotes added yet. Add one above!</Text>
+                ) : (
+                  quotes.map((quote, idx) => (
+                    <motion.div
+                      key={quote.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="flex-start" wrap="nowrap">
+                          {editingQuoteId === quote.id ? (
+                            <Textarea
+                              flex={1}
+                              value={editingQuoteContent}
+                              onChange={(event) => setEditingQuoteContent(event.currentTarget.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !event.shiftKey) {
+                                  event.preventDefault();
+                                  handleUpdateQuote(quote.id);
+                                }
+                              }}
+                              autoFocus
+                              rows={3}
+                              autosize
+                              minRows={2}
+                            />
+                          ) : (
+                            <Text style={{ flexGrow: 1 }}>{quote.content}</Text>
+                          )}
 
-          {isLoadingResources ? (
-            <Group justify="center" mt="md">
-              <Loader />
-              <Text>Loading resources...</Text>
-            </Group>
-          ) : (
-            <Stack>
-              {resources.length === 0 ? (
-                <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
-              ) : (
-                resources.map((resource) => (
-                  <Card key={resource.id} withBorder p="md" radius="sm" shadow="sm">
-                    <Group justify="space-between" align="center" wrap="nowrap">
-                      {editingResourceId === resource.id ? (
-                        <Stack flex={1} spacing="xs">
-                          <TextInput
-                            placeholder="Resource Name"
-                            value={editingResourceName}
-                            onChange={(event) => setEditingResourceName(event.currentTarget.value)}
-                            autoFocus
-                            size="sm"
-                          />
-                          <TextInput
-                            placeholder="Resource Link (URL)"
-                            value={editingResourceLink}
-                            onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
-                            type="url"
-                            size="sm"
-                          />
-                        </Stack>
-                      ) : (
-                        <Anchor
-                          href={resource.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ flexGrow: 1 }}
-                          leftSection={<IconLink size={14} />}
-                        >
-                          {resource.name}
-                        </Anchor>
-                      )}
+                          <Group gap="xs" ml="md">
+                            {editingQuoteId === quote.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateQuote(quote.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update quote"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelQuoteEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditQuote(quote)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit quote"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteQuote(quote.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete quote"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
 
-                      <Group gap="xs" ml="md">
-                        {editingResourceId === resource.id ? (
-                          <>
-                            <ActionIcon
-                              variant="filled"
-                              color="green"
-                              onClick={() => handleUpdateResource(resource.id)}
-                              size="lg"
-                              aria-label="Update resource"
-                            >
-                              <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="filled"
-                              color="red"
-                              onClick={handleCancelResourceEdit}
-                              size="lg"
-                              aria-label="Cancel edit"
-                            >
-                              <IconX style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        ) : (
-                          <>
-                            <ActionIcon
-                              variant="light"
-                              color="blue"
-                              onClick={() => handleEditResource(resource)}
-                              size="lg"
-                              aria-label="Edit resource"
-                            >
-                              <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="light"
-                              color="red"
-                              onClick={() => handleDeleteResource(resource.id)}
-                              size="lg"
-                              aria-label="Delete resource"
-                            >
-                              <IconTrash style={{ width: rem(20), height: rem(20) }} />
-                            </ActionIcon>
-                          </>
-                        )}
-                      </Group>
-                    </Group>
-                  </Card>
-                ))
-              )}
+          <Divider my="xl" label="Online Quote Resources" labelPosition="center" />
+
+          {/* Section 2: Online Quote Resources */}
+          <Card withBorder p="lg" radius="lg" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+            <Title order={3} mb="lg">Add New Resource</Title>
+            <Stack spacing="md">
+              <TextInput
+                label="Resource Name"
+                placeholder="e.g., BrainyQuote, GoodReads"
+                value={newResourceName}
+                onChange={(event) => setNewResourceName(event.currentTarget.value)}
+              />
+              <TextInput
+                label="Resource Link (URL)"
+                placeholder="e.g., https://www.brainyquote.com"
+                value={newResourceLink}
+                onChange={(event) => setNewResourceLink(event.currentTarget.value)}
+                type="url"
+              />
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} radius="xl" size="md" style={{ fontWeight: 700 }}>
+                Add Resource
+              </Button>
             </Stack>
-          )}
-        </Card>
-      </Paper>
-    </Container>
+
+            <Divider my="xl" label="Uploaded Resources" labelPosition="center" />
+
+            {errorResources && (
+              <Alert icon={<IconAlertCircle size={16} />} title="Error!" color="red" mb="md">
+                {errorResources}
+              </Alert>
+            )}
+
+            {isLoadingResources ? (
+              <Group justify="center" mt="md">
+                <Loader />
+                <Text>Loading resources...</Text>
+              </Group>
+            ) : (
+              <Stack>
+                {resources.length === 0 ? (
+                  <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
+                ) : (
+                  resources.map((resource, idx) => (
+                    <motion.div
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                    >
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                        <Group justify="space-between" align="center" wrap="nowrap">
+                          {editingResourceId === resource.id ? (
+                            <Stack flex={1} spacing="xs">
+                              <TextInput
+                                placeholder="Resource Name"
+                                value={editingResourceName}
+                                onChange={(event) => setEditingResourceName(event.currentTarget.value)}
+                                autoFocus
+                                size="sm"
+                              />
+                              <TextInput
+                                placeholder="Resource Link (URL)"
+                                value={editingResourceLink}
+                                onChange={(event) => setEditingResourceLink(event.currentTarget.value)}
+                                type="url"
+                                size="sm"
+                              />
+                            </Stack>
+                          ) : (
+                            <Anchor
+                              href={resource.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ flexGrow: 1 }}
+                              leftSection={<IconLink size={14} />}
+                            >
+                              {resource.name}
+                            </Anchor>
+                          )}
+
+                          <Group gap="xs" ml="md">
+                            {editingResourceId === resource.id ? (
+                              <>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="green"
+                                  onClick={() => handleUpdateResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Update resource"
+                                >
+                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="filled"
+                                  color="red"
+                                  onClick={handleCancelResourceEdit}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Cancel edit"
+                                >
+                                  <IconX style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <ActionIcon
+                                  variant="light"
+                                  color="blue"
+                                  onClick={() => handleEditResource(resource)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Edit resource"
+                                >
+                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                                <ActionIcon
+                                  variant="light"
+                                  color="red"
+                                  onClick={() => handleDeleteResource(resource.id)}
+                                  size="lg"
+                                  radius="xl"
+                                  aria-label="Delete resource"
+                                >
+                                  <IconTrash style={{ width: rem(20), height: rem(20) }} />
+                                </ActionIcon>
+                              </>
+                            )}
+                          </Group>
+                        </Group>
+                      </Card>
+                    </motion.div>
+                  ))
+                )}
+              </Stack>
+            )}
+          </Card>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 
