@@ -1,4 +1,5 @@
 import { useForm } from "@mantine/form";
+import React, { useState, useEffect } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -6,34 +7,47 @@ import {
   Title,
   Text,
   Paper,
-  Overlay,
   Divider,
-  Group,
+  SegmentedControl,
+  Loader,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { useState, useEffect } from "react"; // 👈 IMPORTANT: Added useEffect
 import { IconBrandGoogle, IconLogin } from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import { keyframes } from "@emotion/react";
 import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
 
-const animatedBackground = keyframes`
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
-`;
+const STRAPI_URL = "http://localhost:1337/api";
 
-const ADMIN_CONFIG = {
-  email: "admin@gmail.com",
-  password: "admin123",
-  name: "System Admin"
-};
-
-function LoginForm() {
+export default function LoginPage() {
   const navigate = useNavigate();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // 👈 IMPORTANT: Added separate loading state
-  const { loginWithRedirect, user, isAuthenticated, isLoading } = useAuth0(); // 👈 IMPORTANT: Added isLoading
+  const { loginWithRedirect, isLoading: auth0Loading } = useAuth0();
+  const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState("strapi");
+  const [adminRoles, setAdminRoles] = useState([]);
+
+  useEffect(() => {
+    const fetchAdminRoles = async () => {
+      try {
+        const response = await axios.get(
+          `${STRAPI_URL}/users-permissions/roles`
+        );
+        const adminRoles = response.data.roles.filter(
+          (role) => role.type === "admin" || role.name === "Administrator"
+        );
+        setAdminRoles(adminRoles);
+      } catch (error) {
+        console.error("Failed to fetch admin roles:", error);
+        notifications.show({
+          title: "Error",
+          message: "Failed to load role information",
+          color: "red",
+        });
+      }
+    };
+    fetchAdminRoles();
+  }, []);
 
   const form = useForm({
     initialValues: {
@@ -41,76 +55,39 @@ function LoginForm() {
       password: "",
     },
     validate: {
-      email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email",
-      password: (value) =>
-        value.length > 0 ? null : "Password is required",
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) => (value.length > 0 ? null : "Password is required"),
     },
   });
 
-  // 👈 IMPORTANT: Moved Auth0 user handling to useEffect
-  useEffect(() => {
-    if (isAuthenticated && user && !isRedirecting && !isLoading) {
-      handleAuth0User(user);
-    }
-  }, [isAuthenticated, user, isLoading]);
-
-  const handleAuth0User = (user) => {
-    setIsRedirecting(true);
-    const loggedInUser = {
-      name: user.name || user.nickname || user.email,
-      email: user.email,
-      picture: user.picture,
-      authMethod: "auth0",
-      admin: false
-    };
-
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
-
-    notifications.show({
-      title: "Success",
-      message: `Welcome ${loggedInUser.name}!`,
-      color: "green",
-    });
-
-    navigate("/user-dashboard", { replace: true });
+  const isUserAdmin = (user) => {
+    if (!user.role) return false;
+    return adminRoles.some(
+      (adminRole) => adminRole.id === user.role.id || adminRole.id === user.role
+    );
   };
 
-  const handleSubmit = (values) => {
+  const handleStrapiLogin = async (values) => {
+    setLoading(true);
     try {
-      const isAdminLogin =
-        values.email === ADMIN_CONFIG.email && 
-        values.password === ADMIN_CONFIG.password;
+      const response = await axios.post(`${STRAPI_URL}/auth/local`, {
+        identifier: values.email,
+        password: values.password,
+      });
 
-      if (isAdminLogin) {
-        setIsRedirecting(true);
-        const adminUser = {
-          name: ADMIN_CONFIG.name,
-          email: ADMIN_CONFIG.email,
-          admin: true
-        };
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("currentUser", JSON.stringify(adminUser));
+      const { jwt, user } = response.data;
 
-        notifications.show({
-          title: "Success",
-          message: `Welcome back ${adminUser.name}!`,
-          color: "green",
-        });
-
-        setTimeout(() => {
-          navigate("/admin", { replace: true });
-        }, 1000);
-        return;
-      }
-
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const user = users.find(
-        (u) => u.email === values.email && 
-               u.password === values.password && 
-               !u.admin
+      // Fetch complete user data with role
+      const userWithRole = await axios.get(
+        `${STRAPI_URL}/users/${user.id}?populate=role`,
+        {
+          headers: { Authorization: `Bearer ${jwt}` },
+        }
       );
+
+
+      localStorage.setItem("authToken", jwt);
+      localStorage.setItem("user", JSON.stringify(userWithRole.data));
 
       if (user) {
         setIsRedirecting(true);
@@ -118,145 +95,87 @@ function LoginForm() {
         
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
+main
 
-        notifications.show({
-          title: "Success",
-          message: `Welcome back ${user.name}!`,
-          color: "green",
-        });
+      notifications.show({
+        title: "Success",
+        message: `Welcome back, ${user.username}!`,
+        color: "green",
+      });
 
-        setTimeout(() => {
-          navigate("/user-dashboard", { replace: true });
-        }, 1000);
+      if (isUserAdmin(userWithRole.data)) {
+        navigate("/admin");
       } else {
-        notifications.show({
-          title: "Error",
-          message: "Invalid email or password",
-          color: "red",
-        });
+        navigate("/user-dashboard");
       }
     } catch (error) {
-      console.error("Login error:", error);
       notifications.show({
         title: "Error",
-        message: "Login failed. Please try again.",
+        message: error.response?.data?.error?.message || "Login failed",
         color: "red",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 👈 IMPORTANT: Improved Google login handler
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    try {
-      await loginWithRedirect({
-        connection: "google-oauth2", // 👈 IMPORTANT: Verify this matches your Auth0 connection name
-        authorizationParams: {
-          prompt: "login",
-          scope: "openid profile email", // 👈 IMPORTANT: Ensure you get profile data
-          redirect_uri:"http://localhost:5174" 
-        },
-        appState: {
-          returnTo: "/user-dashboard" // 👈 IMPORTANT: Where to redirect after login
-        }
-      });
-    } catch (error) {
-      notifications.show({
-        title: "Google Login Error",
-        message: error.message || "Failed to login with Google",
-        color: "red",
-      });
-      setIsGoogleLoading(false);
+  const handleSubmit = (values) => {
+    if (authMethod === "auth0") {
+      loginWithRedirect();
+    } else {
+      handleStrapiLogin(values);
     }
   };
 
   return (
-    <div
-      style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: `
-          linear-gradient(135deg, #b2f2bb80 0%, #96f2d780 100%),
-          url('https://static.vecteezy.com/system/resources/previews/002/995/838/original/old-new-habits-concept-free-photo.jpg')
-        `,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundBlendMode: "overlay",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        animation: `${animatedBackground} 20s linear infinite`,
-        overflow: "auto",
-        padding: 20,
-      }}
-    >
-      <Overlay color="#e6f4ea" opacity={0.8} zIndex={1} />
-
+    <div className="auth-page-container">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        style={{
-          position: "relative",
-          zIndex: 2,
-          width: "100%",
-          maxWidth: 450,
-        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        <Paper
-          shadow="lg"
-          radius="lg"
-          p="xl"
-          style={{
-            backgroundColor: "rgba(230, 240, 230, 0.15)",
-            backdropFilter: "blur(4px)",
-            WebkitBackdropFilter: "blur(4px)",
-            border: "none",
-          }}
-        >
-          <Title order={2} align="center" mb="md" style={{ color: "black", fontWeight: 700 }}>
-            WELCOME BACK
+        <Paper radius="md" p="xl" shadow="lg" className="auth-paper">
+          <Title order={2} ta="center" mb="md">
+            Welcome Back
           </Title>
-
-          <Text align="center" mb="xl" style={{ color: "black" }}>
-            <strong>Master your habits. Master your life</strong>
+          <Text ta="center" mb="xl" c="dimmed">
+            Master your habits. Master your life.
           </Text>
 
-          <Divider mb="xl" style={{ borderTopColor: "rgba(255,255,255,0.3)" }} />
+          <SegmentedControl
+            fullWidth
+            value={authMethod}
+            onChange={setAuthMethod}
+            data={[
+              { label: "Email Login", value: "strapi" },
+              { label: "Social Login", value: "auth0" },
+            ]}
+            mb="xl"
+          />
 
-          <form onSubmit={form.onSubmit(handleSubmit)}>
-            <TextInput
-              label="Email"
-              placeholder="your@email.com"
-              withAsterisk
-              {...form.getInputProps("email")}
-              mb="md"
-              styles={{
-                input: { backgroundColor: "rgba(255,255,255,0.9)" },
-                label: { color: "black" },
-              }}
-            />
+          {authMethod === "strapi" ? (
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+              <TextInput
+                label="Email"
+                placeholder="your@email.com"
+                {...form.getInputProps("email")}
+                mb="md"
+              />
 
-            <PasswordInput
-              label="Password"
-              placeholder="Your password"
-              withAsterisk
-              {...form.getInputProps("password")}
-              mb="xl"
-              styles={{
-                input: { backgroundColor: "rgba(255,255,255,0.9)" },
-                innerInput: { backgroundColor: "transparent" },
-                label: { color: "black" },
-              }}
-            />
+              <PasswordInput
+                label="Password"
+                placeholder="Your password"
+                {...form.getInputProps("password")}
+                mb="xl"
+              />
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
-                type="submit"
                 fullWidth
+
+                type="submit"
+                leftIcon={<IconLogin size={18} />}
+                loading={loading}
+
                 size="md"
                 color="teal"
                  leftSection ={<IconLogin size={18} />}
@@ -297,31 +216,35 @@ function LoginForm() {
                   letterSpacing: 0.5,
                   borderColor: "rgba(20, 19, 19, 0.5)",
                 }}
-              >
-                CONTINUE WITH GOOGLE
-              </Button>
-            </motion.div>
 
-            <Text align="center" mt="xl" style={{ color: "black" }}>
-              New to HabitTracker?{" "}
-              <Text
-                component={Link}
-                to="/signup"
-                color="white"
-                td="underline"
-                fw={600}
-                style={{ display: "inline" }}
               >
-                Sign up to Start your journey
-              </Text>
+                Continue Journey
+              </Button>
+            </form>
+          ) : (
+            <Button
+              fullWidth
+              leftIcon={<IconBrandGoogle size={18} />}
+              onClick={() => loginWithRedirect()}
+            >
+              Continue with Google
+            </Button>
+          )}
+
+          <Divider label="OR" labelPosition="center" my="lg" />
+
+          <Text ta="center" mt="md">
+            Don't have an account?{" "}
+            <Text component={Link} to="/signup" fw={500} td="underline">
+              Sign up
             </Text>
+
+          </Text>
+
         
+
         </Paper>
       </motion.div>
     </div>
   );
-}
-
-export default function LoginPage() {
-  return <LoginForm />;
 }
