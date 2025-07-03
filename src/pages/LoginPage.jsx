@@ -30,9 +30,11 @@ export default function LoginPage() {
   useEffect(() => {
     const fetchAdminRoles = async () => {
       try {
-        const response = await axios.get(`${STRAPI_URL}/users-permissions/roles`);
-        const adminRoles = response.data.roles.filter(role => 
-          role.type === 'admin' || role.name === 'Administrator'
+        const response = await axios.get(
+          `${STRAPI_URL}/users-permissions/roles`
+        );
+        const adminRoles = response.data.roles.filter(
+          (role) => role.type === "admin" || role.name === "Administrator"
         );
         setAdminRoles(adminRoles);
       } catch (error) {
@@ -60,8 +62,8 @@ export default function LoginPage() {
 
   const isUserAdmin = (user) => {
     if (!user.role) return false;
-    return adminRoles.some(adminRole => 
-      adminRole.id === user.role.id || adminRole.id === user.role
+    return adminRoles.some(
+      (adminRole) => adminRole.id === user.role.id || adminRole.id === user.role
     );
   };
 
@@ -76,9 +78,12 @@ export default function LoginPage() {
       const { jwt, user } = response.data;
 
       // Fetch complete user data with role
-      const userWithRole = await axios.get(`${STRAPI_URL}/users/${user.id}?populate=role`, {
-        headers: { Authorization: `Bearer ${jwt}` }
-      });
+      const userWithRole = await axios.get(
+        `${STRAPI_URL}/users/${user.id}?populate=role`,
+        {
+          headers: { Authorization: `Bearer ${jwt}` },
+        }
+      );
 
       localStorage.setItem("authToken", jwt);
       localStorage.setItem("user", JSON.stringify(userWithRole.data));
@@ -94,7 +99,6 @@ export default function LoginPage() {
       } else {
         navigate("/user-dashboard");
       }
-      
     } catch (error) {
       notifications.show({
         title: "Error",
@@ -116,7 +120,11 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page-container">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <Paper radius="md" p="xl" shadow="lg" className="auth-paper">
           <Title order={2} ta="center" mb="md">
             Welcome Back
@@ -164,9 +172,8 @@ export default function LoginPage() {
           ) : (
             <Button
               fullWidth
-              leftIcon={auth0Loading ? <Loader size="xs" /> : <IconBrandGoogle size={18} />}
+              leftIcon={<IconBrandGoogle size={18} />}
               onClick={() => loginWithRedirect()}
-              disabled={auth0Loading}
             >
               Continue with Google
             </Button>

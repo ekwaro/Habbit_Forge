@@ -38,7 +38,7 @@ export default function SignupPage() {
       } catch (error) {
         console.error("Failed to fetch admin roles:", error);
         notifications.show({
-          title: "Error",
+          title: "theres an Error",
           message: "Failed to load role information",
           color: "red",
         });
