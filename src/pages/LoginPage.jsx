@@ -26,6 +26,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [authMethod, setAuthMethod] = useState("strapi");
   const [adminRoles, setAdminRoles] = useState([]);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   useEffect(() => {
     const fetchAdminRoles = async () => {
@@ -67,6 +69,20 @@ export default function LoginPage() {
     );
   };
 
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await loginWithRedirect();
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Google login failed",
+        color: "red",
+      });
+      setIsGoogleLoading(false);
+    }
+  };
+
   const handleStrapiLogin = async (values) => {
     setLoading(true);
     try {
@@ -85,28 +101,27 @@ export default function LoginPage() {
         }
       );
 
-
       localStorage.setItem("authToken", jwt);
       localStorage.setItem("user", JSON.stringify(userWithRole.data));
 
       if (user) {
         setIsRedirecting(true);
-          const currentUser = { ...user, authMethod: "local" };
+        const currentUser = { ...user, authMethod: "local" };
         
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("currentUser", JSON.stringify(user));
-main
 
-      notifications.show({
-        title: "Success",
-        message: `Welcome back, ${user.username}!`,
-        color: "green",
-      });
+        notifications.show({
+          title: "Success",
+          message: `Welcome back, ${user.username}!`,
+          color: "green",
+        });
 
-      if (isUserAdmin(userWithRole.data)) {
-        navigate("/admin");
-      } else {
-        navigate("/user-dashboard");
+        if (isUserAdmin(userWithRole.data)) {
+          navigate("/admin");
+        } else {
+          navigate("/user-dashboard");
+        }
       }
     } catch (error) {
       notifications.show({
@@ -171,16 +186,12 @@ main
 
               <Button
                 fullWidth
-
                 type="submit"
-                leftIcon={<IconLogin size={18} />}
+                leftSection={<IconLogin size={18} />}
                 loading={loading}
-
                 size="md"
                 color="teal"
-                 leftSection ={<IconLogin size={18} />}
-                loading={isRedirecting}
-                disabled={isGoogleLoading} // 👈 IMPORTANT: Disable during Google login
+                disabled={isGoogleLoading}
                 style={{
                   fontWeight: 600,
                   letterSpacing: 0.5,
@@ -189,43 +200,40 @@ main
               >
                 CONTINUE JOURNEY
               </Button>
-            </motion.div>
-            </form>
 
-            <Divider
-              label="OR"
-              labelPosition="center"
-              my="lg"
-              style={{ borderTopColor: "rgba(255,255,255,0.3)" }}
-            />
+              <Divider
+                label="OR"
+                labelPosition="center"
+                my="lg"
+                style={{ borderTopColor: "rgba(255,255,255,0.3)" }}
+              />
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                onClick={handleGoogleLogin}
-                fullWidth
-                size="md"
-                variant="outline"
-                color="black"
-
-                leftIcon={<IconBrandGoogle size={18} />}
-                loading={isGoogleLoading}
-                disabled={isRedirecting} // 👈 IMPORTANT: Disable during redirect
-
-                style={{
-                  fontWeight: 600,
-                  letterSpacing: 0.5,
-                  borderColor: "rgba(20, 19, 19, 0.5)",
-                }}
-
-              >
-                Continue Journey
-              </Button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handleGoogleLogin}
+                  fullWidth
+                  size="md"
+                  variant="outline"
+                  color="black"
+                  leftSection={<IconBrandGoogle size={18} />}
+                  loading={isGoogleLoading}
+                  disabled={isRedirecting}
+                  style={{
+                    fontWeight: 600,
+                    letterSpacing: 0.5,
+                    borderColor: "rgba(20, 19, 19, 0.5)",
+                  }}
+                >
+                  Continue with Google
+                </Button>
+              </motion.div>
             </form>
           ) : (
             <Button
               fullWidth
-              leftIcon={<IconBrandGoogle size={18} />}
+              leftSection={<IconBrandGoogle size={18} />}
               onClick={() => loginWithRedirect()}
+              loading={auth0Loading}
             >
               Continue with Google
             </Button>
@@ -238,11 +246,7 @@ main
             <Text component={Link} to="/signup" fw={500} td="underline">
               Sign up
             </Text>
-
           </Text>
-
-        
-
         </Paper>
       </motion.div>
     </div>
