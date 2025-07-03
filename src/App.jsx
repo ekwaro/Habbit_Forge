@@ -42,22 +42,19 @@ function App({ colorScheme, toggleColorScheme }) {
 
 
   return (
-    <AppShell
-       header={{ height: headerHeight }}//header height
-       padding={mainPaddingTop}
-       layout="alt"
-    >
-      <AppShell.Header>
-        <PublicNavbar colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} /> 
-      </AppShell.Header>
-      
-      <AppShell.Main>
-        <Outlet/>
-      </AppShell.Main>
-      <AppShell.Footer>
-        <PublicFooter/>
-      </AppShell.Footer>
-    </AppShell>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <header>
+        <PublicNavbar colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} />
+      </header>
+      <main style={{ flex: 1, paddingTop: '56px' }}>
+        <Outlet />
+      </main>
+      <PublicFooter />
+    </div>
   );
 }
 

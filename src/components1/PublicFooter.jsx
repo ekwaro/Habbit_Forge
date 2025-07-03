@@ -9,15 +9,13 @@ const PublicFooter = () => {
     <Box
       component="footer"
       style={{
-       // position: 'fixed',
         width: '100%',
         backgroundColor: '#222',
         color: '#f0f0f0',
-        padding: '2rem 0', // Increased padding
+        padding: '2rem 0',
         borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.15)', // Stronger shadow
-        marginTop: 'auto', // Pushes footer to bottom in flex layouts
-        minHeight: '100px', // Minimum height guarantee
+        boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.15)',
+        minHeight: '100px',
       }}
     >
       <Box
