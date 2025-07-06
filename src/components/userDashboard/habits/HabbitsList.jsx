@@ -38,15 +38,16 @@ const HabbitsList = ({
 }) => {
   const [activePage, setPage] = useState(1)
   const pageSize = 5
+
   console.log(list)
   const paginatedList =(Array.isArray(list)?list:[]).slice((activePage - 1) * pageSize, activePage*pageSize)
 
 
   const navigate = useNavigate();
-  console.log("HabbitsList Rendered", paginatedList);
+  console.log("HabbitsList Rendered", paginatedList[0].id);
   const rows = paginatedList.map((habit) => (
     <Table.Tr key={habit.id}>
-     
+      <Table.Td>{habit.id}</Table.Td>
       <Table.Td>{habit.title}</Table.Td>
       <Table.Td>{habit.frequency}</Table.Td>
       <Table.Td>{new Date(habit.startDate).toLocaleDateString()}</Table.Td>
@@ -57,7 +58,7 @@ const HabbitsList = ({
           variant="outline"
           color="red"
           mr={5}
-          onClick={() => removeItem(habit)}
+          onClick={() => removeItem(habit.documentId)}
         >
           Delete
         </Button>
@@ -95,7 +96,8 @@ const HabbitsList = ({
       >
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Habit Name</Table.Th>
+            <Table.Th>ID</Table.Th>
+            <Table.Th>Title</Table.Th>
             <Table.Th>Frequency</Table.Th>
             <Table.Th>Start Date</Table.Th>
             <Table.Th>End Date</Table.Th>
@@ -127,7 +129,7 @@ const HabbitsItem = () => {
   const { list, loading } = useStrapiHabits(authToken);
   console.log(list)
 
-  const habit = Array.isArray(list.data)?list.data.find((habit) => habit.id.toString() === id):null;
+  const habit = Array.isArray(list)?list.find((habit) => habit.id.toString() === id):null;
 
   if (loading) {
     return (

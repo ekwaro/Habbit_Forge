@@ -43,7 +43,7 @@ const HabbitsManagement = () => {
 
     try {
       if (editingHabit) {
-        updateItem(editingHabit.id, habit);
+        updateItem(editingHabit.documentId, habit);
       } else {
         addItem(habit);
       }

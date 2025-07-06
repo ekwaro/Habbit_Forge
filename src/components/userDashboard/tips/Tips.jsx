@@ -23,9 +23,10 @@ const Tips = () => {
   const fetchPrevTip = () => {
     if (tips.length === 0) return;
     setTipIndex((prevIndex) =>
-      prevIndex - 1 < tips.length - 1 ? 0 : prevIndex - 1
+      prevIndex-1<0?0:prevIndex-1 <tips.length?prevIndex-1:0
     );
   };
+
 
   if (tips) {
     console.log(tips);
@@ -44,7 +45,10 @@ const Tips = () => {
           <Card shadow="md" padding="lg" radius="md" withBorder>
             {tips?.length > 0 ? (
               <>
-               <Text>{tips[tipIndex].text}</Text>
+               <Text>{tips[tipIndex]?.text}</Text>
+                <Text size="sm" align="right" c="dimmed">
+                         — {tips[tipIndex]?.category || "Unknown"}
+                      </Text>
               <Group justify="left" align="center" p="xl" mt="xl">
                   <Button onClick={fetchPrevTip}  variant="light">
                     Previous Tip

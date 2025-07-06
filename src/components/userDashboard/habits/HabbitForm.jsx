@@ -83,9 +83,9 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
      
     };
   
-    const {partnerSearch, ...dataToSend } = formatted;
+    const {partnerSearch, id, partnerId,...dataToSend } = formatted;
   onSubmit(dataToSend)
-  console.log(formatted);
+ 
 };
   return (
     <Modal

@@ -6,13 +6,19 @@ import {
   Group,
   Progress,
   TextInput,
+  Select,
   Textarea,
   Stack,
   Checkbox,
   Divider,
 } from "@mantine/core";
+import dayjs from "dayjs";
+import { IconTrash } from "@tabler/icons-react";
+import { DatePickerInput } from "@mantine/dates";
+import "@mantine/dates/styles.css";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
 
 const GoalForm = ({ opened, onClose, onSubmit }) => {
   const form = useForm({
@@ -73,71 +79,85 @@ const GoalCard = ({
   onAddSubgoal,
   onAddNote,
   onToggleSubgoal,
+  mykey,
+  onDeleteNotes,
+  onDeleteSubgoals,
   onMarkGoalAsCompleted,
+  onremoveGoal
 }) => {
   const subgoals = goal.subgoals || [];
   const notes = goal.notes || [];
+
   const total = goal.subgoals?.length || 1;
   const done = goal.subgoals?.filter((s) => s.completed).length;
   const percent = Math.round((done / total) * 100);
-  const [newSubgoal, setNewSubgoal] = useState("");
-  const [subgoalError, setsubgoalError] = useState(null);
-  const [error, setError] = useState("");
-  const [newNote, setNewNote] = useState("");
-  const validateSubgoalErrors = (text) => {
-    if (!text.trim()) {
-      return "Subgoal cannot be empty";
-    }
-    if (text.trim().length < 3) {
-      return "Subgoal is too short";
-    }
-    if (text.trim().length > 100) {
-      return "Subgoal is too long";
-    }
-    return null;
+
+  const [openedSubgoal, { open: openSubgoal, close: closeSubgoal }] =
+    useDisclosure(false);
+  const [opendNotes, { open: openNotes, close: closeNotes }] =
+    useDisclosure(false);
+
+  const subgoalForm = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      title: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      priority: "",
+    },
+    validate: {
+      title: isNotEmpty("Title cannot be empty"),
+      description: (value) => {
+        if (value.length > 100) {
+          return "Description too long";
+        }
+      },
+    },
+  });
+
+  const noteForm = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      title: "",
+      description: "",
+    },
+    validate: {},
+  });
+
+  const handleAddSubgoal = (values) => {
+    console.log(values);
+    console.log(goal.documentId, goal.subgoals);
+
+    onAddSubgoal(values);
+    subgoalForm.reset();
+    closeSubgoal();
   };
 
-  const validateAddNoteErrors = (text) => {
-    if (!text.trim()) {
-      return "Notes cannot be empty";
-    }
-    if (text.trim().length < 3) {
-      return "Notes is too short";
-    }
-    if (text.trim().length > 100) {
-      return "Notes is too long";
-    }
-    return null;
+  const handleAddNote = (values) => {
+    onAddNote(values);
+
+    noteForm.reset();
+    closeNotes();
   };
 
-  const handleAddSubgoal = () => {
-    const validateSubgoals = validateSubgoalErrors(newSubgoal);
-    if (validateSubgoals) {
-      setsubgoalError(validateSubgoals);
-      return;
-    }
-    onAddSubgoal(newSubgoal.trim());
-    setNewSubgoal("");
-    setsubgoalError(null);
-  };
-  const handleAddNote = () => {
-    const validationNotes = validateAddNoteErrors(newNote);
-    if (validationNotes) {
-      setError(validationNotes);
-      return;
-    }
-    onAddNote(newNote.trim());
-    setNewNote("");
-    setError("");
-  };
   return (
-    <Card withBorder p="md" shadow="sm" radius="md" my="md">
+    <Card withBorder p="md" shadow="sm" radius="md" my="md" key={mykey}>
       <Stack spacing="xs">
-        <Checkbox
-          checked={goal.completed}
-          onChange={(e) => onMarkGoalAsCompleted(e.currentTarget.checked)}
-          label={<Text>{goal.title}</Text>}
-        />
+        <Group>
+          <Checkbox
+            checked={goal.completed}
+            onChange={(e) => onMarkGoalAsCompleted(e.currentTarget.checked)}
+            label={<Text>{goal.title}</Text>}
+          />
+          <Button
+            onClick={onremoveGoal}
+            variant="transparent"
+          >
+            <IconTrash size={20} stroke={1.5} color="red" />
+          </Button>
+        </Group>
+
         <Text size="sm" c="dimmed">
           {goal.description}
         </Text>
@@ -156,16 +176,50 @@ const GoalCard = ({
                 checked={subgoal.completed}
                 onChange={() => onToggleSubgoal(subgoal.id)}
               />
+              <Button
+                onClick={() => onDeleteSubgoals(subgoal.id)}
+                variant="transparent"
+              >
+                <IconTrash size={20} stroke={1.5} color="red" />
+              </Button>
             </Group>
           ))
         )}
-        <TextInput
-          placeholder="Add a subgoal"
-          value={newSubgoal}
-          onChange={(e) => setNewSubgoal(e.target.value)}
-          error={subgoalError}
-        />
-        <Button onClick={handleAddSubgoal}>Add Subgoal</Button>
+        <Modal
+          opened={openedSubgoal}
+          onClose={closeSubgoal}
+          title="Add Subgoal"
+        >
+          <form onSubmit={subgoalForm.onSubmit(handleAddSubgoal)}>
+            <TextInput
+              placeholder="Enter the subgoaltitle"
+              {...subgoalForm.getInputProps("title")}
+              label="Title"
+            />
+            <Textarea
+              placeholder="Enter Description"
+              label="description"
+              {...subgoalForm.getInputProps("description")}
+            />
+            <DatePickerInput
+              label="Start Date"
+              {...subgoalForm.getInputProps("startDate")}
+            />
+            <DatePickerInput
+              label="End Date"
+              {...subgoalForm.getInputProps("endDate")}
+            />
+            <Select
+              mb="xs"
+              label="Priority"
+              data={["Low", "Medium", "High"]}
+              defaultValue="Medium"
+              {...subgoalForm.getInputProps("priority")}
+            />
+            <Button type="submit">Add Subgoal</Button>
+          </form>
+        </Modal>
+        <Button onClick={openSubgoal}>Add Subgoals</Button>
 
         <Divider label="Notes" labelPosition="center" />
         {goal.notes?.length === 0 ? (
@@ -174,25 +228,46 @@ const GoalCard = ({
           </Text>
         ) : (
           goal.notes.map((note) => (
-            <Text key={note.id} size="sm">
-              {note.content} <br />
-              <i>{new Date(note.createdAt).toLocaleString()}</i>
-            </Text>
+            <Group>
+              <Text key={note.id} size="sm">
+                {note.description} <br />
+                <i>
+                  {note.createdAt
+                    ? dayjs(note.createdAt).format("YYYY-MM-DD HH:mm")
+                    : "No timestamp"}
+                </i>
+              </Text>
+              <Button
+                onClick={() => onDeleteNotes(note.id)}
+                variant="transparent"
+              >
+                <IconTrash size={20} stroke={1.5} color="red" />
+              </Button>
+            </Group>
           ))
         )}
-        <TextInput
-          placeholder="Add a Note ..."
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-          error={error}
-        />
+        <Modal opened={opendNotes} onClose={closeNotes} title="Add goal notes">
+          <form onSubmit={noteForm.onSubmit(handleAddNote)}>
+            <TextInput
+              label="Title"
+              placeholder="Your notes Title"
+              {...noteForm.getInputProps("title")}
+            />
+            <Textarea
+              label="Description"
+              placeholder="Add description"
+              {...noteForm.getInputProps("description")}
+            />
+            <Button type="submit" mt="xs">
+              Add
+            </Button>
+          </form>
+        </Modal>
+        <Button onClick={openNotes}>Add Notes</Button>
 
-        <Button size="xs" color="gray" onClick={handleAddNote}>
-          Add Note
-        </Button>
-        <Divider label='Goal Completion' labelPosition='center'/>
+        <Divider label="Goal Completion" labelPosition="center" />
         <Progress value={percent} size="sm" radius="xl" mt="md" />
-        <Text c='dimmed'>{percent}% completed</Text>
+        <Text c="dimmed">{percent}% completed</Text>
       </Stack>
     </Card>
   );

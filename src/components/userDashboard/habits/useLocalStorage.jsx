@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 
 const API_URL = "http://localhost:1337/api/habits";
+const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN
 
-const useStrapiHabits = (authToken) => {
+const useStrapiHabits = (token) => {
+  
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,13 +20,6 @@ const useStrapiHabits = (authToken) => {
       const res = await fetch(API_URL, { headers });
       const data = await res.json();
       console.log(data.data)
-      const habits = Array.isArray(data.data)
-      ? data.data.map((habit) => ({
-          id: habit.id,
-          ...habit.attributes,
-        }))
-      : [];
-
     setList(data.data);
       
     } catch (error) {
@@ -57,6 +52,7 @@ const useStrapiHabits = (authToken) => {
 
   // Update habit
   const updateItem = async (id, updatedData) => {
+    console.log(typeof(id))
 
     const formateddata = {
       title:updatedData.title,
@@ -64,7 +60,7 @@ const useStrapiHabits = (authToken) => {
       frequency:updatedData.frequency,
       startDate:updatedData.startDate,
       endDate: updatedData.endDate,
-      partnerId:updatedData.partnerId
+      //partnerId:updatedData.partnerId
 
     }
     try {
@@ -81,9 +77,12 @@ const useStrapiHabits = (authToken) => {
 
   // Delete habit
   const removeItem = async (id) => {
+    console.log('executed')
+    console.log(`${API_URL}/${id}`)
+    console.log(headers)
     try {
       await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
+        method: "GET",
         headers,
       });
       await fetchHabits();
