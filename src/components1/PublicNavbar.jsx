@@ -1,106 +1,175 @@
-// src/components/PublicNavbar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Group,
   Text,
-  NavLink,
-  Burger, // For the mobile menu icon
-  rem,
-  Drawer,  // To create the slide-out mobile menu
+  Burger,
+  Drawer,
   Stack,
-  Flex,   // To arrange links vertically in the drawer
+  Button,
+  Flex,
+  Box,
+  Image,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks'; // For managing the drawer's open/close state
-import { IconHome } from '@tabler/icons-react'; // Example icon
+import { useDisclosure } from '@mantine/hooks';
+import logo from '../assets/logo.png';
+
 
 const PublicNavbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure();
   const location = useLocation();
 
-  // Re-usable set of navigation links for both desktop and mobile
-  const navLinks = (
+
+  const regularLinks = (
     <>
-      <NavLink
+      <Button
         component={Link}
         to="/"
-        label="Home"
-        // leftSection={<IconHome style={{ width: rem(18), height: rem(18) }} stroke={1.5} />}
-        active={location.pathname === '/'}
-        // onClick={closeDrawer} // Close drawer on link click (for mobile)
-      />
-      <NavLink
+        variant={location.pathname === '/' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm"
+        onClick={closeDrawer}
+        px="md"
+        style={{ minWidth: '80px' }}
+      >
+        Home
+      </Button>
+      <Button
         component={Link}
         to="/about"
-        label="About Us"
-        active={location.pathname === '/about'}
+        variant={location.pathname === '/about' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm"
         onClick={closeDrawer}
-      />
-      <NavLink
+        px="md"
+        style={{ minWidth: '80px' }}
+      >
+        About
+      </Button>
+      <Button
         component={Link}
         to="/contact"
-        label="Contact Us"
-        active={location.pathname === '/contact'}
+        variant={location.pathname === '/contact' ? 'light' : 'subtle'}
+        color="gray"
+        radius="xl"
+        size="sm"
         onClick={closeDrawer}
-      />
-      <NavLink
-        component={Link}
-        to="/signup"
-        label="Sign Up"
-        active={location.pathname === '/signup'}
-        onClick={closeDrawer}
-      />
-      <NavLink
-        component={Link}
-        to="/login"
-        label="Login"
-        active={location.pathname === '/login'}
-        onClick={closeDrawer}
-      />
+        px="md"
+        style={{ minWidth: '80px' }}
+      >
+        Contact
+      </Button>
     </>
   );
 
   return (
-    // This outer Group spans the full header width and justifies content
-    <Group h="100%" px="md" justify="space-between">
+    <Box
+      component="nav"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000,
+        background: '#fff', // or your preferred color
+        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)',
+      }}
+    >
+      <Box py={4} px="md" style={{ height: '56px', borderBottom: '1px solid #e9ecef' }}> 
+        {/* Reduced vertical padding and added subtle border */}
+        <Group h="100%" justify="space-between">
+          {/* Left Side */}
+          <Group gap="xs">
+            <Burger 
+              opened={drawerOpened} 
+              onClick={toggleDrawer} 
+              hiddenFrom="sm" 
+              size="sm"
+            />
+            <Image
+              src={logo}
+              alt="Habit Forge Logo"
+              width={48}
+              height={48}
+              style={{ borderRadius: '50%', boxShadow: '0 1px 6px 0 rgba(34,139,230,0.10)', objectFit: 'cover' }}
+            />
+          </Group>
 
-      {/* Left Side of Header: Logo & Name + Mobile Burger */}
-      {/* This group holds elements that stick to the left */}
-      <Group gap="xs">
-        {/* Burger only visible on small screens */}
-        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" size="sm" />
-        {/* Logo and App Name - always visible */}
-        {/* You can add your Image component here if you have a logo file */}
-        {/* <Image src="/path/to/your/logo.png" alt="Habits Forge Logo" width={30} height={30} /> */}
-        <Text fw={500} size="lg">Habits Forge</Text>
-      </Group>
+          {/* Right Side: Desktop Navigation */}
+          <Flex gap={4} align="center" visibleFrom="sm"> 
+            {/* Tight gap between buttons */}
+            {regularLinks}
+            <Button
+              component={Link}
+              to="/login"
+              variant="outline"
+              color="blue"
+              radius="xl"
+              size="sm"
+              onClick={closeDrawer}
+              px="md"
+              style={{ minWidth: '80px' }}
+            >
+              Login
+            </Button>
+            <Button
+              component={Link}
+              to="/signup"
+              variant="gradient"
+              gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+              radius="xl"
+              size="sm"
+              onClick={closeDrawer}
+              px="md"
+              style={{ minWidth: '80px' }}
+            >
+              Sign Up
+            </Button>
+          </Flex>
 
-      {/* Right Side of Header: Desktop Navigation Links */}
-      {/* This group holds desktop links, hidden on small screens */}
-      <Group gap="md" visibleFrom="sm"
-           style={{
-          display: 'flex',       // Ensure it is a flex container
-          flexDirection: 'row',  // Force children to lay out horizontally
-          alignItems: 'center',
-          flexWrap: 'nowrap',   // Vertically align items in the middle
-        }}>
-        {navLinks} {/* Render the desktop nav links here */}
-      </Group>
-
-      {/* Mobile Navigation Drawer - Appears on small screens when burger is clicked */}
-      <Drawer
-        opened={drawerOpened}
-        onClose={closeDrawer}
-        title="Navigation"
-        overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-        hiddenFrom="md" // Drawer itself is hidden from desktop sizes
-        position="left" // Typically mobile drawers slide from left or right
-      >
-        <Stack>
-          {navLinks} {/* Re-use the same nav links for the vertical drawer menu */}
-        </Stack>
-      </Drawer>
-    </Group>
+          {/* Mobile Navigation Drawer */}
+          <Drawer
+            opened={drawerOpened}
+            onClose={closeDrawer}
+            title="Menu"
+            size="sm"
+            overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+            hiddenFrom="sm"
+            position="left"
+          >
+            <Stack gap={4}> {/* Tight gap */}
+              {regularLinks}
+              <Button
+                component={Link}
+                to="/login"
+                variant="outline"
+                color="blue"
+                radius="xl"
+                size="sm"
+                onClick={closeDrawer}
+                fullWidth
+              >
+                Login
+              </Button>
+              <Button
+                component={Link}
+                to="/signup"
+                variant="gradient"
+                gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+                radius="xl"
+                size="sm"
+                onClick={closeDrawer}
+                fullWidth
+              >
+                Sign Up
+              </Button>
+            </Stack>
+          </Drawer>
+        </Group>
+      </Box>
+    </Box>
   );
 };
 

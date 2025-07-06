@@ -19,7 +19,7 @@ const headerHeight = 100; // Define your header height
   const mainPaddingTop = headerHeight + 2; // Add a bit extra padding for visual separation, e.g., 16px
 
 
-function App() {
+function App({ colorScheme, toggleColorScheme }) {
   
   const { user, isAuthenticated, isLoading } = useAuth0(); 
   
@@ -42,19 +42,19 @@ function App() {
 
 
   return (
-    <AppShell
-       header={{ height: headerHeight }}//header height
-       padding={mainPaddingTop} 
-    >
-      <AppShell.Header>
-        <PublicNavbar /> 
-      </AppShell.Header>
-      
-      <AppShell.Main>
-        <Outlet/>
-        <PublicFooter/>
-      </AppShell.Main>
-    </AppShell>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <header>
+        <PublicNavbar colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} />
+      </header>
+      <main style={{ flex: 1, paddingTop: '56px' }}>
+        <Outlet />
+      </main>
+      <PublicFooter />
+    </div>
   );
 }
 
