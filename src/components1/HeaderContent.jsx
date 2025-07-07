@@ -24,16 +24,16 @@ function HeaderContent() {
       justify="space-between"
       style={{
         flexGrow: 1,
-        background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
-        color: 'white',
+        background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)',
+        color: '#222',
         borderRadius: 12,
-        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)',
+        boxShadow: '0 2px 8px rgba(255,146,43,0.08)',
         padding: '0.5rem 1rem',
         margin: '0.5rem 0',
       }}
     >
       {/* Left side: Dashboard Title */}
-      <Text fw={700} size="xl" style={{ color: 'white', letterSpacing: 1 }}>Admin Dashboard</Text>
+      <Text fw={900} size="xl" style={{ color: '#ff922b', letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Dashboard</Text>
 
       {/* Right side: Admin Info & Logout */}
       <Group>
@@ -60,14 +60,14 @@ function HeaderContent() {
           {/* Hide name/role on mobile */}
           {!isMobile && (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Text size="sm" fw={500} visibleFrom="sm" style={{ color: 'white' }}>Admin Name: {adminInfo.name}</Text>
-              <Badge color="cyan" size="xs" mt={2} style={{ alignSelf: 'flex-start', background: '#e3f2fd', color: '#1976d2' }}>{adminInfo.role}</Badge>
+              <Text size="sm" fw={700} visibleFrom="sm" style={{ color: '#222' }}>Admin Name: {adminInfo.name}</Text>
+              <Badge color="orange" size="xs" mt={2} style={{ alignSelf: 'flex-start', background: '#fff3e0', color: '#ff922b', fontWeight: 700 }}>{adminInfo.role}</Badge>
             </div>
           )}
         </Group>
         <Menu shadow="md" width={200}>
           <Menu.Target>
-            <Button variant="light" size="sm" compact color="blue" style={{ background: '#fff', color: '#1976d2' }}>
+            <Button variant="light" size="sm" compact color="orange" style={{ background: '#fff3e0', color: '#ff922b', fontWeight: 700 }}>
               <Text size="sm" fw={500}>Options</Text> 
             </Button>
           </Menu.Target>
@@ -95,7 +95,7 @@ function HeaderContent() {
         </Menu>
         {/* Hide logout button on mobile */}
         {!isMobile && (
-          <Button variant="default" onClick={handleLogout} hiddenFrom="xs" color="blue" style={{ background: '#fff', color: '#1976d2' }}>
+          <Button variant="default" onClick={handleLogout} hiddenFrom="xs" color="orange" style={{ background: '#fff3e0', color: '#ff922b', fontWeight: 700 }}>
             Logout
           </Button>
         )}

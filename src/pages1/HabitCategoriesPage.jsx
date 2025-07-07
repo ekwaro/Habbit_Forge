@@ -237,71 +237,48 @@ function HabitCategoriesPage() {
   };
 
   return (
-    <Box
-      style={{
-        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
-        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 0',
-        animation: `${animatedBackground} 20s linear infinite`,
-      }}
-    >
-      <Container size="lg" px="md">
-        <Paper
-          p="xl"
-          shadow="xl"
-          radius="lg"
-          style={{
-            background: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(8px)',
-            border: '1.5px solid #e3e8f0',
-            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <Title
-              order={1}
-              mb="sm"
-              style={{
-                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                color: '#222',
-                lineHeight: 1.1,
-              }}
-            >
-              Habit Categories Management
-            </Title>
-            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
-              Define and manage different categories for habits.
-            </Text>
-            <Blockquote
-              color="blue"
-              cite="James Clear"
-              style={{
-                fontSize: '1.1rem',
-                margin: '0 auto',
-                maxWidth: 500,
-                background: 'rgba(34,139,230,0.07)',
-                borderRadius: 8,
-                padding: '16px 24px',
-              }}
-              icon={<IconSparkles size={32} color="#228be6" />}
-            >
-              <strong>"You do not rise to the level of your goals. You fall to the level of your systems."</strong>
-            </Blockquote>
-          </div>
+    <Box style={{
+      minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+      background: 'linear-gradient(120deg, #fffaf3 0%, #fff3e0 50%, #ffe5c0 100%)', // softened orange gradient
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundBlendMode: 'overlay',
+      padding: '48px 0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <Container size="md" px="md">
+        <Paper p="xl" shadow="xl" radius="md" style={{
+          background: 'rgba(255,255,255,0.92)',
+          border: '1.5px solid #ffe0b2',
+          boxShadow: '0 4px 32px 0 rgba(255,146,43,0.10)',
+          backdropFilter: 'blur(8px)',
+          margin: '0 auto',
+        }}>
+          <Title order={2} mb="lg" fw={700} style={{ color: '#ff922b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Habit Categories</Title>
+          <Text c="#222" mb="xl">Manage, Add, Edit, or Delete Habit Categories</Text>
+          <Blockquote
+            color="#ff922b"
+            cite="James Clear"
+            style={{
+              fontSize: '1.1rem',
+              margin: '0 auto',
+              maxWidth: 500,
+              background: 'rgba(255,146,43,0.07)',
+              borderRadius: 8,
+              padding: '16px 24px',
+            }}
+            icon={<IconSparkles size={32} color="#ff922b" />}
+          >
+            <strong>"You do not rise to the level of your goals. You fall to the level of your systems."</strong>
+          </Blockquote>
 
           <Divider my="xl" label="Add New Category" labelPosition="center" />
 
           {/* Section: Add New Habit Category */}
-          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)' }}>
             <Title order={3} mb="lg">Add Category</Title>
             <Stack spacing="md">
               <TextInput
@@ -325,7 +302,7 @@ function HabitCategoriesPage() {
                 autosize
                 minRows={2}
               />
-              <Button leftSection={<IconPlus size={16} />} onClick={handleAddCategory} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddCategory} color="#ff922b" style={{ fontWeight: 600 }}>
                 Add Category
               </Button>
             </Stack>
@@ -348,7 +325,7 @@ function HabitCategoriesPage() {
           ) : (
             <Stack>
               {categories.length === 0 ? (
-                <Text c="dimmed" ta="center">No categories added yet. Add one above!</Text>
+                <Text c="#222" ta="center">No categories added yet. Add one above!</Text>
               ) : (
                 categories.map((category, idx) => (
                   <motion.div
@@ -357,7 +334,7 @@ function HabitCategoriesPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: idx * 0.07 }}
                   >
-                    <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                    <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)' }}>
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
                         {editingCategoryId === category.id ? (
                           <Stack flex={1} spacing="xs">
@@ -380,9 +357,9 @@ function HabitCategoriesPage() {
                           </Stack>
                         ) : (
                           <Stack flex={1} spacing={4}>
-                            <Text fw={600} size="lg">{category.name}</Text>
+                            <Text fw={600} size="lg" style={{ color: '#222' }}>{category.name}</Text>
                             {category.description && (
-                              <Text size="sm" c="dimmed">{category.description}</Text>
+                              <Text size="sm" style={{ color: '#222' }}>{category.description}</Text>
                             )}
                           </Stack>
                         )}
@@ -390,16 +367,9 @@ function HabitCategoriesPage() {
                         <Group gap="xs" ml="md">
                           {editingCategoryId === category.id ? (
                             <>
-                              <ActionIcon
-                                variant="filled"
-                                color="green"
-                                onClick={() => handleUpdateCategory(category.id)}
-                                size="lg"
-                                radius="xl"
-                                aria-label="Update category"
-                              >
-                                <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                              </ActionIcon>
+                              <Button leftSection={<IconCheck size={16} />} onClick={() => handleUpdateCategory(category.id)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                Save
+                              </Button>
                               <ActionIcon
                                 variant="filled"
                                 color="red"
@@ -413,16 +383,9 @@ function HabitCategoriesPage() {
                             </>
                           ) : (
                             <>
-                              <ActionIcon
-                                variant="light"
-                                color="blue"
-                                onClick={() => handleEditCategory(category)}
-                                size="lg"
-                                radius="xl"
-                                aria-label="Edit category"
-                              >
-                                <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                              </ActionIcon>
+                              <Button leftSection={<IconEdit size={16} />} onClick={() => handleEditCategory(category)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                Edit
+                              </Button>
                               <ActionIcon
                                 variant="light"
                                 color="red"

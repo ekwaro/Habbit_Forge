@@ -344,67 +344,28 @@ function HabitTipsPage() {
   };
 
   return (
-    <Box
-      style={{
-        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
-        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 0',
-        animation: `${animatedBackground} 20s linear infinite`,
-      }}
-    >
-      <Container size="lg" px="md">
-        <Paper
-          p="xl"
-          shadow="xl"
-          radius="lg"
-          style={{
-            background: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(8px)',
-            border: '1.5px solid #e3e8f0',
-            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <Title
-              order={1}
-              mb="sm"
-              style={{
-                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                color: '#222',
-                lineHeight: 1.1,
-              }}
-            >
-              Habit Tips & Tricks Management
-            </Title>
-            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
-              Manage valuable tips, strategies, and resources for building good habits.
-            </Text>
-            <Blockquote
-              color="blue"
-              cite="Stephen Covey"
-              style={{
-                fontSize: '1.1rem',
-                margin: '0 auto',
-                maxWidth: 500,
-                background: 'rgba(34,139,230,0.07)',
-                borderRadius: 8,
-                padding: '16px 24px',
-              }}
-              icon={<IconSparkles size={32} color="#228be6" />}
-            >
-              <strong>"The key is not to prioritize what's on your schedule, but to schedule your priorities."</strong>
-            </Blockquote>
-          </div>
-
+    <Box style={{
+      minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+      background: 'linear-gradient(120deg, #fffaf3 0%, #fff3e0 50%, #ffe5c0 100%)', // softened orange gradient
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundBlendMode: 'overlay',
+      padding: '48px 0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <Container size="md" px="md">
+        <Paper p="xl" shadow="xl" radius="md" style={{
+          background: 'rgba(255,255,255,0.92)',
+          border: '1.5px solid #ffe0b2',
+          boxShadow: '0 4px 32px 0 rgba(255,146,43,0.10)',
+          backdropFilter: 'blur(8px)',
+          margin: '0 auto',
+        }}>
+          <Title order={2} mb="lg" fw={700} style={{ color: '#ff922b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Habit Tips</Title>
+          <Text c="#222" mb="xl">Manage, Add, Edit, or Delete Habit Tips and Resources</Text>
           <Divider my="xl" label="Habit Tips" labelPosition="center" />
 
           {/* Section 1: Text-Based Habit Tips */}
@@ -426,7 +387,7 @@ function HabitTipsPage() {
               minRows={2}
               mb="md"
             />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip} radius="xl" size="md" style={{ fontWeight: 700 }}>
+            <Button leftSection={<IconPlus size={16} />} onClick={handleAddTip} color="#ff922b" style={{ fontWeight: 600 }}>
               Add Tip
             </Button>
 
@@ -480,16 +441,9 @@ function HabitTipsPage() {
                           <Group gap="xs" ml="md">
                             {editingTipId === tip.id ? (
                               <>
-                                <ActionIcon
-                                  variant="filled"
-                                  color="green"
-                                  onClick={() => handleUpdateTip(tip.id)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Update tip"
-                                >
-                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconCheck size={16} />} onClick={() => handleUpdateTip(tip.id)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Save
+                                </Button>
                                 <ActionIcon
                                   variant="filled"
                                   color="red"
@@ -503,16 +457,9 @@ function HabitTipsPage() {
                               </>
                             ) : (
                               <>
-                                <ActionIcon
-                                  variant="light"
-                                  color="blue"
-                                  onClick={() => handleEditTip(tip)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Edit tip"
-                                >
-                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconEdit size={16} />} onClick={() => handleEditTip(tip)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Edit
+                                </Button>
                                 <ActionIcon
                                   variant="light"
                                   color="red"
@@ -554,7 +501,7 @@ function HabitTipsPage() {
                 onChange={(event) => setNewResourceLink(event.currentTarget.value)}
                 type="url"
               />
-              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} color="#ff922b" style={{ fontWeight: 600 }}>
                 Add Resource
               </Button>
             </Stack>
@@ -618,16 +565,9 @@ function HabitTipsPage() {
                           <Group gap="xs" ml="md">
                             {editingResourceId === resource.id ? (
                               <>
-                                <ActionIcon
-                                  variant="filled"
-                                  color="green"
-                                  onClick={() => handleUpdateResource(resource.id)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Update resource"
-                                >
-                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconCheck size={16} />} onClick={() => handleUpdateResource(resource.id)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Save
+                                </Button>
                                 <ActionIcon
                                   variant="filled"
                                   color="red"
@@ -641,16 +581,9 @@ function HabitTipsPage() {
                               </>
                             ) : (
                               <>
-                                <ActionIcon
-                                  variant="light"
-                                  color="blue"
-                                  onClick={() => handleEditResource(resource)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Edit resource"
-                                >
-                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconEdit size={16} />} onClick={() => handleEditResource(resource)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Edit
+                                </Button>
                                 <ActionIcon
                                   variant="light"
                                   color="red"

@@ -12,12 +12,14 @@ import {
   Image,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
 import logo from '../assets/logo.png';
 
 
 const PublicNavbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure();
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
 
   const regularLinks = (
@@ -73,26 +75,43 @@ const PublicNavbar = () => {
         left: 0,
         width: '100%',
         zIndex: 1000,
-        background: '#fff', // or your preferred color
-        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)',
+        background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)', // soft orange gradient
+        boxShadow: '0 2px 8px rgba(255,146,43,0.08)',
       }}
     >
-      <Box py={4} px="md" style={{ height: '56px', borderBottom: '1px solid #e9ecef' }}> 
+      <Box
+        py={isMobile ? 2 : 4}
+        px={isMobile ? 'xs' : 'md'}
+        style={{
+          height: isMobile ? 48 : 56,
+          borderBottom: '1px solid #ffe0b2',
+          minHeight: isMobile ? 48 : 56,
+        }}
+      >
         {/* Reduced vertical padding and added subtle border */}
-        <Group h="100%" justify="space-between">
+        <Group h="100%" justify="space-between" wrap="nowrap" style={{ flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           {/* Left Side */}
-          <Group gap="xs">
+          <Group gap={isMobile ? 2 : 'xs'} style={{ flexWrap: 'nowrap' }}>
             <Burger 
               opened={drawerOpened} 
               onClick={toggleDrawer} 
               hiddenFrom="sm" 
-              size="sm"
+              size={isMobile ? 'xs' : 'sm'}
+              color="#ff922b"
+              style={{
+                background: drawerOpened ? 'rgba(255,146,43,0.10)' : 'rgba(255,255,255,0.85)',
+                borderRadius: 6,
+                border: `2px solid #ff922b`,
+                boxShadow: drawerOpened ? '0 2px 8px rgba(255,146,43,0.12)' : '0 1px 4px rgba(34,139,230,0.07)',
+                transition: 'background 0.2s, box-shadow 0.2s, border 0.2s',
+                padding: isMobile ? 1 : 2,
+              }}
             />
             <Image
               src={logo}
               alt="Habit Forge Logo"
-              width={48}
-              height={48}
+              width={isMobile ? 32 : 48}
+              height={isMobile ? 32 : 48}
               style={{ borderRadius: '50%', boxShadow: '0 1px 6px 0 rgba(34,139,230,0.10)', objectFit: 'cover' }}
             />
           </Group>
@@ -105,12 +124,12 @@ const PublicNavbar = () => {
               component={Link}
               to="/login"
               variant="outline"
-              color="blue"
+              color="orange"
               radius="xl"
               size="sm"
               onClick={closeDrawer}
               px="md"
-              style={{ minWidth: '80px' }}
+              style={{ minWidth: '80px', color: '#ff922b', borderColor: '#ff922b' }}
             >
               Login
             </Button>
@@ -118,7 +137,7 @@ const PublicNavbar = () => {
               component={Link}
               to="/signup"
               variant="gradient"
-              gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+              gradient={{ from: '#ff922b', to: '#ffe0b2', deg: 45 }}
               radius="xl"
               size="sm"
               onClick={closeDrawer}
@@ -145,11 +164,12 @@ const PublicNavbar = () => {
                 component={Link}
                 to="/login"
                 variant="outline"
-                color="blue"
+                color="orange"
                 radius="xl"
                 size="sm"
                 onClick={closeDrawer}
                 fullWidth
+                style={{ color: '#ff922b', borderColor: '#ff922b' }}
               >
                 Login
               </Button>
@@ -157,7 +177,7 @@ const PublicNavbar = () => {
                 component={Link}
                 to="/signup"
                 variant="gradient"
-                gradient={{ from: 'blue', to: 'cyan', deg: 45 }}
+                gradient={{ from: '#ff922b', to: '#ffe0b2', deg: 45 }}
                 radius="xl"
                 size="sm"
                 onClick={closeDrawer}
