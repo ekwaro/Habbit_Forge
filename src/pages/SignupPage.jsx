@@ -17,6 +17,7 @@ import { IconBrandGoogle, IconUserPlus } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
+import "./LoginPage.css";
 
 const STRAPI_URL = "http://localhost:1337/api";
 
@@ -127,17 +128,18 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="auth-page-container">
+    <div className="auth-page-container login-page-bg">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
+        className="login-motion-wrapper"
       >
-        <Paper radius="md" p="xl" shadow="lg" className="auth-paper">
-          <Title order={2} ta="center" mb="md">
+        <Paper radius="md" p="xl" shadow="lg" className="auth-paper login-paper">
+          <Title order={2} ta="center" mb="md" className="login-title">
             Create Account
           </Title>
-          <Text ta="center" mb="xl" c="dimmed">
+          <Text ta="center" mb="xl" c="dimmed" className="login-subtitle">
             Start your journey to better habits today
           </Text>
 
@@ -150,16 +152,18 @@ export default function SignupPage() {
               { label: "Social Signup", value: "auth0" },
             ]}
             mb="xl"
+            className="login-segmented"
           />
 
           {authMethod === "strapi" ? (
-            <form onSubmit={form.onSubmit(handleSubmit)}>
+            <form onSubmit={form.onSubmit(handleSubmit)} className="login-form">
               <TextInput
                 label="Username"
                 placeholder="Your username"
                 {...form.getInputProps("username")}
                 mb="md"
                 required
+                className="login-input"
               />
 
               <TextInput
@@ -168,6 +172,7 @@ export default function SignupPage() {
                 {...form.getInputProps("email")}
                 mb="md"
                 required
+                className="login-input"
               />
 
               <PasswordInput
@@ -176,6 +181,7 @@ export default function SignupPage() {
                 {...form.getInputProps("password")}
                 mb="md"
                 required
+                className="login-input"
               />
 
               <PasswordInput
@@ -184,13 +190,15 @@ export default function SignupPage() {
                 {...form.getInputProps("confirmPassword")}
                 mb="xl"
                 required
+                className="login-input"
               />
 
               <Button
                 fullWidth
                 type="submit"
-                leftIcon={<IconUserPlus size={18} />}
+                leftSection={<IconUserPlus size={18} />}
                 loading={loading}
+                className="login-btn"
               >
                 Create Account
               </Button>
@@ -198,25 +206,20 @@ export default function SignupPage() {
           ) : (
             <Button
               fullWidth
-              leftIcon={
-                auth0Loading ? (
-                  <Loader size="xs" />
-                ) : (
-                  <IconBrandGoogle size={18} />
-                )
-              }
+              leftSection={auth0Loading ? <Loader size="xs" /> : <IconBrandGoogle size={18} />}
               onClick={() => loginWithRedirect()}
               disabled={auth0Loading}
+              className="login-google-btn"
             >
               Sign up with Google
             </Button>
           )}
 
-          <Divider label="OR" labelPosition="center" my="lg" />
+          <Divider label="OR" labelPosition="center" my="lg" className="login-divider" />
 
-          <Text ta="center" mt="md">
+          <Text ta="center" mt="md" className="login-signup-text">
             Already have an account?{" "}
-            <Text component={Link} to="/login" fw={500} td="underline">
+            <Text component={Link} to="/login" fw={500} td="underline" className="login-signup-link">
               Log in
             </Text>
           </Text>
