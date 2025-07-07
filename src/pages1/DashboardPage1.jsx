@@ -84,17 +84,17 @@ function DashboardPage1() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
     >
-      <Card shadow="md" padding="lg" radius="lg" withBorder style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(6px)' }}>
+      <Card shadow="md" padding="lg" radius="lg" withBorder style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)', backdropFilter: 'blur(6px)' }}>
         <Group justify="space-between" mb="xs">
-          <Text fw={600} size="lg">{title}</Text>
-          <Icon style={{ width: rem(28), height: rem(28), color: color || 'var(--mantine-color-gray-6)' }} stroke={1.5} />
+          <Text fw={600} size="lg" style={{ color: '#222' }}>{title}</Text>
+          <Icon style={{ width: rem(28), height: rem(28), color: color || '#ff922b' }} stroke={1.5} />
         </Group>
         {loading ? (
           <Group justify="center">
             <Loader size="sm" />
           </Group>
         ) : (
-          <Text size="xl" fw={800} style={{ fontSize: '2rem' }}>
+          <Text size="xl" fw={800} style={{ fontSize: '1.4rem', color: '#222' }}>
             {value}
           </Text>
         )}
@@ -106,7 +106,7 @@ function DashboardPage1() {
     <Box
       style={{
         minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
-        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
+        background: 'linear-gradient(120deg, #fffaf3 0%, #fff3e0 50%, #ffe5c0 100%)', // softened orange gradient
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -124,10 +124,10 @@ function DashboardPage1() {
           radius="lg"
           p="xl"
           style={{
-            background: 'rgba(255,255,255,0.85)',
+            background: 'rgba(255,255,255,0.92)',
             backdropFilter: 'blur(8px)',
-            border: '1.5px solid #e3e8f0',
-            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
+            border: '1.5px solid #ffe0b2', // light orange border
+            boxShadow: '0 4px 32px 0 rgba(255,146,43,0.10)', // subtle orange shadow
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -138,21 +138,21 @@ function DashboardPage1() {
                 fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
                 fontWeight: 900,
                 letterSpacing: '-0.02em',
-                color: '#222',
+                color: '#ff922b', // orange title
                 lineHeight: 1.1,
               }}
             >
               Admin Dashboard
             </Title>
-            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
+            <Text size="lg" color="#222" mb="sm" style={{ fontWeight: 500 }}>
               Welcome to your Habits Forge Admin Dashboard!
             </Text>
-            <Text size="md" color="dimmed" mb="md">
+            <Text size="md" color="#222" mb="md">
               Get a quick summary of your application's content and activity.
             </Text>
           </div>
 
-          <Divider my="lg" />
+          <Divider my="lg" color="#ff922b" />
 
           {/* Grid for statistical overview cards */}
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
@@ -160,42 +160,42 @@ function DashboardPage1() {
               icon={IconCategory}
               title="Habit Categories"
               value={stats.totalCategories}
-              color="var(--mantine-color-indigo-6)"
+              color="#ff922b"
               delay={0.05}
             />
             <StatCard
               icon={IconQuote}
               title="Motivational Quotes"
               value={stats.totalMotivationalQuotes}
-              color="var(--mantine-color-orange-6)"
+              color="#ff922b"
               delay={0.1}
             />
             <StatCard
               icon={IconLink}
               title="Habit Tips"
               value={stats.totalHabitTips}
-              color="var(--mantine-color-yellow-6)"
+              color="#ff922b"
               delay={0.15}
             />
             <StatCard
               icon={IconLink}
               title="Quote Resources"
               value={stats.totalQuoteResources}
-              color="var(--mantine-color-pink-6)"
+              color="#ff922b"
               delay={0.2}
             />
             <StatCard
               icon={IconLink}
               title="Habit Tip Resources"
               value={stats.totalHabitTipResources}
-              color="var(--mantine-color-green-6)"
+              color="#ff922b"
               delay={0.25}
             />
             <StatCard
               icon={IconUsers}
               title="Total Users"
               value={stats.totalUsers}
-              color="var(--mantine-color-blue-6)"
+              color="#ff922b"
               delay={0.3}
             />
             <StatCard
@@ -211,7 +211,7 @@ function DashboardPage1() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <Card shadow="md" padding="lg" radius="lg" withBorder style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(6px)' }}>
+              <Card shadow="md" padding="lg" radius="lg" withBorder style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)', backdropFilter: 'blur(6px)' }}>
                 <Stack gap="md">
                   <Title order={4} mb="xs">Quick Actions</Title>
                   <Button
@@ -270,17 +270,17 @@ function DashboardPage1() {
           <Divider my="xl" />
 
           <Blockquote
-            color="blue"
+            color="#ff922b"
             cite="James Clear"
             style={{
               fontSize: '1.1rem',
               margin: '0 auto',
               maxWidth: 500,
-              background: 'rgba(34,139,230,0.07)',
+              background: 'rgba(255,146,43,0.07)',
               borderRadius: 8,
               padding: '16px 24px',
             }}
-            icon={<IconSparkles size={32} color="#228be6" />}
+            icon={<IconSparkles size={32} color="#ff922b" />}
           >
             <strong>"Every action you take is a vote for the type of person you wish to become."</strong>
           </Blockquote>

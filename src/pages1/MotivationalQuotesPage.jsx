@@ -377,71 +377,48 @@ function MotivationalQuotesPage() {
   };
 
   return (
-    <Box
-      style={{
-        minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
-        background: `linear-gradient(120deg, #e0e7ff 0%, #b2f2bb 100%)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 0',
-        animation: `${animatedBackground} 20s linear infinite`,
-      }}
-    >
-      <Container size="lg" px="md">
-        <Paper
-          p="xl"
-          shadow="xl"
-          radius="lg"
-          style={{
-            background: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(8px)',
-            border: '1.5px solid #e3e8f0',
-            boxShadow: '0 4px 32px 0 rgba(34,139,230,0.10)',
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <Title
-              order={1}
-              mb="sm"
-              style={{
-                fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
-                fontWeight: 900,
-                letterSpacing: '-0.02em',
-                color: '#222',
-                lineHeight: 1.1,
-              }}
-            >
-              Motivational Quotes Management
-            </Title>
-            <Text size="lg" color="dimmed" mb="sm" style={{ fontWeight: 500 }}>
-              Add, edit, or delete motivational quotes and external resource links for your users.
-            </Text>
-            <Blockquote
-              color="blue"
-              cite="Zig Ziglar"
-              style={{
-                fontSize: '1.1rem',
-                margin: '0 auto',
-                maxWidth: 500,
-                background: 'rgba(34,139,230,0.07)',
-                borderRadius: 8,
-                padding: '16px 24px',
-              }}
-              icon={<IconSparkles size={32} color="#228be6" />}
-            >
-              <strong>"People often say that motivation doesn't last. Well, neither does bathing – that's why we recommend it daily."</strong>
-            </Blockquote>
-          </div>
+    <Box style={{
+      minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+      background: 'linear-gradient(120deg, #fffaf3 0%, #fff3e0 50%, #ffe5c0 100%)', // softened orange gradient
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundBlendMode: 'overlay',
+      padding: '48px 0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <Container size="md" px="md">
+        <Paper p="xl" shadow="xl" radius="md" style={{
+          background: 'rgba(255,255,255,0.92)',
+          border: '1.5px solid #ffe0b2',
+          boxShadow: '0 4px 32px 0 rgba(255,146,43,0.10)',
+          backdropFilter: 'blur(8px)',
+          margin: '0 auto',
+        }}>
+          <Title order={2} mb="lg" fw={700} style={{ color: '#ff922b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Motivational Quotes</Title>
+          <Text c="#222" mb="xl">Manage, Add, Edit, or Delete Motivational Quotes and Resources</Text>
+          <Blockquote
+            color="#ff922b"
+            cite="Zig Ziglar"
+            style={{
+              fontSize: '1.1rem',
+              margin: '0 auto',
+              maxWidth: 500,
+              background: 'rgba(255,146,43,0.07)',
+              borderRadius: 8,
+              padding: '16px 24px',
+            }}
+            icon={<IconSparkles size={32} color="#ff922b" />}
+          >
+            <strong>"People often say that motivation doesn't last. Well, neither does bathing – that's why we recommend it daily."</strong>
+          </Blockquote>
 
           <Divider my="xl" label="Text-Based Quotes" labelPosition="center" />
 
           {/* Section 1: Text-Based Motivational Quotes */}
-          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+          <Card withBorder p="lg" radius="lg" mb="xl" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)' }}>
             <Title order={3} mb="lg">Add New Quote</Title>
             <Textarea
               label="Quote Content"
@@ -459,7 +436,7 @@ function MotivationalQuotesPage() {
               minRows={2}
               mb="md"
             />
-            <Button leftSection={<IconPlus size={16} />} onClick={handleAddQuote} radius="xl" size="md" style={{ fontWeight: 700 }}>
+            <Button leftSection={<IconPlus size={16} />} onClick={handleAddQuote} color="#ff922b" style={{ fontWeight: 600 }}>
               Add Quote
             </Button>
 
@@ -488,7 +465,7 @@ function MotivationalQuotesPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: idx * 0.07 }}
                     >
-                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)' }}>
                         <Group justify="space-between" align="flex-start" wrap="nowrap">
                           {editingQuoteId === quote.id ? (
                             <Textarea
@@ -507,22 +484,15 @@ function MotivationalQuotesPage() {
                               minRows={2}
                             />
                           ) : (
-                            <Text style={{ flexGrow: 1 }}>{quote.content}</Text>
+                            <Text style={{ flexGrow: 1, color: '#222' }}>{quote.content}</Text>
                           )}
 
                           <Group gap="xs" ml="md">
                             {editingQuoteId === quote.id ? (
                               <>
-                                <ActionIcon
-                                  variant="filled"
-                                  color="green"
-                                  onClick={() => handleUpdateQuote(quote.id)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Update quote"
-                                >
-                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconCheck size={16} />} onClick={() => handleUpdateQuote(quote.id)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Save
+                                </Button>
                                 <ActionIcon
                                   variant="filled"
                                   color="red"
@@ -536,16 +506,9 @@ function MotivationalQuotesPage() {
                               </>
                             ) : (
                               <>
-                                <ActionIcon
-                                  variant="light"
-                                  color="blue"
-                                  onClick={() => handleEditQuote(quote)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Edit quote"
-                                >
-                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconEdit size={16} />} onClick={() => handleEditQuote(quote)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Edit
+                                </Button>
                                 <ActionIcon
                                   variant="light"
                                   color="red"
@@ -587,7 +550,7 @@ function MotivationalQuotesPage() {
                 onChange={(event) => setNewResourceLink(event.currentTarget.value)}
                 type="url"
               />
-              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} radius="xl" size="md" style={{ fontWeight: 700 }}>
+              <Button leftSection={<IconPlus size={16} />} onClick={handleAddResource} color="#ff922b" style={{ fontWeight: 600 }}>
                 Add Resource
               </Button>
             </Stack>
@@ -608,7 +571,7 @@ function MotivationalQuotesPage() {
             ) : (
               <Stack>
                 {resources.length === 0 ? (
-                  <Text c="dimmed" ta="center">No resources added yet. Add one above!</Text>
+                  <Text c="#222" ta="center">No resources added yet. Add one above!</Text>
                 ) : (
                   resources.map((resource, idx) => (
                     <motion.div
@@ -617,7 +580,7 @@ function MotivationalQuotesPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: idx * 0.07 }}
                     >
-                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(34,139,230,0.07)' }}>
+                      <Card withBorder p="md" radius="md" shadow="md" style={{ background: 'rgba(255,255,255,0.92)', boxShadow: '0 2px 12px 0 rgba(255,146,43,0.07)' }}>
                         <Group justify="space-between" align="center" wrap="nowrap">
                           {editingResourceId === resource.id ? (
                             <Stack flex={1} spacing="xs">
@@ -641,8 +604,8 @@ function MotivationalQuotesPage() {
                               href={resource.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              style={{ flexGrow: 1 }}
-                              leftSection={<IconLink size={14} />}
+                              style={{ flexGrow: 1, color: '#222' }}
+                              leftSection={<IconLink size={14} color="#ff922b" />}
                             >
                               {resource.name}
                             </Anchor>
@@ -651,16 +614,9 @@ function MotivationalQuotesPage() {
                           <Group gap="xs" ml="md">
                             {editingResourceId === resource.id ? (
                               <>
-                                <ActionIcon
-                                  variant="filled"
-                                  color="green"
-                                  onClick={() => handleUpdateResource(resource.id)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Update resource"
-                                >
-                                  <IconCheck style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconCheck size={16} />} onClick={() => handleUpdateResource(resource.id)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Save
+                                </Button>
                                 <ActionIcon
                                   variant="filled"
                                   color="red"
@@ -674,16 +630,9 @@ function MotivationalQuotesPage() {
                               </>
                             ) : (
                               <>
-                                <ActionIcon
-                                  variant="light"
-                                  color="blue"
-                                  onClick={() => handleEditResource(resource)}
-                                  size="lg"
-                                  radius="xl"
-                                  aria-label="Edit resource"
-                                >
-                                  <IconEdit style={{ width: rem(20), height: rem(20) }} />
-                                </ActionIcon>
+                                <Button leftSection={<IconEdit size={16} />} onClick={() => handleEditResource(resource)} color="#ff922b" style={{ fontWeight: 600 }}>
+                                  Edit
+                                </Button>
                                 <ActionIcon
                                   variant="light"
                                   color="red"

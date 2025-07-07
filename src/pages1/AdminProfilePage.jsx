@@ -68,10 +68,28 @@ function AdminProfilePage() {
   };
 
   return (
-    <Box maw="95vw" mx="auto" my="lg"> 
-      <Paper p="xl" shadow="xs" radius="md">
-        <Title order={2} mb="lg" fw={700}>Admin Profile</Title>
-        <Text c="dimmed" mb="xl">Edit, Update or Cancel Changes</Text>
+    <Box maw="95vw" mx="auto" my="lg" style={{
+      minHeight: 'calc(100vh - var(--mantine-header-height, 0px) - var(--mantine-footer-height, 0px))',
+      background: 'linear-gradient(120deg, #fffaf3 0%, #fff3e0 50%, #ffe5c0 100%)', // softened orange gradient
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundBlendMode: 'overlay',
+      padding: '48px 0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}> 
+      <Paper p="xl" shadow="xl" radius="md" style={{
+        background: 'rgba(255,255,255,0.92)',
+        border: '1.5px solid #ffe0b2',
+        boxShadow: '0 4px 32px 0 rgba(255,146,43,0.10)',
+        backdropFilter: 'blur(8px)',
+        maxWidth: 480,
+        margin: '0 auto',
+      }}>
+        <Title order={2} mb="lg" fw={700} style={{ color: '#ff922b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Profile</Title>
+        <Text c="#222" mb="xl">Edit, Update or Cancel Changes</Text>
 
         <Stack gap="lg">
           <Group justify="center">
@@ -120,7 +138,7 @@ function AdminProfilePage() {
 
           <Group justify="flex-end" mt="md">
             {!isEditing ? (
-              <Button leftSection={<IconEdit size={16} />} onClick={() => setIsEditing(true)}>
+              <Button leftSection={<IconEdit size={16} />} onClick={() => setIsEditing(true)} color="#ff922b" style={{ fontWeight: 600 }}>
                 Edit Profile
               </Button>
             ) : (
@@ -128,7 +146,7 @@ function AdminProfilePage() {
                 <Button variant="outline" color="red" leftSection={<IconX size={16} />} onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button leftSection={<IconCheck size={16} />} onClick={handleUpdate}>
+                <Button leftSection={<IconCheck size={16} />} onClick={handleUpdate} color="#ff922b" style={{ fontWeight: 600 }}>
                   Update Profile
                 </Button>
               </>
