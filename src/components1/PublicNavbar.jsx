@@ -75,8 +75,8 @@ const PublicNavbar = () => {
         left: 0,
         width: '100%',
         zIndex: 1000,
-        background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)', // soft orange gradient
-        boxShadow: '0 2px 8px rgba(255,146,43,0.08)',
+        background: 'linear-gradient(90deg, #fff8f0 0%, #fff3e0 60%, #ffecb3 100%)', // even lighter orange/cream gradient
+        boxShadow: '0 2px 8px rgba(255,236,179,0.08)',
       }}
     >
       <Box
@@ -84,7 +84,7 @@ const PublicNavbar = () => {
         px={isMobile ? 'xs' : 'md'}
         style={{
           height: isMobile ? 48 : 56,
-          borderBottom: '1px solid #ffe0b2',
+          borderBottom: '1px solid #ffecb3',
           minHeight: isMobile ? 48 : 56,
         }}
       >
@@ -97,12 +97,12 @@ const PublicNavbar = () => {
               onClick={toggleDrawer} 
               hiddenFrom="sm" 
               size={isMobile ? 'xs' : 'sm'}
-              color="#ff922b"
+              color="#ffecb3"
               style={{
-                background: drawerOpened ? 'rgba(255,146,43,0.10)' : 'rgba(255,255,255,0.85)',
+                background: drawerOpened ? 'rgba(255,236,179,0.10)' : 'rgba(255,255,255,0.85)',
                 borderRadius: 6,
-                border: `2px solid #ff922b`,
-                boxShadow: drawerOpened ? '0 2px 8px rgba(255,146,43,0.12)' : '0 1px 4px rgba(34,139,230,0.07)',
+                border: `2px solid #ffecb3`,
+                boxShadow: drawerOpened ? '0 2px 8px rgba(255,236,179,0.12)' : '0 1px 4px rgba(255,236,179,0.07)',
                 transition: 'background 0.2s, box-shadow 0.2s, border 0.2s',
                 padding: isMobile ? 1 : 2,
               }}
@@ -112,7 +112,7 @@ const PublicNavbar = () => {
               alt="Habit Forge Logo"
               width={isMobile ? 32 : 48}
               height={isMobile ? 32 : 48}
-              style={{ borderRadius: '50%', boxShadow: '0 1px 6px 0 rgba(34,139,230,0.10)', objectFit: 'cover' }}
+              style={{ borderRadius: '50%', boxShadow: '0 1px 6px 0 rgba(255,236,179,0.10)', objectFit: 'cover' }}
             />
           </Group>
 
@@ -124,12 +124,12 @@ const PublicNavbar = () => {
               component={Link}
               to="/login"
               variant="outline"
-              color="orange"
+              color="#ffecb3"
               radius="xl"
               size="sm"
               onClick={closeDrawer}
               px="md"
-              style={{ minWidth: '80px', color: '#ff922b', borderColor: '#ff922b' }}
+              style={{ minWidth: '80px', color: '#ffa726', borderColor: '#ffecb3', background: '#fff' }}
             >
               Login
             </Button>
@@ -137,7 +137,7 @@ const PublicNavbar = () => {
               component={Link}
               to="/signup"
               variant="gradient"
-              gradient={{ from: '#ff922b', to: '#ffe0b2', deg: 45 }}
+              gradient={{ from: '#ffecb3', to: '#fff8f0', deg: 45 }}
               radius="xl"
               size="sm"
               onClick={closeDrawer}
@@ -164,12 +164,12 @@ const PublicNavbar = () => {
                 component={Link}
                 to="/login"
                 variant="outline"
-                color="orange"
+                color="#ffecb3"
                 radius="xl"
                 size="sm"
                 onClick={closeDrawer}
                 fullWidth
-                style={{ color: '#ff922b', borderColor: '#ff922b' }}
+                style={{ color: '#ffa726', borderColor: '#ffecb3', background: '#fff' }}
               >
                 Login
               </Button>
@@ -177,7 +177,7 @@ const PublicNavbar = () => {
                 component={Link}
                 to="/signup"
                 variant="gradient"
-                gradient={{ from: '#ff922b', to: '#ffe0b2', deg: 45 }}
+                gradient={{ from: '#ffecb3', to: '#fff8f0', deg: 45 }}
                 radius="xl"
                 size="sm"
                 onClick={closeDrawer}
