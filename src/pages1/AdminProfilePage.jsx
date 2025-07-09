@@ -20,13 +20,6 @@ function AdminProfilePage() {
     profilePicture: initialAdminInfo.profilePicture || '',
   });
 
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser?.admin) {
-      navigate('/user-dashboard');
-    }
-  }, [navigate]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
