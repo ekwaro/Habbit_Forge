@@ -14,6 +14,7 @@ import {
 import { Outlet, useNavigate } from "react-router-dom";
 const UserDashBoard = () => {
   let user = JSON.parse(localStorage.getItem('currentUser'))
+  console.log(user)
 
 
   const handleLogout=()=>{
@@ -46,9 +47,9 @@ const UserDashBoard = () => {
             
             radius='xl'
             size='md'
-            alt={user?.name}
+            alt={user?.username}
             />
-            <Text size='sm' fw={500}>{user?.name}</Text>
+            <Text size='sm' fw={500}>{user?.username}</Text>
             <Button variant='light' c='red' size='xs' onClick={handleLogout}>Logout</Button>
 
          

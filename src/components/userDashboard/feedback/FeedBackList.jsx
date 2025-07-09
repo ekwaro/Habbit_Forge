@@ -1,14 +1,14 @@
 import { Card, Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
-
+const STRAPI_AUTH_TOKEN = import.meta.env.VITE_STRAPI_AUTH_TOKEN
 const FeedBackList = ({habitId}) => {
     const [feedbacks, setFeedbacks] = useState([])
     useEffect(()=>{
         const fetchFeedbacks = async()=>{
             const res = await fetch(`http://localhost:1337/api/feedbacks?filters[habit][id][$eq]=${habitId}&populate=from_user`, {
                 headers:{
-                    Authorization: `Bearer ${process.env.STRAPI_AUTH_TOKEN}`
+                    Authorization: `Bearer ${STRAPI_AUTH_TOKEN}`
                 }
             })
 

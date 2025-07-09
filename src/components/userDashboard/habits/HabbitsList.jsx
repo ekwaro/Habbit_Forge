@@ -19,8 +19,8 @@ import useStrapiHabits from "./useLocalStorage";
 import "@mantine/dates/styles.css";
 import { DatePicker } from "@mantine/dates";
 import { LineChart } from "@mantine/charts";
-import { useEffect, useState } from "react";
-import { useNavigate, Outlet, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import {
   isTodayMatchingFrequency,
@@ -28,7 +28,7 @@ import {
 } from "./utils/TodaysHabit";
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
-import { IconArrowLeft, IconSignLeftFilled } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 const HabbitsList = ({
   list,
   removeItem,
@@ -40,11 +40,11 @@ const HabbitsList = ({
   const pageSize = 5
 
   console.log(list)
-  const paginatedList =(Array.isArray(list)?list:[]).slice((activePage - 1) * pageSize, activePage*pageSize)
+  const paginatedList = (Array.isArray(list) ? list : []).slice((activePage - 1) * pageSize, activePage * pageSize)
 
 
   const navigate = useNavigate();
-  console.log("HabbitsList Rendered", paginatedList[0].id);
+  console.log("HabbitsList Rendered", paginatedList[0]?.id);
   const rows = paginatedList.map((habit) => (
     <Table.Tr key={habit.id}>
       <Table.Td>{habit.id}</Table.Td>
@@ -107,14 +107,14 @@ const HabbitsList = ({
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
       {list?.length > pageSize && (
-  <Pagination
-    value={activePage}
-    onChange={setPage}
-    total={Math.ceil(list?.length / pageSize)}
-    mt="md"
-    position="center"
-  />
-)}
+        <Pagination
+          value={activePage}
+          onChange={setPage}
+          total={Math.ceil(list?.length / pageSize)}
+          mt="md"
+          position="center"
+        />
+      )}
     </>
   );
 };
@@ -122,14 +122,14 @@ const HabbitsList = ({
 
 const HabbitsItem = () => {
   const { id } = useParams();
-  console.log(typeof(id))
+  console.log(typeof (id))
   const navigate = useNavigate();
   const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN;
 
   const { list, loading } = useStrapiHabits(authToken);
   console.log(list)
 
-  const habit = Array.isArray(list)?list.find((habit) => habit.id.toString() === id):null;
+  const habit = Array.isArray(list) ? list.find((habit) => habit.id.toString() === id) : null;
 
   if (loading) {
     return (
@@ -265,34 +265,29 @@ const HabitCalenderView = ({ habit }) => {
   // This component can be used to display a calendar view of habits
 };
 
-const DailyHabitView = ({ list, removeItem, updateItem }) => {
+const DailyHabitView = ({ list, removeItem, updateItem, toggleHabbitCompletion , loading}) => {
   const todayStr = dayjs().format("YYYY-MM-DD");
+  console.log(list)
 
-  const isTodayInRange = (startdate, endDate) => {
+  const isTodayInRange = (startDate, endDate) => {
     const today = dayjs().startOf("day");
-    return dayjs(startdate) <= today && today <= dayjs(endDate);
+    return dayjs(startDate) <= today && today <= dayjs(endDate);
   };
 
-  const getTodaysHabit = (habits) => (Array.isArray(habits)?habits:[])
-    
-      .filter((habit) => isTodayMatchingFrequency(habit))
-      .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
+  const getTodaysHabit = (habits) => (Array.isArray(habits) ? habits : [])
+
+    .filter((habit) => isTodayMatchingFrequency(habit))
+    .filter((habit) => isTodayInRange(habit.startDate, habit.endDate));
 
   const todaysHabits = useMemo(() => getTodaysHabit(list), [list]);
+  if (loading){
+    return(<Card>
+      <Loader/>
+      <Text>Fetching habits</Text>
+    </Card>)
+  }
 
-  const markHabitComplete = (habit) => {
-    const today = todayStr;
-    const alreadyCompleted = habit.completedDates?.includes(today) ?? false;
 
-    const updatedHabit = {
-      ...habit,
-      completedDates: alreadyCompleted
-        ? habit.completedDates.filter((date) => date !== today)
-        : [...(habit.completedDates || []), today],
-    };
-
-    updateItem(habit.id, updatedHabit);
-  };
 
   return (
     <Card withBorder shadow="sm" p="lg" my="md">
@@ -324,7 +319,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                     <Checkbox
                       label={habit.title}
                       checked={isCompleted}
-                      onChange={() => markHabitComplete(habit)}
+                      onChange={() => toggleHabbitCompletion(habit.documentId)}
                     />
                     <Badge color="teal" variant="light">
                       {habit.frequency}

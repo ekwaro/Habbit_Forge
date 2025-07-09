@@ -26,6 +26,7 @@ const HabbitsManagement = () => {
     removeItem,
     clearList,
     updateItem,
+    toggleHabbitCompletion
   } = useStrapiHabits(authToken);
 
   const handleSubmit = (habit) => {
@@ -117,6 +118,8 @@ const HabbitsManagement = () => {
         list={list}
         removeItem={removeItem}
         updateItem={updateItem}
+        toggleHabbitCompletion={toggleHabbitCompletion}
+        loading = {loading}
       />
     </Container>
   );

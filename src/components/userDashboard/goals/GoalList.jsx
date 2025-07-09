@@ -3,6 +3,7 @@ import {
   Card,
   Text,
   Button,
+  Autocomplete,
   Group,
   Progress,
   TextInput,
@@ -17,16 +18,30 @@ import { IconTrash } from "@tabler/icons-react";
 import { DatePickerInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 import { useForm, isNotEmpty } from "@mantine/form";
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { useDisclosure } from "@mantine/hooks";
 
+
+const STRAPI_AUTH_TOKEN = import.meta.env.VITE_STRAPI_AUTH_TOKEN
+
 const GoalForm = ({ opened, onClose, onSubmit }) => {
+   const [users, setUsers] = useState([]);
+  useEffect(()=>{fetch("http://localhost:1337/api/users", {
+
+              headers: {
+        Authorization: `Bearer ${STRAPI_AUTH_TOKEN}`,
+      },
+    })
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch(console.error);},[])
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
       title: "",
       description: "",
-      targetDate: "", // Assuming targetDate is a string in 'YYYY-MM-DD' format
+      targetDate: "",
+      accountabilityPartner: ''
     },
     validate: {
       title: (value) =>
@@ -35,6 +50,15 @@ const GoalForm = ({ opened, onClose, onSubmit }) => {
         value.length < 5
           ? "Description must be at least 5 characters long"
           : null,
+
+      accountabilityPartner: (value, values) => {
+        if (!value && !values.partnerSearch) {
+          return "Please select an accountability partner";
+        }
+        return null;
+      },
+     
+     
     },
   });
   return (
@@ -65,6 +89,23 @@ const GoalForm = ({ opened, onClose, onSubmit }) => {
           type="date"
           label="Target Date"
           {...form.getInputProps("targetDate")}
+        />
+        <Autocomplete
+          label="Accountability Partner"
+          placeholder="Search by username or email"
+          searchable
+          nothingFound="No users found"
+          mt="sm"
+          value={form.values.partnerSearch}
+          onChange={(val) => form.setFieldValue("partnerSearch", val)}
+        onOptionSubmit={(val) => {
+            const selectedUser = users.find(
+              (u) => `${u.username} (${u.email})` === val
+            );
+            form.setFieldValue("partnerSearch", val);
+            form.setFieldValue("accountabilityPartner", selectedUser?.id);
+          }}
+          data={users?.map((u) => `${u.username} (${u.email})`)}
         />
         <Button type="submit" mt={10}>
           Create Goal
