@@ -1,47 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { Group, Text, Avatar, Button, rem, Menu, Badge } from '@mantine/core';
+import { Group, Text, Avatar, Button, rem, Menu, Loader } from '@mantine/core';
 import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
-import { Link, useNavigate } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mantine/hooks';
+import { useAuth0 } from '@auth0/auth0-react';
 
 function HeaderContent() {
+  const { user, isAuthenticated, isLoading } = useAuth0();
   const [adminInfo, setAdminInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser || !currentUser.email) return;
-    // Fetch all users and find the one matching the current user's email, with profilePicture populated
-    fetch('http://localhost:1337/api/users?populate=profilePicture')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const matched = data.find(user => user.email === currentUser.email);
-          if (matched) setAdminInfo(matched);
-        }
-      });
-  }, []);
-
-  if (!adminInfo) return null; // or a loading spinner
-
-  // Get the profile image URL from the media object if available
-  let profileImageUrl = undefined;
-  if (adminInfo.profilePicture) {
-    if (Array.isArray(adminInfo.profilePicture) && adminInfo.profilePicture[0]?.url) {
-      profileImageUrl = adminInfo.profilePicture[0].url.startsWith('http')
-        ? adminInfo.profilePicture[0].url
-        : `http://localhost:1337${adminInfo.profilePicture[0].url}`;
-    } else if (adminInfo.profilePicture.url) {
-      profileImageUrl = adminInfo.profilePicture.url.startsWith('http')
-        ? adminInfo.profilePicture.url
-        : `http://localhost:1337${adminInfo.profilePicture.url}`;
+    if (isLoading || !isAuthenticated || !user) {
+      setLoading(true);
+      return;
     }
-  }
+    // If Auth0 user has all info, use it directly
+    if (user.email && user.name && user.picture) {
+      setAdminInfo({
+        email: user.email,
+        username: user.name,
+        profilePicture: user.picture,
+      });
+      setLoading(false);
+    } else {
+      // Optionally, fetch more details from backend using user.email
+      fetch(`http://localhost:1337/api/users?filters[email][$eq]=${encodeURIComponent(user.email)}&populate=profilePicture`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            const matched = data[0];
+            let profileImageUrl = undefined;
+            if (matched.profilePicture) {
+              if (Array.isArray(matched.profilePicture) && matched.profilePicture[0]?.url) {
+                profileImageUrl = matched.profilePicture[0].url.startsWith('http')
+                  ? matched.profilePicture[0].url
+                  : `http://localhost:1337${matched.profilePicture[0].url}`;
+              } else if (matched.profilePicture.url) {
+                profileImageUrl = matched.profilePicture.url.startsWith('http')
+                  ? matched.profilePicture.url
+                  : `http://localhost:1337${matched.profilePicture.url}`;
+              }
+            }
+            setAdminInfo({
+              email: matched.email,
+              username: matched.username,
+              profilePicture: profileImageUrl,
+            });
+          } else {
+            setAdminInfo({
+              email: user.email,
+              username: user.name,
+              profilePicture: user.picture,
+            });
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          setAdminInfo({
+            email: user.email,
+            username: user.name,
+            profilePicture: user.picture,
+          });
+          setLoading(false);
+        });
+    }
+  }, [user, isAuthenticated, isLoading]);
 
   const handleLogout = () => {
     navigate('/');
   };
+
+  if (isLoading || loading || !adminInfo) {
+    return <Group h="100%" px="md" justify="center" style={{ flexGrow: 1 }}><Loader size="md" color="orange" /></Group>;
+  }
 
   return (
     <Group h="100%" px="md" justify="space-between" style={{ flexGrow: 1, background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)', color: '#222', borderRadius: 12, boxShadow: '0 2px 8px rgba(255,146,43,0.08)', padding: '0.5rem 1rem', margin: '0.5rem 0' }}>
@@ -49,7 +83,7 @@ function HeaderContent() {
       <Group>
         <Group gap={6} align="center">
           <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Avatar src={profileImageUrl || undefined} alt={adminInfo.username} radius="xl" size={40} style={{ border: '2px solid #fff' }} />
+            <Avatar src={adminInfo.profilePicture || undefined} alt={adminInfo.username} radius="xl" size={40} style={{ border: '2px solid #fff' }} />
           </div>
           {/* Show admin name and email */}
           {!isMobile && (
