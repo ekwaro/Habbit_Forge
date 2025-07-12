@@ -18,8 +18,15 @@ const useStrapiHabits = (token) => {
     try {
       const res = await fetch(API_URL, { headers });
       const data = await res.json();
-      console.log(data.data);
+
+      console.log('Raw API response:', data);
+      console.log('Habits data:', data.data);
+      if (data.data && data.data.length > 0) {
+        console.log('First habit structure:', data.data[0]);
+      }
       setList(data.data);
+      
+
     } catch (error) {
       console.error("Error fetching habits", error);
     } finally {
@@ -60,7 +67,9 @@ const useStrapiHabits = (token) => {
       frequency: updatedData.frequency,
       startDate: updatedData.startDate,
       endDate: updatedData.endDate,
-      completed: [],
+
+      completedDates: updatedData.completedDates || [],
+
       //partnerId:updatedData.partnerId
     };
     try {
@@ -81,7 +90,7 @@ const useStrapiHabits = (token) => {
     console.log(headers);
     try {
       await fetch(`${API_URL}/${id}`, {
-        method: "GET",
+        method: "DELETE",
         headers,
       });
       await fetchHabits();
