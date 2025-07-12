@@ -268,15 +268,23 @@ const HabitCalenderView = ({ habit }) => {
 const DailyHabitView = ({ list, removeItem, updateItem }) => {
   const todayStr = dayjs().format("YYYY-MM-DD");
 
-  const isTodayInRange = (startdate, endDate) => {
+  const isTodayInRange = (startDate, endDate) => {
     const today = dayjs().startOf("day");
-    return dayjs(startdate) <= today && today <= dayjs(endDate);
+    return dayjs(startDate) <= today && today <= dayjs(endDate);
   };
 
-  const getTodaysHabit = (habits) => (Array.isArray(habits)?habits:[])
-    
-      .filter((habit) => isTodayMatchingFrequency(habit))
-      .filter((habit) => isTodayInRange(habit.startdate, habit.endDate));
+  const getTodaysHabit = (habits) => {
+    console.log('Filtering habits for today:', habits);
+    const filtered = (Array.isArray(habits)?habits:[])
+      .filter((habit) => {
+        const matchesFrequency = isTodayMatchingFrequency(habit);
+        const inRange = isTodayInRange(habit.startDate, habit.endDate);
+        console.log(`Habit "${habit.title}": frequency=${matchesFrequency}, inRange=${inRange}, startDate=${habit.startDate}, endDate=${habit.endDate}`);
+        return matchesFrequency && inRange;
+      });
+    console.log('Today\'s habits after filtering:', filtered);
+    return filtered;
+  };
 
   const todaysHabits = useMemo(() => getTodaysHabit(list), [list]);
 
@@ -332,7 +340,7 @@ const DailyHabitView = ({ list, removeItem, updateItem }) => {
                   </Group>
 
                   <Text size="sm" mt="xs" c="dimmed">
-                    {`Start: ${dayjs(habit.startdate).format("MMM D, YYYY")} | End: ${dayjs(habit.endDate).format("MMM D, YYYY")}`}
+                    {`Start: ${dayjs(habit.startDate).format("MMM D, YYYY")} | End: ${dayjs(habit.endDate).format("MMM D, YYYY")}`}
                   </Text>
 
                   <Progress value={progress} mt="md" size="sm" radius="xl" />
