@@ -3,93 +3,118 @@ import { Group, Text, Avatar, Button, rem, Menu, Loader } from '@mantine/core';
 import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mantine/hooks';
-import { useAuth0 } from '@auth0/auth0-react';
 
 function HeaderContent() {
-  const { user, isAuthenticated, isLoading } = useAuth0();
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isLoading || !isAuthenticated || !user) {
-      setLoading(true);
-      return;
-    }
-    // If Auth0 user has all info, use it directly
-    if (user.email && user.name && user.picture) {
-      setAdminInfo({
-        email: user.email,
-        username: user.name,
-        profilePicture: user.picture,
-      });
-      setLoading(false);
-    } else {
-      // Optionally, fetch more details from backend using user.email
-      fetch(`http://localhost:1337/api/users?filters[email][$eq]=${encodeURIComponent(user.email)}&populate=profilePicture`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            const matched = data[0];
-            let profileImageUrl = undefined;
-            if (matched.profilePicture) {
-              if (Array.isArray(matched.profilePicture) && matched.profilePicture[0]?.url) {
-                profileImageUrl = matched.profilePicture[0].url.startsWith('http')
-                  ? matched.profilePicture[0].url
-                  : `http://localhost:1337${matched.profilePicture[0].url}`;
-              } else if (matched.profilePicture.url) {
-                profileImageUrl = matched.profilePicture.url.startsWith('http')
-                  ? matched.profilePicture.url
-                  : `http://localhost:1337${matched.profilePicture.url}`;
-              }
-            }
-            setAdminInfo({
-              email: matched.email,
-              username: matched.username,
-              profilePicture: profileImageUrl,
-            });
-          } else {
-            setAdminInfo({
-              email: user.email,
-              username: user.name,
-              profilePicture: user.picture,
-            });
-          }
-          setLoading(false);
-        })
-        .catch(() => {
+    const loadAdminInfo = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // First, try to get user from localStorage (for Strapi auth)
+        const storedUser = localStorage.getItem('currentUser');
+        const authToken = localStorage.getItem('authToken');
+
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          console.log('Stored user data:', user);
           setAdminInfo({
-            email: user.email,
-            username: user.name,
-            profilePicture: user.picture,
+            email: user.email || 'admin@example.com',
+            username: user.username || user.name || 'Admin User',
+            profilePicture: user.picture || user.profilePicture || user.avatar || 'https://ui-avatars.com/api/?name=Admin&background=ff922b&color=fff&size=150',
           });
           setLoading(false);
+          return;
+        }
+
+        // If no stored user, try to fetch from Strapi API
+        if (authToken) {
+          const response = await fetch('http://localhost:1337/api/users/me', {
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            console.log('API user data:', userData);
+            setAdminInfo({
+              email: userData.email || 'admin@example.com',
+              username: userData.username || userData.name || 'Admin User',
+              profilePicture: userData.profilePicture || userData.picture || userData.avatar || 'https://ui-avatars.com/api/?name=Admin&background=ff922b&color=fff&size=150',
+            });
+          } else {
+            throw new Error('Failed to fetch user data');
+          }
+        } else {
+          // Fallback to default admin info
+          setAdminInfo({
+            email: 'admin@example.com',
+            username: 'Admin User',
+            profilePicture: 'https://ui-avatars.com/api/?name=Admin&background=ff922b&color=fff&size=150',
+          });
+        }
+      } catch (err) {
+        console.error('Error loading admin info:', err);
+        setError(err.message);
+        // Set fallback admin info
+        setAdminInfo({
+          email: 'admin@example.com',
+          username: 'Admin User',
+          profilePicture: 'https://ui-avatars.com/api/?name=Admin&background=ff922b&color=fff&size=150',
         });
-    }
-  }, [user, isAuthenticated, isLoading]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAdminInfo();
+  }, []);
 
   const handleLogout = () => {
+    // Clear all stored data
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('isAuthenticated');
     navigate('/');
   };
 
-  if (isLoading || loading || !adminInfo) {
-    return <Group h="100%" px="md" justify="center" style={{ flexGrow: 1 }}><Loader size="md" color="orange" /></Group>;
+  // Show loading only for a short time, then show content even if there's an error
+  if (loading && !adminInfo) {
+    return (
+      <Group h="100%" px="md" justify="center" style={{ flexGrow: 1 }}>
+        <Loader size="md" color="orange" />
+      </Group>
+    );
   }
 
   return (
-    <Group h="100%" px="md" justify="space-between" style={{ flexGrow: 1, background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)', color: '#222', borderRadius: 12, boxShadow: '0 2px 8px rgba(255,146,43,0.08)', padding: '0.5rem 1rem', margin: '0.5rem 0' }}>
-      <Text fw={900} size="xl" style={{ color: '#ff922b', letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Dashboard</Text>
+    <Group h="100%" px="md" justify="flex-end" style={{ flexGrow: 1, background: 'linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%)', color: '#222', borderRadius: 12, boxShadow: '0 2px 8px rgba(255,146,43,0.08)', padding: '0.5rem 1rem', margin: '0.5rem 0' }}>
       <Group>
         <Group gap={6} align="center">
           <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Avatar src={adminInfo.profilePicture || undefined} alt={adminInfo.username} radius="xl" size={40} style={{ border: '2px solid #fff' }} />
+            <Avatar 
+              src={adminInfo?.profilePicture || 'https://ui-avatars.com/api/?name=Admin&background=ff922b&color=fff&size=150'} 
+              alt={adminInfo?.username || 'Admin'} 
+              radius="xl" 
+              size={40} 
+              style={{ border: '2px solid #fff' }} 
+            />
           </div>
           {/* Show admin name and email */}
           {!isMobile && (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Text size="sm" fw={700} visibleFrom="sm" style={{ color: '#222' }}>Admin Name: {adminInfo.username}</Text>
-              <Text size="xs" c="#888">{adminInfo.email}</Text>
+              <Text size="sm" fw={700} visibleFrom="sm" style={{ color: '#222' }}>
+                {adminInfo?.username || 'Admin User'}
+              </Text>
+              <Text size="xs" c="#888">{adminInfo?.email || 'admin@example.com'}</Text>
             </div>
           )}
         </Group>
