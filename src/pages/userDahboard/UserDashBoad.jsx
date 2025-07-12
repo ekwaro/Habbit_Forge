@@ -20,7 +20,9 @@ import { IconUser, IconTarget, IconQuote, IconBulb, IconLogout, IconDashboard, I
 
 const UserDashBoard = () => {
   let user = JSON.parse(localStorage.getItem('currentUser'))
+
   const isMobile = useMediaQuery('(max-width: 768px)');
+
 
   const handleLogout=()=>{
     localStorage.removeItem('currentUser')
@@ -84,11 +86,13 @@ const UserDashBoard = () => {
         }}
       >
         <Group h="100%" px="md" justify='space-between' align='center'>
+
           <Group>
             <Tooltip
               label={`${opened ? 'Close' : 'Open'} sidebar (Ctrl+B)`}
               position="bottom"
               withArrow
+
             >
               <Button
                 variant="light"

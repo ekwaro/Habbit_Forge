@@ -31,6 +31,7 @@ const HabbitsManagement = () => {
     removeItem,
     clearList,
     updateItem,
+    toggleHabbitCompletion
   } = useStrapiHabits(authToken);
 
   const handleSubmit = (habit) => {
@@ -126,6 +127,7 @@ const HabbitsManagement = () => {
           Add New Habit
         </Button>
 
+
         <ScrollArea mt={20} style={{ height: "60vh" }}>
           {loading ? (
             <Stack align="center" mt="md">
@@ -186,6 +188,7 @@ const HabbitsManagement = () => {
           updateItem={updateItem}
         />
       </Paper>
+
     </Container>
   );
 };

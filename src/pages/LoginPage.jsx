@@ -9,6 +9,8 @@ import {
   Paper,
   Divider,
   SegmentedControl,
+  Loader,
+  Center,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
@@ -21,16 +23,68 @@ import "./LoginPage.css";
 const STRAPI_URL = "http://localhost:1337/api";
 
 // Add image for left side
-const loginImageUrl = 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80'; // Person using laptop (sign up/login theme)
+const loginImageUrl = 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { loginWithRedirect, isLoading: auth0Loading } = useAuth0();
+  const { 
+    loginWithRedirect, 
+    isLoading: auth0Loading, 
+    isAuthenticated, 
+    user: auth0User,
+    getAccessTokenSilently 
+  } = useAuth0();
+  
   const [loading, setLoading] = useState(false);
   const [authMethod, setAuthMethod] = useState("strapi");
   const [adminRoles, setAdminRoles] = useState([]);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isProcessingAuth0, setIsProcessingAuth0] = useState(false);
+
+  // Handle Auth0 authentication result
+  useEffect(() => {
+    const handleAuth0Success = async () => {
+      if (isAuthenticated && auth0User && !isProcessingAuth0) {
+        setIsProcessingAuth0(true);
+        try {
+          // Get or create user in Strapi
+          const strapiUser = await getOrCreateStrapiUser(auth0User);
+          
+          if (strapiUser) {
+            // Store user data
+            localStorage.setItem("isAuthenticated", "true");
+            localStorage.setItem("currentUser", JSON.stringify(strapiUser));
+            localStorage.setItem("authMethod", "auth0");
+            
+            notifications.show({
+              title: "Success",
+              message: `Welcome back, ${strapiUser.username || strapiUser.email}!`,
+              color: "green",
+            });
+
+            // Navigate based on role
+            if (isUserAdmin(strapiUser)) {
+              navigate("/admin");
+            } else {
+              navigate("/user-dashboard");
+            }
+          }
+        } catch (error) {
+          console.error("Auth0 login processing error:", error);
+          notifications.show({
+            title: "Error",
+            message: "Failed to complete authentication",
+            color: "red",
+          });
+        } finally {
+          setIsProcessingAuth0(false);
+        }
+      }
+    };
+
+    handleAuth0Success();
+  }, [isAuthenticated, auth0User, navigate, isProcessingAuth0]);
 
   useEffect(() => {
     const fetchAdminRoles = async () => {
@@ -65,6 +119,45 @@ export default function LoginPage() {
     },
   });
 
+  const getOrCreateStrapiUser = async (auth0User) => {
+    try {
+      // First, try to find existing user by email
+      const existingUserResponse = await axios.get(
+        `${STRAPI_URL}/users?filters[email][$eq]=${auth0User.email}&populate=role`
+      );
+
+      if (existingUserResponse.data.length > 0) {
+        return existingUserResponse.data[0];
+      }
+
+      // If user doesn't exist, create new one
+      const newUserData = {
+        username: auth0User.nickname || auth0User.email.split('@')[0],
+        email: auth0User.email,
+        confirmed: true,
+        blocked: false,
+        provider: 'auth0',
+        // You might want to assign a default role here
+        role: 1, // Assuming 1 is the default user role ID
+      };
+
+      const createUserResponse = await axios.post(
+        `${STRAPI_URL}/users`,
+        newUserData
+      );
+
+      // Fetch the created user with role populated
+      const userWithRole = await axios.get(
+        `${STRAPI_URL}/users/${createUserResponse.data.id}?populate=role`
+      );
+
+      return userWithRole.data;
+    } catch (error) {
+      console.error("Error getting/creating Strapi user:", error);
+      throw error;
+    }
+  };
+
   const isUserAdmin = (user) => {
     if (!user.role) return false;
     return adminRoles.some(
@@ -75,8 +168,14 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      await loginWithRedirect();
+      await loginWithRedirect({
+        authorizationParams: {
+          connection: 'google-oauth2', // Specify Google connection
+          prompt: 'login',
+        },
+      });
     } catch (error) {
+      console.error("Google login error:", error);
       notifications.show({
         title: "Error",
         message: "Google login failed",
@@ -139,11 +238,27 @@ export default function LoginPage() {
 
   const handleSubmit = (values) => {
     if (authMethod === "auth0") {
-      loginWithRedirect();
+      handleGoogleLogin();
     } else {
       handleStrapiLogin(values);
     }
   };
+
+  // Show loading state while Auth0 is processing
+  if (auth0Loading || isProcessingAuth0) {
+    return (
+      <div className="auth-page-container login-page-bg">
+        <Center style={{ height: '100vh' }}>
+          <div style={{ textAlign: 'center' }}>
+            <Loader size="lg" color="teal" />
+            <Text mt="md" c="dimmed">
+              {isProcessingAuth0 ? "Completing authentication..." : "Loading..."}
+            </Text>
+          </div>
+        </Center>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-page-container login-page-bg">
@@ -216,44 +331,28 @@ export default function LoginPage() {
               >
                 CONTINUE JOURNEY
               </Button>
-              <Divider
-                label="OR"
-                labelPosition="center"
-                my="lg"
-                style={{ borderTopColor: "rgba(255,255,255,0.3)" }}
-                className="login-divider"
-              />
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="login-google-motion">
-                <Button
-                  onClick={handleGoogleLogin}
-                  fullWidth
-                  size="md"
-                  variant="outline"
-                  color="black"
-                  leftSection={<IconBrandGoogle size={18} />}
-                  loading={isGoogleLoading}
-                  disabled={isRedirecting}
-                  className="login-google-btn"
-                  style={{
-                    fontWeight: 600,
-                    letterSpacing: 0.5,
-                    borderColor: "rgba(20, 19, 19, 0.5)",
-                  }}
-                >
-                  Continue with Google
-                </Button>
-              </motion.div>
             </form>
           ) : (
-            <Button
-              fullWidth
-              leftSection={<IconBrandGoogle size={18} />}
-              onClick={() => loginWithRedirect()}
-              loading={auth0Loading}
-              className="login-google-btn"
-            >
-              Continue with Google
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="login-google-motion">
+              <Button
+                onClick={handleGoogleLogin}
+                fullWidth
+                size="md"
+                variant="outline"
+                color="black"
+                leftSection={<IconBrandGoogle size={18} />}
+                loading={isGoogleLoading}
+                disabled={isRedirecting}
+                className="login-google-btn"
+                style={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  borderColor: "rgba(20, 19, 19, 0.5)",
+                }}
+              >
+                Continue with Google
+              </Button>
+            </motion.div>
           )}
           <Divider label="OR" labelPosition="center" my="lg" className="login-divider" />
           <Text ta="center" mt="md" className="login-signup-text">

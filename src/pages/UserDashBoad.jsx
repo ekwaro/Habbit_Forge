@@ -92,7 +92,7 @@ const UserDashBoard = () => {
       </AppShell.Main>
       <AppShell.Footer>
         <AppShellSection>
-          <Text>Footer content goes here.</Text>
+      
         </AppShellSection>
       </AppShell.Footer>
     </AppShell>
