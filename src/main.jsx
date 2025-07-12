@@ -82,7 +82,8 @@ function MainApp() {
             <Route path="terms-of-service" element={<TermsOfService />} />
           </Route>
           <Route path="/user-dashboard" element={<UserDashBoard />}>
-            <Route index element={<Profiles />} />
+            <Route index element={<Overview />} />
+            <Route path="profile" element={<Profiles />} />
             <Route path="habbits-management" element={<HabbitsManagement />} />
             <Route path="habbits-management/:id" element={<HabbitsItem />} />
             <Route path="goals-management" element={<GoalsManagement />} />
