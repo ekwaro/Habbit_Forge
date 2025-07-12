@@ -20,9 +20,9 @@ import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+// import CallbackPage from './pages/CallbackPage';
 import DashboardPage from "./pages/DashboardPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"; // 
-
 
 import AboutUsPage from "./pages1/AboutUsPage";
 import ContactUsPage from "./pages1/ContactUsPage";
@@ -37,20 +37,69 @@ import DashboardPage1 from './pages1/DashboardPage1';
 import TermsOfService from "./pages1/TermsOfService"; 
 import { useLocalStorage } from "@mantine/hooks";
 
+// Create a simple callback component to handle Auth0 redirects
+import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Loader, Center, Text } from "@mantine/core";
+
+// Callback component to handle Auth0 redirects
+function CallbackPage() {
+  const { handleRedirectCallback, isLoading, error } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleCallback = async () => {
+      try {
+        await handleRedirectCallback();
+        navigate("/login"); // Redirect back to login to process the authentication
+      } catch (error) {
+        console.error("Callback error:", error);
+        navigate("/login");
+      }
+    };
+
+    handleCallback();
+  }, [handleRedirectCallback, navigate]);
+
+  if (error) {
+    return (
+      <Center style={{ height: '100vh' }}>
+        <Text color="red">Authentication error: {error.message}</Text>
+      </Center>
+    );
+  }
+
+  return (
+    <Center style={{ height: '100vh' }}>
+      <div style={{ textAlign: 'center' }}>
+        <Loader size="lg" color="teal" />
+        <Text mt="md" c="dimmed">Processing authentication...</Text>
+      </div>
+    </Center>
+  );
+}
+
 const theme = {
   colorScheme: "light",
   primaryColor: "blue",
   fontFamily: "Arial, sans-serif",
   headings: { fontFamily: "Arial, sans-serif" },
 };
-
-// Auth0 configuration - Replace these with your actual Auth0 values
+const redirect_uri = window.location.origin + "/callback";
+console.log("[Auth0 Config] Redirect URI:", redirect_uri);
+// Auth0 configuration - Using environment variables
 const auth0Config = {
-  domain: "dev-z2vowf3m4m0hawqt.us.auth0.com", 
-  clientId: "5Uw4Fnn5EmdsVnSsCpTl3KLsyxF27LxJ",
+  domain: import.meta.env.VITE_AUTH0_DOMAIN,
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
   authorizationParams: {
-    redirect_uri: window.location.origin,
+    redirect_uri: redirect_uri, // Ensure this matches your Auth0 application settings
+    // IMPORTANT: Add /callback
+     
+    scope: "openid profile email", // Ensure we get user profile data
   },
+  cacheLocation: "localstorage", // Cache tokens in localStorage
+  useRefreshTokens: true, // Use refresh tokens for better UX
 };
 
 function MainApp() {
@@ -77,10 +126,15 @@ function MainApp() {
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
              <Route path="/forgot-password" element={<ForgotPasswordPage />} /> 
+             {/* <Route path="/callback" element={<CallbackPage />} /> */}
             <Route path="about" element={<AboutUsPage />} />
             <Route path="contact" element={<ContactUsPage />} />
             <Route path="terms-of-service" element={<TermsOfService />} />
           </Route>
+          
+          {/* Add the callback route - IMPORTANT */}
+          <Route path="/callback" element={<CallbackPage />} />
+          
           <Route path="/user-dashboard" element={<UserDashBoard />}>
             <Route index element={<Profiles />} />
             <Route path="habbits-management" element={<HabbitsManagement />} />
@@ -111,6 +165,8 @@ createRoot(document.getElementById("root")).render(
       domain={auth0Config.domain}
       clientId={auth0Config.clientId}
       authorizationParams={auth0Config.authorizationParams}
+      cacheLocation={auth0Config.cacheLocation}
+      useRefreshTokens={auth0Config.useRefreshTokens}
     >
       <MainApp />
     </Auth0Provider>
