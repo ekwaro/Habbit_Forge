@@ -33,11 +33,13 @@ useEffect(()=>{fetchGoals()},[fetchGoals]);
 
 const addGoal = async(goal)=>{
     console.log(goal)
+
+    const {partnerSearch, ...data} = goal
     try{
         const res = await fetch(`${Goals_Api}`, {
             method:'POST',
             headers,
-            body:JSON.stringify({data:{...goal, completed:false, subgoals:[], notes:[]}})
+            body:JSON.stringify({data:{...data, completed:false, subgoals:[], notes:[]}})
 
         })
 

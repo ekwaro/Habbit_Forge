@@ -37,7 +37,7 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
       startDate: "",
       endDate: "",
       partnerSearch: "",
-      partnerId: '',
+      accountabilityPartner: '',
       ...initialValues,
     },
     validate: {
@@ -57,7 +57,7 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
         return end < start ? "End date must be after start date" : null;
       },
       frequency: (value) => (!value ? "Frequency is required" : null),
-      partnerId: (value, values) => {
+      accountabilityPartner: (value, values) => {
         if (!value && !values.partnerSearch) {
           return "Please select an accountability partner";
         }
@@ -83,8 +83,9 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
      
     };
   
-    const {partnerSearch, id, partnerId,...dataToSend } = formatted;
+    const {partnerSearch, id,...dataToSend } = formatted;
   onSubmit(dataToSend)
+  form.reset()
  
 };
   return (
@@ -93,7 +94,9 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
       onClose={() => {
         form.reset();
         onClose();
+        initialValues={}
       }}
+      
       title={initialValues ? "Update Habit" : "Add New Habit"}
       size="lg"
     >
@@ -152,7 +155,7 @@ const HabbitForm = ({ initialValues = null, onSubmit, onClose, opened }) => {
               (u) => `${u.username} (${u.email})` === val
             );
             form.setFieldValue("partnerSearch", val);
-            form.setFieldValue("partnerId", selectedUser?.id);
+            form.setFieldValue("accountabilityPartner", selectedUser?.id);
           }}
           data={users?.map((u) => `${u.username} (${u.email})`)}
         />
