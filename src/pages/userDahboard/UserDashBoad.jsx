@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import {
   AppShell,
@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { Outlet, useNavigate } from "react-router-dom";
-import { IconUser, IconTarget, IconQuote, IconBulb, IconLogout, IconDashboard, IconMenu2, IconX } from '@tabler/icons-react';
+import { IconUser, IconTarget, IconQuote, IconBulb, IconLogout, IconDashboard, IconMenu2, IconX, IconCheck, IconCalendar, IconTrophy, IconBrain, IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 
 const UserDashBoard = () => {
   let user = JSON.parse(localStorage.getItem('currentUser'))
@@ -30,12 +30,33 @@ const UserDashBoard = () => {
   }
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
+  const [expandedItems, setExpandedItems] = useState(new Set());
 
   const handleNavigate = (path) => {
     navigate(path);
     // Only close sidebar on mobile devices for better UX
     if (isMobile) {
       toggle();
+    }
+  };
+
+  const toggleExpanded = (itemPath) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemPath)) {
+        newSet.delete(itemPath);
+      } else {
+        newSet.add(itemPath);
+      }
+      return newSet;
+    });
+  };
+
+  const handleItemClick = (item) => {
+    if (item.hasSubItems) {
+      toggleExpanded(item.path);
+    } else {
+      handleNavigate(item.path);
     }
   };
 
@@ -55,10 +76,49 @@ const UserDashBoard = () => {
   const navItems = [
     { path: "/user-dashboard", label: "Overview", icon: IconDashboard },
     { path: "/user-dashboard/profile", label: "Profile", icon: IconUser },
-    { path: "/user-dashboard/habbits-management", label: "Habits Management", icon: IconTarget },
-    { path: "/user-dashboard/goals-management", label: "Goals Management", icon: IconTarget },
-    { path: "/user-dashboard/motivational-quotes", label: "Motivational Quotes", icon: IconQuote },
-    { path: "/user-dashboard/tips", label: "Tips", icon: IconBulb },
+    { 
+      path: "/user-dashboard/manage-habits", 
+      label: "Manage Habits", 
+      icon: IconTarget,
+      hasSubItems: true,
+      subItems: [
+        { path: "/user-dashboard/habbits-management", label: "Create Habits", icon: IconTarget },
+        { path: "/user-dashboard/interactive-habits", label: "Interactive Habits", icon: IconCheck },
+        { path: "/user-dashboard/calendar-view", label: "Calendar View", icon: IconCalendar },
+      ]
+    },
+    { 
+      path: "/user-dashboard/manage-goals", 
+      label: "Manage Goals", 
+      icon: IconTarget,
+      hasSubItems: true,
+      subItems: [
+        { path: "/user-dashboard/goals-management", label: "Create Goals", icon: IconTarget },
+        { path: "/user-dashboard/goal-tracking", label: "Track Goals", icon: IconTarget },
+      ]
+    },
+    { path: "/user-dashboard/achievements", label: "Achievements", icon: IconTrophy },
+    { 
+      path: "/user-dashboard/motivation", 
+      label: "Motivation", 
+      icon: IconQuote,
+      hasSubItems: true,
+      subItems: [
+        { path: "/user-dashboard/motivational-quotes", label: "View Quotes", icon: IconQuote },
+        { path: "/user-dashboard/quote-resources", label: "Quotes Resources", icon: IconQuote },
+      ]
+    },
+    { 
+      path: "/user-dashboard/habit-tips", 
+      label: "Habit Tips", 
+      icon: IconBulb,
+      hasSubItems: true,
+      subItems: [
+        { path: "/user-dashboard/tips", label: "View Tips", icon: IconBulb },
+        { path: "/user-dashboard/tips-resources", label: "Tips Resources", icon: IconBulb },
+      ]
+    },
+    { path: "/user-dashboard/insights", label: "Insights", icon: IconBrain },
   ];
 
   return (
@@ -179,82 +239,104 @@ const UserDashBoard = () => {
         }} />
         
         <AppShell.Section pr={24} pl={24} pt={24} pb={24}>
-          {/* Sidebar Header */}
-          <Box mb={32} style={{ textAlign: 'center' }}>
-            <div style={{
-              width: 60,
-              height: 60,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #ff922b 0%, #ffa726 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 12px',
-              boxShadow: '0 4px 16px rgba(255,146,43,0.25)',
-              border: '3px solid #fff'
-            }}>
-              <IconDashboard size={28} color="#fff" />
-            </div>
-            <Text size="sm" fw={600} style={{ color: '#ff922b', textTransform: 'uppercase', letterSpacing: 1 }}>
-              Navigation
-            </Text>
-          </Box>
-
-          <ScrollArea style={{ height: "calc(100vh - 200px)" }} mx="auto" type="hover">
+          <ScrollArea style={{ height: "calc(100vh - 120px)" }} mx="auto" type="hover">
             <Stack spacing={8}>
-              {navItems.map((item, index) => (
-                <Button
-                  key={item.path}
-                  variant={index === 0 ? "filled" : "light"}
-                  fullWidth
-                  size="lg"
-                  onClick={() => handleNavigate(item.path)}
-                  leftSection={<item.icon size={20} />}
-                  style={{
-                    fontWeight: 600,
-                    borderRadius: 12,
-                    padding: '12px 16px',
-                    height: 'auto',
-                    minHeight: 48,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: index === 0 
-                      ? 'linear-gradient(135deg, #ff922b 0%, #ffa726 100%)' 
-                      : 'rgba(255,255,255,0.8)',
-                    color: index === 0 ? '#fff' : '#333',
-                    border: index === 0 
-                      ? 'none' 
-                      : '1px solid rgba(255,146,43,0.15)',
-                    boxShadow: index === 0 
-                      ? '0 4px 16px rgba(255,146,43,0.3)' 
-                      : '0 2px 8px rgba(255,146,43,0.08)',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: index === 0 
-                        ? '0 8px 24px rgba(255,146,43,0.4)' 
-                        : '0 4px 16px rgba(255,146,43,0.15)',
-                      background: index === 0 
-                        ? 'linear-gradient(135deg, #ff8a00 0%, #ff9800 100%)' 
-                        : 'rgba(255,146,43,0.1)',
-                    }
-                  }}
-                >
-                  <div style={{ textAlign: 'left', width: '100%' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600 }}>
-                      {item.label}
-                    </div>
-                    {index === 0 && (
-                      <div style={{ 
-                        fontSize: '11px', 
-                        opacity: 0.9, 
-                        marginTop: '2px',
-                        fontWeight: 400 
-                      }}>
-                        Dashboard Home
+              {navItems.map((item, index) => {
+                const isExpanded = expandedItems.has(item.path);
+                const isMainItem = index === 0;
+                
+                return (
+                  <div key={item.path}>
+                    <Button
+                      variant={isMainItem ? "filled" : "light"}
+                      fullWidth
+                      size="lg"
+                      onClick={() => handleItemClick(item)}
+                      leftSection={<item.icon size={20} />}
+                      rightSection={item.hasSubItems && (
+                        isExpanded ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />
+                      )}
+                      style={{
+                        fontWeight: 600,
+                        borderRadius: 12,
+                        padding: '12px 16px',
+                        height: 'auto',
+                        minHeight: 48,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        background: isMainItem 
+                          ? 'linear-gradient(135deg, #ff922b 0%, #ffa726 100%)' 
+                          : 'rgba(255,255,255,0.8)',
+                        color: isMainItem ? '#fff' : '#333',
+                        border: isMainItem 
+                          ? 'none' 
+                          : '1px solid rgba(255,146,43,0.15)',
+                        boxShadow: isMainItem 
+                          ? '0 4px 16px rgba(255,146,43,0.3)' 
+                          : '0 2px 8px rgba(255,146,43,0.08)',
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: isMainItem 
+                            ? '0 8px 24px rgba(255,146,43,0.4)' 
+                            : '0 4px 16px rgba(255,146,43,0.15)',
+                          background: isMainItem 
+                            ? 'linear-gradient(135deg, #ff8a00 0%, #ff9800 100%)' 
+                            : 'rgba(255,146,43,0.1)',
+                        }
+                      }}
+                    >
+                      <div style={{ textAlign: 'left', width: '100%' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 600 }}>
+                          {item.label}
+                        </div>
+                        {isMainItem && (
+                          <div style={{ 
+                            fontSize: '11px', 
+                            opacity: 0.9, 
+                            marginTop: '2px',
+                            fontWeight: 400 
+                          }}>
+                            Dashboard Home
+                          </div>
+                        )}
                       </div>
+                    </Button>
+                    
+                    {/* Render sub-items if expanded */}
+                    {item.hasSubItems && isExpanded && (
+                      <Stack spacing={4} ml={16} mt={4}>
+                        {item.subItems.map((subItem) => (
+                          <Button
+                            key={subItem.path}
+                            variant="light"
+                            fullWidth
+                            size="md"
+                            onClick={() => handleNavigate(subItem.path)}
+                            leftSection={<subItem.icon size={18} />}
+                            style={{
+                              fontWeight: 500,
+                              borderRadius: 8,
+                              padding: '8px 12px',
+                              height: 'auto',
+                              minHeight: 40,
+                              transition: 'all 0.2s ease',
+                              background: 'rgba(255,146,43,0.05)',
+                              color: '#666',
+                              border: '1px solid rgba(255,146,43,0.1)',
+                              fontSize: '13px',
+                              '&:hover': {
+                                background: 'rgba(255,146,43,0.1)',
+                                transform: 'translateX(2px)',
+                              }
+                            }}
+                          >
+                            {subItem.label}
+                          </Button>
+                        ))}
+                      </Stack>
                     )}
                   </div>
-                </Button>
-              ))}
+                );
+              })}
             </Stack>
           </ScrollArea>
 

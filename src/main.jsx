@@ -14,8 +14,14 @@ import MotivationalQuotes from "./components/userDashboard/quotes/MotivationalQu
 import Tips from "./components/userDashboard/tips/Tips.jsx";
 //import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./components/userDashboard/Overview.jsx";
+import EnhancedOverview from "./components/userDashboard/EnhancedOverview.jsx";
 import Profiles from "./components/userDashboard/UserProfile.jsx";
 import { HabbitsItem } from "./components/userDashboard/habits/HabbitsList.jsx";
+import InteractiveHabits from "./components/userDashboard/InteractiveHabits.jsx";
+import CalendarView from "./components/userDashboard/CalendarView.jsx";
+import Achievements from "./components/userDashboard/Achievements.jsx";
+import GoalTracking from "./components/userDashboard/GoalTracking.jsx";
+import Insights from "./components/userDashboard/Insights.jsx";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -131,18 +137,25 @@ function MainApp() {
             <Route path="contact" element={<ContactUsPage />} />
             <Route path="terms-of-service" element={<TermsOfService />} />
           </Route>
-          
-          {/* Add the callback route - IMPORTANT */}
-          <Route path="/callback" element={<CallbackPage />} />
-          
-          <Route path="/user-dashboard" element={<UserDashBoard />}>
-            <Route index element={<Overview />} />
+          <Route path="/user-dashboard/*" element={<UserDashBoard />}>
+            <Route index element={<EnhancedOverview />} />
             <Route path="profile" element={<Profiles />} />
+            <Route path="manage-habits" element={<HabbitsManagement />} />
             <Route path="habbits-management" element={<HabbitsManagement />} />
             <Route path="habbits-management/:id" element={<HabbitsItem />} />
+            <Route path="interactive-habits" element={<InteractiveHabits />} />
+            <Route path="calendar-view" element={<CalendarView />} />
+            <Route path="manage-goals" element={<GoalsManagement />} />
             <Route path="goals-management" element={<GoalsManagement />} />
+            <Route path="goal-tracking" element={<GoalTracking />} />
+            <Route path="achievements" element={<Achievements />} />
+            <Route path="motivation" element={<MotivationalQuotes />} />
             <Route path="motivational-quotes" element={<MotivationalQuotes />} />
+            <Route path="quote-resources" element={<MotivationalQuotes />} />
+            <Route path="habit-tips" element={<Tips />} />
             <Route path="tips" element={<Tips />} />
+            <Route path="tips-resources" element={<Tips />} />
+            <Route path="insights" element={<Insights />} />
           </Route>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage1 />} />

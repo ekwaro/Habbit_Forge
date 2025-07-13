@@ -280,8 +280,7 @@ return{
     markGoalsAsComplete,
     removeGoals,
     deleteSubgoals,
-    deleteGoal,
-    deleteNotes
+    deleteGoal
 }
   
 
