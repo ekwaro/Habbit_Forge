@@ -33,6 +33,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage"; //
 import AboutUsPage from "./pages1/AboutUsPage";
 import ContactUsPage from "./pages1/ContactUsPage";
 import QuoteResourcesPage from './pages1/QuoteResourcesPage.jsx';
+import TipResourcesPage from './pages1/TipResourcesPage.jsx';
 
 import AdminLayout from './components1/AdminLayout';
 import AdminProfilePage from './pages1/AdminProfilePage';
@@ -155,7 +156,7 @@ function MainApp() {
             <Route path="quote-resource" element={<QuoteResourcesPage />} />
             <Route path="habit-tips" element={<Tips />} />
             <Route path="tips" element={<Tips />} />
-            <Route path="tip-resources" element={<Tips />} />
+            <Route path="tip-resources" element={<TipResourcesPage />} />
             <Route path="insights" element={<Insights />} />
           </Route>
           <Route path="/admin" element={<AdminLayout />}>
