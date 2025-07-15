@@ -14,6 +14,7 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
+import { IconBulb, IconDashboard, IconUser, IconTarget, IconCheck, IconCalendar, IconTrophy, IconQuote, IconBrain, IconX, IconMenu2 } from '@tabler/icons-react';
 import { useMediaQuery } from "@mantine/hooks";
 import { Outlet, useNavigate } from "react-router-dom";
 const UserDashBoard = () => {
