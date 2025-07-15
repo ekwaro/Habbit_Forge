@@ -34,7 +34,7 @@ import { keyframes } from '@emotion/react';
 
 // Define your Strapi API URLs
 const STRAPI_TIPS_API_URL = 'http://localhost:1337/api/habit-tips';
-const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/habit-resources';
+const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/tip-resources';
 
 // Animated background keyframes
 const animatedBackground = keyframes`
