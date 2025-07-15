@@ -8,8 +8,12 @@ import {
   Stack,
   Button,
   Group,
+  Box,
+  Image,
+  Card
 } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
+import freshStartImg from '../../../assets/fresh-start.jpg';
 
 const MotivationalQuotes = () => {
   const [quotes, setQuote] = useState([]);
@@ -23,11 +27,9 @@ const MotivationalQuotes = () => {
         "http://localhost:1337/api/quotes?populate=*"
       );
       const data = await response.json();
-      console.log(data);
       setQuote(data.data);
       setQuoteIndex(0);
     } catch (error) {
-      console.error("Failed to fetch quote:", error);
       setQuote(null);
     } finally {
       setLoading(false);
@@ -46,6 +48,7 @@ const MotivationalQuotes = () => {
   const displayPreviousQuote = () => {
     setQuoteIndex((prev) => (prev - 1 < 0 ? quotes.length - 1 : prev - 1));
   };
+
   if (loading) {
     return (
       <Center mt="md">
@@ -67,35 +70,41 @@ const MotivationalQuotes = () => {
   const current = quotes[quoteIndex];
 
   return (
-    <Paper shadow="md" p="lg" radius="md" withBorder mt="md">
-      <Stack spacing="sm">
-        <Text size="lg" italic>
-          “{current?.text}”
-        </Text>
-        <Text size="sm" align="right" c="dimmed">
-          — {current?.author || "Unknown"}
-        </Text>
-
-        <Group position="apart">
-          <Button size="xs" variant="light" onClick={displayPreviousQuote}>
-            Previous
-          </Button>
-
-          <Button size="xs" variant="light" onClick={displayNextQuote}>
-            Next Quote
-          </Button>
-
-          <Button
-            size="xs"
-            variant="light"
-            onClick={fetchQuote}
-            leftSection={<IconRefresh size={14} />}
-          >
-            Refresh All
-          </Button>
-        </Group>
-      </Stack>
-    </Paper>
+    <Box style={{ display: 'flex', gap: 48, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'space-between', maxWidth: 1100, margin: '40px auto' }}>
+      {/* Left: Quote Card */}
+      <Box style={{ flex: 1, minWidth: 0 }}>
+        <Paper shadow="md" p="xl" radius="lg" withBorder mt="md" style={{ minWidth: 340, fontSize: '1.15rem' }}>
+          <Stack spacing="sm">
+            <Text size="lg" italic>
+              “{current?.text}”
+            </Text>
+            <Text size="sm" align="right" c="dimmed">
+              — {current?.author || "Unknown"}
+            </Text>
+            <Group position="apart">
+              <Button size="xs" variant="light" onClick={displayPreviousQuote}>
+                Previous
+              </Button>
+              <Button size="xs" variant="light" onClick={displayNextQuote}>
+                Next Quote
+              </Button>
+              <Button
+                size="xs"
+                variant="light"
+                onClick={fetchQuote}
+                leftSection={<IconRefresh size={14} />}
+              >
+                Refresh All
+              </Button>
+            </Group>
+          </Stack>
+        </Paper>
+      </Box>
+      {/* Right: Large Image Card */}
+      <Card shadow="xl" p={0} radius={24} style={{ minWidth: 320, maxWidth: 400, flex: '0 0 370px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(120deg, #fffaf3 0%, #ffe5c0 100%)', border: '2.5px solid #ffe0b2', boxShadow: '0 8px 32px 0 rgba(255,146,43,0.15)' }}>
+        <Image src={freshStartImg} alt="Fresh Start" radius={24} fit="cover" w={350} h={350} style={{ objectFit: 'cover', borderRadius: 24 }} />
+      </Card>
+    </Box>
   );
 };
 
