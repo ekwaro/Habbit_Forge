@@ -24,7 +24,7 @@ const UserDashBoard = () => {
 
   const handleLogout=()=>{
     localStorage.removeItem('currentUser')
-    navigate('/login')
+    navigate('/')
   }
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
