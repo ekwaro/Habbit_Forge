@@ -36,9 +36,27 @@ const useTip=()=>{
         }
     ]
 
+<<<<<<< HEAD
     const fetchTip=async()=>{
         setLoading(true)
         setError('')
+=======
+    try{
+        const res = await fetch("http://localhost:1337/api/tips",{
+            method:'GET',
+            headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('authToken')}`}
+        })
+        if(!res.ok)throw new Error('Failed to fetch Tip')
+        const data = await res.json()
+        setTips(data.data)
+    }
+    catch(err){
+        setError('Could not fetch tip, please try again')
+    }
+    finally{
+        setLoading(false)
+    }
+>>>>>>> 6fc339b (add notifications)
 
         try{
             const res = await fetch("http://localhost:1337/api/habit-tips")

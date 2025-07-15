@@ -39,7 +39,7 @@ const addGoal = async(goal)=>{
         const res = await fetch(`${Goals_Api}`, {
             method:'POST',
             headers,
-            body:JSON.stringify({data:{...data, completed:false, subgoals:[], notes:[]}})
+            body:JSON.stringify({data:{...data, completed:false, subgoals:[], notes:[] ,owner:JSON.parse(localStorage.getItem('currentUser')).id,}})
 
         })
 

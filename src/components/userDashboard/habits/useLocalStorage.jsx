@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import dayjs from "dayjs";
-const API_URL = "http://localhost:1337/api/habits";
-const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN;
+const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+const API_URL = `http://localhost:1337/api/habits?filters[owner][id][$eq]=${currentUser.id}&populate=*`;
+const authToken = localStorage.getItem('authToken');
+const API_URL_HABBIT = `http://localhost:1337/api/habits?populate=*`
 
-const useStrapiHabits = (token) => {
+
+const useStrapiHabits = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,6 +17,7 @@ const useStrapiHabits = (token) => {
 
   // Fetch habits
   const fetchHabits = useCallback(async () => {
+   
     setLoading(true);
     try {
       const res = await fetch(API_URL, { headers });
@@ -44,12 +48,14 @@ const useStrapiHabits = (token) => {
   // Add habit
   const addItem = async (item) => {
     console.log(JSON.parse(localStorage.getItem("currentUser")));
+
     console.log(item);
+  
     try {
       await fetch(API_URL, {
         method: "POST",
         headers,
-        body: JSON.stringify({ data: item }),
+        body: JSON.stringify({ data: item}),
       });
       await fetchHabits();
     } catch (error) {
@@ -67,17 +73,26 @@ const useStrapiHabits = (token) => {
       frequency: updatedData.frequency,
       startDate: updatedData.startDate,
       endDate: updatedData.endDate,
+<<<<<<< HEAD
 
       completedDates: updatedData.completedDates || [],
 
       //partnerId:updatedData.partnerId
+=======
+      completedDates: [],      
+      accountabilityPartner:updatedData.accountabilityPartner,
+
+>>>>>>> 6fc339b (add notifications)
     };
     try {
-      await fetch(`${API_URL}/${id}`, {
+      const res= await fetch(`${API_URL_HABBIT}/${id}`, {
         method: "PUT",
         headers,
         body: JSON.stringify({ data: formateddata }),
       });
+      if(!res.ok){
+        console.log(res.error)
+      }
       await fetchHabits();
     } catch (error) {
       console.error("Error updating habit", error);
@@ -86,11 +101,16 @@ const useStrapiHabits = (token) => {
 
   const removeItem = async (id) => {
     console.log("executed");
-    console.log(`${API_URL}/${id}`);
+    console.log(`${API_URL_HABBIT}/${id}`);
     console.log(headers);
     try {
+<<<<<<< HEAD
       await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+=======
+      await fetch(`${API_URL_HABBIT}/${id}`, {
+        method: "GET",
+>>>>>>> 6fc339b (add notifications)
         headers,
       });
       await fetchHabits();

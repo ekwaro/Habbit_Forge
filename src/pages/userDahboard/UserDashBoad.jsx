@@ -16,8 +16,6 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { Outlet, useNavigate } from "react-router-dom";
-import { IconUser, IconTarget, IconQuote, IconBulb, IconLogout, IconDashboard, IconMenu2, IconX, IconCheck, IconCalendar, IconTrophy, IconBrain, IconChevronDown, IconChevronRight } from '@tabler/icons-react';
-
 const UserDashBoard = () => {
   let user = JSON.parse(localStorage.getItem('currentUser'))
 
@@ -196,148 +194,61 @@ const UserDashBoard = () => {
               alt={user?.name}
               style={{ border: '2px solid #fff', boxShadow: '0 2px 4px rgba(255,146,43,0.2)' }}
             />
-            <Text size='sm' fw={600} style={{ color: '#222' }}>{user?.name}</Text>
-            <Button 
-              variant='light' 
-              size='xs' 
-              onClick={handleLogout}
-              style={{ 
-                background: '#fff3e0', 
-                color: '#ff922b', 
-                fontWeight: 700,
-                border: '1px solid #ffd180'
-              }}
-              leftSection={<IconLogout size={14} />}
-            >
-              Logout
-            </Button>
+            <Text size='sm' fw={500}>{user?.username}</Text>
+            <Button variant='light' c='red' size='xs' onClick={handleLogout}>Logout</Button>
+
+         
+
           </Group>
         </Group>
       </AppShell.Header>
-
-      <AppShell.Navbar 
-        width={{ base: 280 }} 
-        collapsed={{ mobile: !opened }}
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,248,240,0.95) 100%)',
-          backdropFilter: 'blur(12px)',
-          borderRight: '2px solid #ffd180',
-          boxShadow: '4px 0 16px rgba(255,146,43,0.12)',
-          overflow: 'hidden',
-          zIndex: 100
-        }}
-      >
-        {/* Decorative background elements */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '100%',
-          background: 'radial-gradient(circle at 20% 80%, rgba(255,146,43,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,193,7,0.03) 0%, transparent 50%)',
-          pointerEvents: 'none'
-        }} />
-        
-        <AppShell.Section pr={24} pl={24} pt={24} pb={24}>
-          <ScrollArea style={{ height: "calc(100vh - 120px)" }} mx="auto" type="hover">
-            <Stack spacing={8}>
-              {navItems.map((item, index) => {
-                const isExpanded = expandedItems.has(item.path);
-                const isMainItem = index === 0;
-                
-                return (
-                  <div key={item.path}>
-                    <Button
-                      variant={isMainItem ? "filled" : "light"}
-                      fullWidth
-                      size="lg"
-                      onClick={() => handleItemClick(item)}
-                      leftSection={<item.icon size={20} />}
-                      rightSection={item.hasSubItems && (
-                        isExpanded ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />
-                      )}
-                      style={{
-                        fontWeight: 600,
-                        borderRadius: 12,
-                        padding: '12px 16px',
-                        height: 'auto',
-                        minHeight: 48,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        background: isMainItem 
-                          ? 'linear-gradient(135deg, #ff922b 0%, #ffa726 100%)' 
-                          : 'rgba(255,255,255,0.8)',
-                        color: isMainItem ? '#fff' : '#333',
-                        border: isMainItem 
-                          ? 'none' 
-                          : '1px solid rgba(255,146,43,0.15)',
-                        boxShadow: isMainItem 
-                          ? '0 4px 16px rgba(255,146,43,0.3)' 
-                          : '0 2px 8px rgba(255,146,43,0.08)',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: isMainItem 
-                            ? '0 8px 24px rgba(255,146,43,0.4)' 
-                            : '0 4px 16px rgba(255,146,43,0.15)',
-                          background: isMainItem 
-                            ? 'linear-gradient(135deg, #ff8a00 0%, #ff9800 100%)' 
-                            : 'rgba(255,146,43,0.1)',
-                        }
-                      }}
-                    >
-                      <div style={{ textAlign: 'left', width: '100%' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 600 }}>
-                          {item.label}
-                        </div>
-                        {isMainItem && (
-                          <div style={{ 
-                            fontSize: '11px', 
-                            opacity: 0.9, 
-                            marginTop: '2px',
-                            fontWeight: 400 
-                          }}>
-                            Dashboard Home
-                          </div>
-                        )}
-                      </div>
-                    </Button>
-                    
-                    {/* Render sub-items if expanded */}
-                    {item.hasSubItems && isExpanded && (
-                      <Stack spacing={4} ml={16} mt={4}>
-                        {item.subItems.map((subItem) => (
-                          <Button
-                            key={subItem.path}
-                            variant="light"
-                            fullWidth
-                            size="md"
-                            onClick={() => handleNavigate(subItem.path)}
-                            leftSection={<subItem.icon size={18} />}
-                            style={{
-                              fontWeight: 500,
-                              borderRadius: 8,
-                              padding: '8px 12px',
-                              height: 'auto',
-                              minHeight: 40,
-                              transition: 'all 0.2s ease',
-                              background: 'rgba(255,146,43,0.05)',
-                              color: '#666',
-                              border: '1px solid rgba(255,146,43,0.1)',
-                              fontSize: '13px',
-                              '&:hover': {
-                                background: 'rgba(255,146,43,0.1)',
-                                transform: 'translateX(2px)',
-                              }
-                            }}
-                          >
-                            {subItem.label}
-                          </Button>
-                        ))}
-                      </Stack>
-                    )}
-                  </div>
-                );
-              })}
-            </Stack>
+      <AppShell.Navbar width={{ base: 250 }} hidden={!opened}>
+        <AppShell.Section pr={20} mt={20}>
+          <ScrollArea style={{ height: "100%" }} mx="auto">
+            <Button
+              variant="gradient"
+              fullWidth
+              m="md"
+              onClick={() => handleNavigate("/user-dashboard/profile")}
+            >
+              Profile
+            </Button>
+            <Button
+              fullWidth
+              variant="gradient"
+              m="md"
+              onClick={() =>
+                handleNavigate("/user-dashboard/habbits-management")
+              }
+            >
+              Habbits Management
+            </Button>
+            <Button
+              fullWidth
+              variant="gradient"
+              m="md"
+              onClick={() => handleNavigate("/user-dashboard/goals-management")}
+            >
+              Goals Management
+            </Button>
+            <Button
+              fullWidth
+              variant="gradient"
+              m="md"
+              onClick={() =>
+                handleNavigate("/user-dashboard/motivational-quotes")
+              }
+            >
+              Motivational quotes
+            </Button>
+            <Button
+              fullWidth
+              variant="gradient"
+              m="md"
+              onClick={() => handleNavigate("/user-dashboard/tips")}
+            >
+              Tips
+            </Button>
           </ScrollArea>
 
           {/* Sidebar Footer */}

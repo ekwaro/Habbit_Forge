@@ -1,7 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Notifications } from "@mantine/notifications";
 import "./index.css";
 import "@mantine/core/styles.css";
+import '@mantine/notifications/styles.css';
 import App from "./App.jsx";
 import { MantineProvider } from "@mantine/core";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -44,6 +46,7 @@ import DashboardPage1 from './pages1/DashboardPage1';
 import TermsOfService from "./pages1/TermsOfService"; 
 import { useLocalStorage } from "@mantine/hooks";
 
+<<<<<<< HEAD
 // Create a simple callback component to handle Auth0 redirects
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect } from "react";
@@ -87,6 +90,9 @@ function CallbackPage() {
   );
 }
 
+=======
+import PartnerActionsManagement from './components/userDashboard/feedback/PartnerActionsManagement'
+>>>>>>> 6fc339b (add notifications)
 const theme = {
   colorScheme: "light",
   primaryColor: "blue",
@@ -126,6 +132,7 @@ function MainApp() {
 
   return (
     <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
+      <Notifications />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App colorScheme={colorScheme} toggleColorScheme={toggleColorScheme} />}>
@@ -155,8 +162,12 @@ function MainApp() {
             <Route path="quote-resource" element={<QuoteResourcesPage />} />
             <Route path="habit-tips" element={<Tips />} />
             <Route path="tips" element={<Tips />} />
+<<<<<<< HEAD
             <Route path="tip-resources" element={<Tips />} />
             <Route path="insights" element={<Insights />} />
+=======
+            <Route path='partneractions' element={<PartnerActionsManagement />}/>
+>>>>>>> 6fc339b (add notifications)
           </Route>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage1 />} />
