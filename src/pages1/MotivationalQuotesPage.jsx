@@ -35,7 +35,7 @@ import QuoteResources from '../components/userDashboard/quotes/QuoteResources.js
 
 // Define your Strapi API URLs
 const STRAPI_QUOTES_API_URL = 'http://localhost:1337/api/motivational-quotes';
-const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/quote-resource';
+const STRAPI_RESOURCES_API_URL = 'http://localhost:1337/api/quote-resources';
 
 // Animated background keyframes
 const animatedBackground = keyframes`
