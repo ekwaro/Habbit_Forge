@@ -105,7 +105,7 @@ const UserDashBoard = () => {
       hasSubItems: true,
       subItems: [
         { path: "/user-dashboard/motivational-quotes", label: "View Quotes", icon: IconQuote },
-        { path: "/user-dashboard/quote-resources", label: "Quotes Resources", icon: IconQuote },
+        { path: "/user-dashboard/quote-resource", label: "Quotes Resources", icon: IconQuote },
       ]
     },
     { 
@@ -115,7 +115,7 @@ const UserDashBoard = () => {
       hasSubItems: true,
       subItems: [
         { path: "/user-dashboard/tips", label: "View Tips", icon: IconBulb },
-        { path: "/user-dashboard/tips-resources", label: "Tips Resources", icon: IconBulb },
+        { path: "/user-dashboard/tip-resources", label: "Tip Resources", icon: IconBulb },
       ]
     },
     { path: "/user-dashboard/insights", label: "Insights", icon: IconBrain },

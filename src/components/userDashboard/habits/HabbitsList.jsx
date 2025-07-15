@@ -29,6 +29,7 @@ import {
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
 import { IconArrowLeft } from "@tabler/icons-react";
+import QuoteResources from '../quotes/QuoteResources.jsx';
 const HabbitsList = ({
   list,
   removeItem,
@@ -288,9 +289,6 @@ const DailyHabitView = ({ list, removeItem, updateItem, toggleHabbitCompletion ,
     return filtered;
   };
 
-
-    .filter((habit) => isTodayMatchingFrequency(habit))
-    .filter((habit) => isTodayInRange(habit.startDate, habit.endDate));
 
   const todaysHabits = useMemo(() => getTodaysHabit(list), [list]);
   if (loading){
