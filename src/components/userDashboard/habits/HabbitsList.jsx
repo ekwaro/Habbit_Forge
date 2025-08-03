@@ -29,7 +29,12 @@ import {
 import { buildChartData } from "./utils/LineChart";
 import { useMemo } from "react";
 import { IconArrowLeft } from "@tabler/icons-react";
+<<<<<<< HEAD
 import QuoteResources from '../quotes/QuoteResources.jsx';
+=======
+import { PartnerChatBox, PartnerInfoCard } from "../feedback/Feedback";
+import FeedbackList from "../feedback/FeedBackList";
+>>>>>>> 6fc339b (add notifications)
 const HabbitsList = ({
   list,
   removeItem,
@@ -125,6 +130,7 @@ const HabbitsItem = () => {
   const { id } = useParams();
   console.log(typeof (id))
   const navigate = useNavigate();
+  const currentUser =JSON.parse(localStorage.getItem('currentUser'))
   const authToken = import.meta.env.VITE_STRAPI_AUTH_TOKEN;
 
   const { list, loading } = useStrapiHabits(authToken);
@@ -165,6 +171,7 @@ const HabbitsItem = () => {
           </Text>
 
           <Divider my="xs" />
+         <PartnerInfoCard partner={habit.accountabilityPartner}/>
 
           <Text size="sm" c="gray">
             <strong>Start Date:</strong>{" "}
@@ -211,6 +218,11 @@ const HabbitsItem = () => {
           </Card>
         </Group>
       )}
+
+      <FeedbackList habitId={habit.id}/>
+      <PartnerChatBox  currentUser={currentUser}
+              partner={habit.accountabilityPartner}
+              habitId={habit.id} />
 
       <Button
         onClick={() => navigate(-1)}
