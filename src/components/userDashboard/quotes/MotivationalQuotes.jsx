@@ -9,11 +9,14 @@ import {
   Button,
   Group,
   Box,
-  Divider,
-  Alert,
+
+  Image,
+  Card
 } from "@mantine/core";
-import { IconRefresh, IconAlertCircle } from "@tabler/icons-react";
-import { QuoteList, ResourceList } from "./QuotesList";
+import { IconRefresh } from "@tabler/icons-react";
+import freshStartImg from '../../../assets/fresh-start.jpg';
+
+
 
 const MotivationalQuotes = () => {
   const [quotes, setQuotes] = useState([]);
@@ -28,26 +31,16 @@ const MotivationalQuotes = () => {
   const fetchQuote = async () => {
     try {
       setLoading(true);
-      setError(null);
-      const res = await fetch(`${API_URL}/api/quotes?populate=*`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch quotes. Check permissions or token.");
-      }
-
-      const data = await res.json();
-      setQuotes(data.data);
+      const response = await fetch(
+        "http://localhost:1337/api/quotes?populate=*"
+      );
+      const data = await response.json();
+      setQuote(data.data);
       setQuoteIndex(0);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-      setQuotes([]);
+    } catch (error) {
+      setQuote(null);
+
     } finally {
       setLoading(false);
     }
@@ -88,71 +81,64 @@ const MotivationalQuotes = () => {
     setQuoteIndex((prev) => (prev - 1 < 0 ? quotes.length - 1 : prev - 1));
   };
 
-  const currentQuote = quotes[quoteIndex];
-  console.log(currentQuote)
+  if (loading) {
+    return (
+      <Center mt="md">
+        <Loader color="teal" />
+      </Center>
+    );
+  }
+
+  if (!quotes || quotes.length === 0) {
+    return (
+      <Center mt="md">
+        <Text color="red">No quotes available.</Text>
+        <Button onClick={fetchQuote} mt="sm">
+          Try Again
+        </Button>
+      </Center>
+    );
+  }
+  const current = quotes[quoteIndex];
 
   return (
-    <Paper shadow="md" p="lg" radius="lg" withBorder mt="xl">
-      <Title order={2} mb="md" align='center'>
-        Daily Motivation
-      </Title>
+    <Box style={{ display: 'flex', gap: 48, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'space-between', maxWidth: 1100, margin: '40px auto' }}>
+      {/* Left: Quote Card */}
+      <Box style={{ flex: 1, minWidth: 0 }}>
+        <Paper shadow="md" p="xl" radius="lg" withBorder mt="md" style={{ minWidth: 340, fontSize: '1.15rem' }}>
+          <Stack spacing="sm">
+            <Text size="lg" italic>
+              “{current?.text}”
+            </Text>
+            <Text size="sm" align="right" c="dimmed">
+              — {current?.author || "Unknown"}
+            </Text>
+            <Group position="apart">
+              <Button size="xs" variant="light" onClick={displayPreviousQuote}>
+                Previous
+              </Button>
+              <Button size="xs" variant="light" onClick={displayNextQuote}>
+                Next Quote
+              </Button>
+              <Button
+                size="xs"
+                variant="light"
+                onClick={fetchQuote}
+                leftSection={<IconRefresh size={14} />}
+              >
+                Refresh All
+              </Button>
+            </Group>
+          </Stack>
+        </Paper>
+      </Box>
+      {/* Right: Large Image Card */}
+      <Card shadow="xl" p={0} radius={24} style={{ minWidth: 320, maxWidth: 400, flex: '0 0 370px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(120deg, #fffaf3 0%, #ffe5c0 100%)', border: '2.5px solid #ffe0b2', boxShadow: '0 8px 32px 0 rgba(255,146,43,0.15)' }}>
+        <Image src={freshStartImg} alt="Fresh Start" radius={24} fit="cover" w={350} h={350} style={{ objectFit: 'cover', borderRadius: 24 }} />
+      </Card>
+    </Box>
 
-      {loading ? (
-        <Center>
-          <Loader color="teal" />
-        </Center>
-      ) : error ? (
-        <Alert
-          icon={<IconAlertCircle size={18} />}
-          title="Error!"
-          color="red"
-          mb="md"
-        >
-          {error}
-          <Button mt="sm" onClick={fetchQuote}>
-            Retry
-          </Button>
-        </Alert>
-      ) : quotes.length === 0 ? (
-        <Text color="dimmed" align="center">
-          No quotes available.
-        </Text>
-      ) : (
-        <Box>
-          <QuoteCard quote={currentQuote} />
 
-          <Group mt="sm" justify='space-evenly'>
-            <Button variant="light" size="xs" onClick={displayPreviousQuote}>
-              Previous
-            </Button>
-            
-            <Button
-              variant="light"
-              size="xs"
-              onClick={fetchQuote}
-              leftSection={<IconRefresh size={16} />}
-            >
-              Refresh
-            </Button>
-            <Button variant="light" size="xs" onClick={displayNextQuote}>
-              Next
-            </Button>
-          </Group>
-        </Box>
-      )}
-
-      <Divider my="xl" label='admin picks' c='dimmed'/>
-
-      <Section title="">
-        <QuoteList quotes={adminQuotes} />
-      </Section>
-
-      <Divider m='lg' label='more helpfull resources'/>
-
-      <Section title="">
-        <ResourceList resources={resources} />
-      </Section>
-    </Paper>
   );
 };
 

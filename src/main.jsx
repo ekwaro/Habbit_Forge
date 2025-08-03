@@ -35,6 +35,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage"; //
 import AboutUsPage from "./pages1/AboutUsPage";
 import ContactUsPage from "./pages1/ContactUsPage";
 import QuoteResourcesPage from './pages1/QuoteResourcesPage.jsx';
+import TipResourcesPage from './pages1/TipResourcesPage.jsx';
 
 import AdminLayout from './components1/AdminLayout';
 import AdminProfilePage from './pages1/AdminProfilePage';
@@ -46,53 +47,9 @@ import DashboardPage1 from './pages1/DashboardPage1';
 import TermsOfService from "./pages1/TermsOfService"; 
 import { useLocalStorage } from "@mantine/hooks";
 
-<<<<<<< HEAD
-// Create a simple callback component to handle Auth0 redirects
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader, Center, Text } from "@mantine/core";
 
-// Callback component to handle Auth0 redirects
-function CallbackPage() {
-  const { handleRedirectCallback, isLoading, error } = useAuth0();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        await handleRedirectCallback();
-        navigate("/login"); // Redirect back to login to process the authentication
-      } catch (error) {
-        console.error("Callback error:", error);
-        navigate("/login");
-      }
-    };
-
-    handleCallback();
-  }, [handleRedirectCallback, navigate]);
-
-  if (error) {
-    return (
-      <Center style={{ height: '100vh' }}>
-        <Text color="red">Authentication error: {error.message}</Text>
-      </Center>
-    );
-  }
-
-  return (
-    <Center style={{ height: '100vh' }}>
-      <div style={{ textAlign: 'center' }}>
-        <Loader size="lg" color="teal" />
-        <Text mt="md" c="dimmed">Processing authentication...</Text>
-      </div>
-    </Center>
-  );
-}
-
-=======
 import PartnerActionsManagement from './components/userDashboard/feedback/PartnerActionsManagement'
->>>>>>> 6fc339b (add notifications)
+
 const theme = {
   colorScheme: "light",
   primaryColor: "blue",
@@ -162,12 +119,11 @@ function MainApp() {
             <Route path="quote-resource" element={<QuoteResourcesPage />} />
             <Route path="habit-tips" element={<Tips />} />
             <Route path="tips" element={<Tips />} />
-<<<<<<< HEAD
-            <Route path="tip-resources" element={<Tips />} />
-            <Route path="insights" element={<Insights />} />
-=======
-            <Route path='partneractions' element={<PartnerActionsManagement />}/>
->>>>>>> 6fc339b (add notifications)
+
+            <Route path="tip-resources" element={<TipResourcesPage />} />
+
+
+    
           </Route>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage1 />} />

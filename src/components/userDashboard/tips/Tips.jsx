@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-<<<<<<< HEAD
 
-=======
->>>>>>> 6fc339b (add notifications)
 import {
   Card,
   Center,
@@ -14,43 +11,17 @@ import {
   Button,
   Group,
   Box,
-  Divider,
+
+  Image
 } from "@mantine/core";
 import useTip from "./tipsutil";
+import stickyQuotesImg from '../../../assets/stiky-quotes.jpg';
 
-
-const TipCard = ({ tip }) => (
-  <Card withBorder radius="md" p="md" shadow="xs">
-    <Text>{tip?.text}</Text>
-    <Text size="sm" align="right" c="dimmed" mt="sm">
-      — {tip?.category || "Unknown"}
-    </Text>
-  </Card>
-);
-
-
-const ResourceCard = ({ resource }) => (
-  <Card withBorder radius="md" p="md" shadow="xs">
-    <Text fw={500}>{resource?.title}</Text>
-    <Text size="sm" c="dimmed" mt="xs">
-      {resource?.description}
-    </Text>
-    <Text size="xs" mt="xs">
-      <a href={resource?.link} target="_blank" rel="noopener noreferrer">
-        Visit Resource
-      </a>
-    </Text>
-  </Card>
-);
 
 const Tips = () => {
   const { tips, loading, error, fetchtip } = useTip();
   const [tipIndex, setTipIndex] = useState(0);
-<<<<<<< HEAD
-  
-  // Debug logging
-  console.log('Tips component rendered:', { tips, loading, error, tipIndex });
-=======
+
 
   const [adminTips, setAdminTips] = useState([]);
   const [resources, setResources] = useState([]);
@@ -69,7 +40,7 @@ const Tips = () => {
     setResources(json.data);
   };
 
->>>>>>> 6fc339b (add notifications)
+
   const fetchNextTip = () => {
     if (tips.length === 0) return;
     setTipIndex((prev) => (prev + 1 >= tips.length ? 0 : prev + 1));
@@ -80,86 +51,24 @@ const Tips = () => {
     setTipIndex((prev) => (prev - 1 < 0 ? tips.length - 1 : prev - 1));
   };
 
-<<<<<<< HEAD
-  // Ensure tipIndex is within bounds
-  const safeTipIndex = Math.min(tipIndex, tips.length - 1);
-  const currentTip = tips[safeTipIndex];
 
-  // Reset tipIndex when tips change
-  useEffect(() => {
-    if (tips.length > 0 && tipIndex >= tips.length) {
-      setTipIndex(0);
-    }
-  }, [tips, tipIndex]);
-=======
   useEffect(() => {
     fetchAdminTips();
     fetchResources();
 
   }, []);
->>>>>>> 6fc339b (add notifications)
 
-  return (
-<<<<<<< HEAD
-    <Container size="lg" py="xl">
-      <Stack align="center" spacing="md">
-        <Title order={2} style={{ color: '#ff922b', fontWeight: 700 }}>Daily Habit Tip</Title>
-        {loading ? (
-          <Center>
-            <Loader size="lg" color="orange" />
-            <Text mt="md" color="#666">Loading your daily tip...</Text>
-          </Center>
-        ) : error ? (
-          <Card shadow="md" padding="lg" radius="md" withBorder style={{ background: '#fff3e0', border: '1px solid #ffd180' }}>
-            <Stack align="center" spacing="md">
-              <Text c="red" fw={600}>Unable to load tips</Text>
-              <Text size="sm" c="#666" ta="center">{error}</Text>
-              <Button onClick={fetchtip} variant="light" color="orange">
-                Try Again
-              </Button>
-            </Stack>
-          </Card>
-        ) : (
-          <Card shadow="md" padding="xl" radius="lg" withBorder style={{ 
-            background: 'rgba(255,255,255,0.95)', 
-            border: '2px solid #ffd180',
-            maxWidth: 600,
-            width: '100%'
-          }}>
-            {tips?.length > 0 ? (
-              <>
-                <Text size="lg" style={{ lineHeight: 1.6, color: '#333' }}>
-                  {currentTip?.content}
-                </Text>
-                <Text size="sm" align="right" c="dimmed" mt="md">
-                  — {currentTip?.category || "Habit Building"}
-                </Text>
-                <Group justify="center" align="center" mt="xl">
-                  <Button onClick={fetchPrevTip} variant="light" color="orange">
-                    Previous Tip
-                  </Button>
-                  <Button onClick={fetchNextTip} variant="filled" color="orange">
-                    Next Tip
-                  </Button>
-                </Group>
-                <Text size="xs" c="dimmed" ta="center" mt="md">
-                  Tip {safeTipIndex + 1} of {tips.length}
-                </Text>
-              </>
-            ) : (
-              <Stack align="center" spacing="md">
-                <Text color="dimmed" size="lg">No tips available at the moment.</Text>
-                <Text size="sm" c="#666" ta="center">
-                  Check back later for helpful habit-building tips!
-                </Text>
-                <Button onClick={fetchtip} variant="light" color="orange">
-                  Refresh
-                </Button>
-              </Stack>
-            )}
-          </Card>
-        )}
-=======
+
+ 
+          </Stack>
+        </Box>
+        {/* Right: Sticky Quotes Image */}
+        <Card shadow="xl" p={0} radius={24} style={{ minWidth: 320, maxWidth: 400, flex: '0 0 370px', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(120deg, #fffaf3 0%, #ffe0b2 100%)', border: '2.5px solid #ffe0b2', boxShadow: '0 8px 32px 0 rgba(255,146,43,0.15)' }}>
+          <Image src={stickyQuotesImg} alt="Sticky Quotes" radius={24} fit="cover" w={350} h={350} style={{ objectFit: 'cover', borderRadius: 24 }} />
+        </Card>
+      </Box>
+
+
     <Container size="sm" py="xl">
       <Stack spacing="xl">
         {/* --- Daily Tip Section --- */}
@@ -222,8 +131,9 @@ const Tips = () => {
             </Stack>
           )}
         </Box>
->>>>>>> 6fc339b (add notifications)
+
       </Stack>
+
     </Container>
   );
 };
